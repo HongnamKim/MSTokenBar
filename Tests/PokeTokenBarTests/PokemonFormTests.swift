@@ -230,47 +230,6 @@ final class PokemonFormTests: XCTestCase {
 
     // MARK: Hatch
 
-    func testHatchUsesThePreparedFormOfAnyLine() async throws {
-        var state = CompanionState()
-        state.pendingHatchID = 492
-        state.pendingForm = sky
-        state.eggUsage = PokemonBalance.eggHatchThreshold
-        let s = try store(state)
-        await s.hatchIfNeeded()
-        XCTAssertEqual(s.state.active?.baseID, 492)
-        XCTAssertEqual(s.state.active?.form, sky)
-        XCTAssertEqual(s.currentForm, sky)
-        XCTAssertNil(s.state.pendingForm)
-    }
-
-    func testEvolutionNamesTheFormLikeHatchAndGraduation() async throws {
-        let east = PokemonForm("east")
-        var state = CompanionState()
-        state.language = .en
-        state.pendingHatchID = 422
-        state.pendingForm = east
-        state.eggUsage = PokemonBalance.eggHatchThreshold
-        let s = try store(state)
-        await s.hatchIfNeeded()
-        s.applyUsage(PokemonBalance.phaseThreshold(rarity: .common, totalForms: 2, stageIndex: 0))
-        XCTAssertEqual(s.state.active?.currentID, 423)
-        XCTAssertEqual(s.justEvolvedTo,
-                       PokemonForm.displayName("Gastrodon", speciesID: 423, form: east, language: .en))
-        XCTAssertNotEqual(s.justEvolvedTo, "Gastrodon", "East Sea Gastrodon must not read as the default West Sea")
-    }
-
-    func testHatchWithoutPreparationRollsAmongTheLineForms() async throws {
-        var seen = Set<PokemonForm>()
-        for seed in UInt64(1)...24 {
-            let s = try store(CompanionState(), seed: seed)
-            await s.hatch(baseID: 412)
-            let form = try XCTUnwrap(s.state.active?.form)
-            XCTAssertTrue(PokemonForm.lineForms(baseID: 412).contains(form))
-            seen.insert(form)
-        }
-        XCTAssertEqual(seen, Set(PokemonForm.lineForms(baseID: 412)))
-    }
-
     func testRevealedDittoDropsTheDisguiseForm() async throws {
         let json = """
         {"installBaselineSet":true,"usedSinceInstall":1000000000,"lastDate":"d1","dex":[],"collectedFinals":[],

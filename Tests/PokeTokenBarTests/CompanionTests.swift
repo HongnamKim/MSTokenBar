@@ -140,36 +140,6 @@ private actor SuspendedLineProvider: PokeProviding {
     }
 }
 
-private actor SuspendedFailingIndexProvider: PokeProviding {
-    private var continuation: CheckedContinuation<[BaseSpecies], Error>?
-    private var failNextRequest = false
-
-    func line(baseSpeciesID: Int) async throws -> EvoLine { throw URLError(.notConnectedToInternet) }
-
-    func baseSpeciesIndex() async throws -> [BaseSpecies] {
-        if failNextRequest {
-            failNextRequest = false
-            throw URLError(.notConnectedToInternet)
-        }
-        return try await withCheckedThrowingContinuation { continuation in
-            precondition(self.continuation == nil, "only one index request may be suspended")
-            self.continuation = continuation
-        }
-    }
-
-    func baseSpecies(id: Int) async throws -> BaseSpecies? { throw URLError(.notConnectedToInternet) }
-    func isSuspended() -> Bool { continuation != nil }
-
-    func resumeFailure() {
-        guard let pending = continuation else {
-            failNextRequest = true
-            return
-        }
-        continuation = nil
-        pending.resume(throwing: URLError(.notConnectedToInternet))
-    }
-}
-
 private actor SuspendedFailingLineProvider: PokeProviding {
     private var continuation: CheckedContinuation<EvoLine, Error>?
     private var failNextRequest = false
@@ -229,17 +199,15 @@ private struct LineThrowsProvider: PokeProviding {
     func baseSpeciesIndex() async throws -> [BaseSpecies] { [] }
 }
 
-/// 샘플러 테스트용 — 주입한 base 인덱스 + 요청 id 그대로의 무진화 라인 반환.
+/// 부화 경로 테스트용 — 요청 id 그대로의 무진화 라인 반환. `failAll` = 라인 조회 실패(오프라인).
+/// 종 선정은 내장 카탈로그(`HatchPlanner`)라 provider 를 타지 않는다.
 final class IndexProvider: PokeProviding, @unchecked Sendable {
-    nonisolated(unsafe) var index: [BaseSpecies] = []
     nonisolated(unsafe) var failAll = false
     func line(baseSpeciesID: Int) async throws -> EvoLine {
-        makeLine(base: baseSpeciesID, tree: node(baseSpeciesID))
-    }
-    func baseSpeciesIndex() async throws -> [BaseSpecies] {
         if failAll { throw PokeStubError.boom }
-        return index
+        return makeLine(base: baseSpeciesID, tree: node(baseSpeciesID))
     }
+    func baseSpeciesIndex() async throws -> [BaseSpecies] { [] }
 }
 
 private func allIDs(_ n: EvoNode) -> [Int] { [n.speciesID] + n.children.flatMap(allIDs) }
@@ -1303,9 +1271,9 @@ final class CompanionStoreTests: XCTestCase {
     func testReloadPreservesCompleteShortPlannedRouteLength() async {
         let line = makeLine(base: 1, tree: node(1, [node(2), node(3, [node(4)])]))
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-reload-plan-\(UUID().uuidString).json")
-        let s1 = CompanionStore(provider: StubProvider(value: line), clock: { fixedNow }, fileURL: url, rng: SeededRNG(seed: 7))
+        let s1 = CompanionStore(provider: StubProvider(value: line), clock: { fixedNow }, fileURL: url, rng: SequenceRNG([0]))
         await s1.hatch(baseID: 1)
-        XCTAssertEqual(s1.state.active?.plannedPathIDs, [1, 2], "seed selects the short complete route")
+        XCTAssertEqual(s1.state.active?.plannedPathIDs, [1, 2], "roll 0 selects the short complete route")
 
         var opposing = SeededRNG(seed: 1)
         XCTAssertEqual(opposing.next() % 2, 1, "a reroll would select the opposite branch (3)")
@@ -1625,50 +1593,6 @@ final class CompanionIdentityTests: XCTestCase {
         return CompanionStore(provider: StubProvider(value: line), clock: { fixedNow }, fileURL: url, rng: SeededRNG(seed: seed))
     }
 
-    /// 직접 hatch(baseID:) 는 rng 를 shiny → nature 순으로 소비한다. 같은 시드 재생으로 기대값 산출.
-    private func expectedRoll(seed: UInt64) -> (shiny: Bool, nature: PokemonNature) {
-        var rng = SeededRNG(seed: seed)
-        let shiny = rng.next() % PokemonOdds.shinyDenominator == 0
-        let nature = PokemonNature.allCases[Int(rng.next() % UInt64(PokemonNature.allCases.count))]
-        return (shiny, nature)
-    }
-
-    /// 임의 시드에서 부화 롤이 결정적이고 성격이 항상 부여되는지.
-    func testHatchAssignsDeterministicShinyAndNature() async {
-        for seed: UInt64 in [1, 7, 42, 12345] {
-            let s = store(linear3, seed: seed)
-            let expected = expectedRoll(seed: seed)
-            await s.hatch(baseID: 1)
-            XCTAssertEqual(s.state.active?.isShiny, expected.shiny, "seed \(seed)")
-            XCTAssertEqual(s.state.active?.nature, expected.nature, "seed \(seed)")
-        }
-    }
-
-    /// shiny 가 실제로 나오는 시드를 탐색해 true 경로를 검증(1/64 확률이 코드에 존재함을 보장).
-    func testShinyPathReachable() async {
-        var shinySeed: UInt64?
-        for seed: UInt64 in 0..<5000 where expectedRoll(seed: seed).shiny { shinySeed = seed; break }
-        guard let seed = shinySeed else { return XCTFail("5000개 시드 중 shiny 없음 — 분모 확인") }
-        let s = store(linear3, seed: seed)
-        await s.hatch(baseID: 1)
-        XCTAssertEqual(s.state.active?.isShiny, true)
-        XCTAssertTrue(s.currentIsShiny)
-    }
-
-    /// 진화를 거쳐 졸업해도 shiny/nature 가 도감 항목에 보존되는지.
-    func testGraduateCarriesIdentityToDex() async {
-        let s = store(noEvo, seed: 3)   // 무진화 → 임계 도달 시 바로 졸업
-        await s.hatch(baseID: 20)
-        let shiny = s.state.active!.isShiny
-        let nature = s.state.active!.nature
-        XCTAssertNotNil(nature)
-        s.applyUsage(PokemonBalance.graduationTotal(.common))
-        XCTAssertNil(s.state.active)   // 졸업
-        XCTAssertEqual(s.state.dex.count, 1)
-        XCTAssertEqual(s.state.dex[0].isShiny, shiny)
-        XCTAssertEqual(s.state.dex[0].nature, nature)
-    }
-
     /// 구버전 저장(shiny/nature 키 없음) 디코딩 — 기본값(false/nil)으로 로드.
     func testBackwardCompatibleDecode() throws {
         let old = """
@@ -1781,28 +1705,6 @@ final class CompanionIdentityTests: XCTestCase {
         XCTAssertEqual(s.state.active?.usedAtStage, 123)
     }
 
-    /// [회귀] 부화 이월(overflow)로 즉시 진화해도 마지막 연출은 hatch(shiny) — evolve 가 버스트를 덮지 않는다.
-    func testShinyBurstSurvivesOverflowEvolve() async {
-        // hatchIfNeeded 경로: chooseBase(1) → shiny(2) → nature(3) 순 rng 소비. shiny 시드 탐색.
-        func rollsShinyViaHatchIfNeeded(_ seed: UInt64) -> Bool {
-            var r = SeededRNG(seed: seed)
-            _ = r.next()   // chooseBase: 가중 선택 롤(정확히 1회)
-            return r.next() % PokemonOdds.shinyDenominator == 0
-        }
-        var seed: UInt64?
-        for s: UInt64 in 0..<20000 where rollsShinyViaHatchIfNeeded(s) { seed = s; break }
-        guard let seed else { return XCTFail("shiny 시드 탐색 실패") }
-
-        let s = store(linear3, seed: seed)
-        s.update(todayTokensByProvider: ["test": 0], todayDate: "d1", monthTotal: 0, burnTier: .idle, limitWarning: false, hasUsageData: true)
-        // 알 임계(5M) + stage0 임계(125M) 초과 → 부화 즉시 1회 진화하는 이월
-        s.update(todayTokensByProvider: ["test": 135_000_000], todayDate: "d1", monthTotal: 0, burnTier: .idle, limitWarning: false, hasUsageData: true)
-        await s.hatchIfNeeded()
-        XCTAssertEqual(s.state.active?.isShiny, true)
-        XCTAssertEqual(s.state.active?.stageIndex, 1, "이월로 1회 진화했어야 함")
-        XCTAssertEqual(s.celebration, .hatch(shiny: true), "evolve 가 shiny 부화 버스트를 덮으면 안 된다")
-    }
-
     /// [회귀] 이월이 졸업 총량을 넘어 부화 즉시 졸업한 극단 케이스 — hatch 연출은 생략(이미 도감행).
     func testHatchCelebrationSkippedOnInstantGraduate() async {
         let s = store(noEvo, seed: 11)
@@ -1834,72 +1736,9 @@ final class CompanionIdentityTests: XCTestCase {
         return st
     }
 
-    /// 누적 가중 선택이 결정적이다 — 정확히 1롤, 롤 값이 가중 구간에 매핑.
-    func testSamplerWeightedPickDeterministic() async {
-        let index = [BaseSpecies(id: 10, captureRate: 100),
-                     BaseSpecies(id: 20, captureRate: 100),
-                     BaseSpecies(id: 30, captureRate: 100)]
-        for seed: UInt64 in [1, 7, 42, 999] {
-            var r = SeededRNG(seed: seed)
-            let roll = Int(r.next() % 300)
-            let expected = index[roll / 100].id      // 구간: [0,100)→10, [100,200)→20, [200,300)→30
-            let p = IndexProvider(); p.index = index
-            let s = samplerStore(p, seed: seed, preloadState: eggReadyState())
-            await s.hatchIfNeeded()
-            XCTAssertEqual(s.state.active?.baseID, expected, "seed \(seed) roll \(roll)")
-        }
-    }
-
-    /// capture_rate 가 곧 가중치 — cr 비율만큼 선택 구간이 좁아진다 (희귀種 낮은 확률).
-    func testSamplerCaptureRateIsWeight() async {
-        // [common 254, legendary 2] → roll 0..253 → common, 254..255 → legendary
-        let index = [BaseSpecies(id: 100, captureRate: 254), BaseSpecies(id: 200, captureRate: 2)]
-        var legendarySeed: UInt64?, commonSeed: UInt64?
-        for seed: UInt64 in 0..<3000 {
-            var r = SeededRNG(seed: seed)
-            let roll = Int(r.next() % 256)
-            if roll >= 254, legendarySeed == nil { legendarySeed = seed }
-            if roll < 254, commonSeed == nil { commonSeed = seed }
-            if legendarySeed != nil, commonSeed != nil { break }
-        }
-        for (seed, expected) in [(commonSeed!, 100), (legendarySeed!, 200)] {
-            let p = IndexProvider(); p.index = index
-            let s = samplerStore(p, seed: seed, preloadState: eggReadyState())
-            await s.hatchIfNeeded()
-            XCTAssertEqual(s.state.active?.baseID, expected)
-        }
-    }
-
-    /// 이미 수집한 base 는 가중치 ½ — 경계 롤에서 선택 구간이 바뀌는 것으로 검증.
-    func testSamplerHalvesCollectedWeight() async {
-        // 미수집: [200, 200] → 경계 200. id=1 수집 시: [100, 200] → 경계 100.
-        // roll ∈ [100, 200) 인 시드는 수집 전엔 id=1, 수집 후엔 id=2 를 뽑는다.
-        let index = [BaseSpecies(id: 1, captureRate: 200), BaseSpecies(id: 2, captureRate: 200)]
-        // 같은 시드 → 같은 원시 롤값 v. 미수집 총합 400 / 수집 후 총합 300 으로 모듈로만 달라진다.
-        // v%400 < 200 (미수집 → id=1) 이면서 v%300 ≥ 100 (수집 후 → id=2) 인 시드를 찾는다.
-        var found: UInt64?
-        for seed: UInt64 in 0..<5000 {
-            var r = SeededRNG(seed: seed)
-            let v = r.next()
-            if v % 400 < 200, v % 300 >= 100 { found = seed; break }
-        }
-        guard let seed = found else { return XCTFail("시드 탐색 실패") }
-        // 수집 전: id=1 구간
-        let p1 = IndexProvider(); p1.index = index
-        let s1 = samplerStore(p1, seed: seed, preloadState: eggReadyState())
-        await s1.hatchIfNeeded()
-        XCTAssertEqual(s1.state.active?.baseID, 1)
-        // id=1 수집 후: 같은 시드가 id=2 구간으로 밀림 (가중치 ½ 효과)
-        let p2 = IndexProvider(); p2.index = index
-        let s2 = samplerStore(p2, seed: seed, preloadState: eggReadyState(collected: ["1:1"]))
-        await s2.hatchIfNeeded()
-        XCTAssertEqual(s2.state.active?.baseID, 2, "수집済 가중치 ½ 로 선택 구간이 이동해야 한다")
-    }
-
     /// 알 상태 프리패칭 — update 틱에 종이 pre-roll 되어 영속되고, 부화는 pending 을 그대로 사용.
     func testEggPrefetchStoresPendingAndHatchUsesIt() async {
         let p = IndexProvider()
-        p.index = [BaseSpecies(id: 77, captureRate: 255)]
         var st = CompanionState()
         st.installBaselineSet = true
         st.lastDate = "d1"
@@ -1907,19 +1746,18 @@ final class CompanionIdentityTests: XCTestCase {
         // 임계 미만 사용 → 부화는 안 되지만 프리패칭은 돌아야 한다
         s.update(todayTokensByProvider: ["test": 1_000], todayDate: "d1", monthTotal: 0, burnTier: .idle, limitWarning: false, hasUsageData: true)
         for _ in 0..<50 where s.state.pendingHatchID == nil { await Task.yield() }
-        XCTAssertEqual(s.state.pendingHatchID, 77, "알 상태에서 종이 미리 롤/저장돼야 한다")
-        // 임계 도달 → 부화는 pending 그대로 (추가 선택 롤 없음: shiny/nature 만 소비)
+        guard let pending = s.state.pendingHatchID else { return XCTFail("알 상태에서 종이 미리 롤/저장돼야 한다") }
+        XCTAssertTrue(GunplaID.isGunpla(pending))
+        // 임계 도달 → 부화는 pending 그대로 (추가 선택 롤 없음)
         s.update(todayTokensByProvider: ["test": 6_000_000], todayDate: "d1", monthTotal: 0, burnTier: .idle, limitWarning: false, hasUsageData: true)
         await s.hatchIfNeeded()
-        XCTAssertEqual(s.state.active?.baseID, 77)
+        XCTAssertEqual(s.state.active?.baseID, pending)
         XCTAssertNil(s.state.pendingHatchID, "부화 후 pending 은 비워져야 한다")
-        XCTAssertNotNil(s.state.active?.nature)
     }
 
     /// 요청 실패 뒤 provider 가 복구되면 다음 부화 시도가 성공하고 지연 안내가 사라진다.
     func testFailedHatchRetriesAfterProviderRecovers() async {
         let p = IndexProvider()
-        p.index = [BaseSpecies(id: 88, captureRate: 255)]
         p.failAll = true
         let s = samplerStore(p, seed: 9, preloadState: eggReadyState())
 
@@ -1930,11 +1768,11 @@ final class CompanionIdentityTests: XCTestCase {
         p.failAll = false
         await s.hatchIfNeeded()
 
-        XCTAssertEqual(s.state.active?.baseID, 88)
+        XCTAssertTrue(GunplaID.isGunpla(s.state.active?.baseID ?? 0))
         XCTAssertFalse(s.isHatchRetryDelayed)
     }
 
-    /// 오프라인(인덱스 취득 실패) — 알 진행 보존, isHatching 해제, 다음 틱 재시도 가능.
+    /// 오프라인(라인 조회 실패) — 알 진행 보존, isHatching 해제, 다음 틱 재시도 가능.
     func testSamplerOfflineKeepsEgg() async {
         let p = IndexProvider()
         p.failAll = true
@@ -2081,48 +1919,6 @@ final class CompanionIdentityTests: XCTestCase {
 
         try store.applySave(envelope, todayTokensByProvider: [:], todayDate: "2026-09-11", hasUsageData: false)
         XCTAssertFalse(store.isHatchRetryDelayed, "세이브 임포트 시 이전 대기 플래그가 클리어되어야 함")
-    }
-
-    @MainActor
-    func testPrefetchFailureMarksEggThatBecameReadyDuringRequest() async {
-        let provider = SuspendedFailingIndexProvider()
-        var state = CompanionState()
-        state.installBaselineSet = true
-        state.lastDate = "d1"
-        state.eggUsage = PokemonBalance.eggHatchThreshold - 1
-        state.claimedTodayTokensByProvider = ["test": 0]
-        let store = samplerStore(provider, seed: 42, preloadState: state)
-
-        store.update(todayTokensByProvider: ["test": 0], todayDate: "d1", monthTotal: 0,
-                     burnTier: .idle, limitWarning: false, hasUsageData: true)
-        let prefetchSuspended = await waitUntilAsync { await provider.isSuspended() }
-        XCTAssertTrue(prefetchSuspended)
-
-        store.update(todayTokensByProvider: ["test": 1], todayDate: "d1", monthTotal: 0,
-                     burnTier: .idle, limitWarning: false, hasUsageData: true)
-        await provider.resumeFailure()
-
-        let retryDelayed = await waitUntil { store.isHatchRetryDelayed }
-        XCTAssertTrue(retryDelayed)
-        XCTAssertTrue(store.isEgg)
-        XCTAssertEqual(store.eggProgress, 1)
-    }
-
-    @MainActor
-    func testStaleSpeciesSelectionFailureDoesNotMarkImportedEggDelayed() async throws {
-        let provider = SuspendedFailingIndexProvider()
-        let store = samplerStore(provider, seed: 42, preloadState: eggReadyState())
-        let hatch = Task { await store.hatchIfNeeded() }
-        let selectionSuspended = await waitUntilAsync { await provider.isSuspended() }
-        XCTAssertTrue(selectionSuspended)
-
-        try store.applySave(importedFreshEggEnvelope(), todayTokensByProvider: [:],
-                            todayDate: "2026-09-11", hasUsageData: false)
-        await provider.resumeFailure()
-        await hatch.value
-
-        XCTAssertFalse(store.isHatchRetryDelayed)
-        XCTAssertEqual(store.eggProgress, 0)
     }
 
     @MainActor

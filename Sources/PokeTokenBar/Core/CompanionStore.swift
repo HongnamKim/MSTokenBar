@@ -1574,7 +1574,7 @@ final class CompanionStore {
         if let pending = state.pendingHatchID {
             base = pending
         } else {
-            base = await chooseBase()
+            base = chooseBase()
         }
         guard isCurrentReadyEgg(generation: generation) else {
             AppLog.write("hatch: discarded before result handling — subject replaced during species roll")
@@ -1585,8 +1585,7 @@ final class CompanionStore {
             isHatchRetryDelayed = true
             return
         }
-        let pendingForm = state.pendingHatchID == base ? state.pendingForm : nil
-        await hatchCore(baseID: base, generation: generation, form: pendingForm)
+        await hatchCore(baseID: base, generation: generation)
     }
 
     /// 부화가 폐기된 뒤 남은 개체(대개 방금 불러온 개체)의 진화 라인을 다시 로드한다.
@@ -1633,7 +1632,7 @@ final class CompanionStore {
         defer { finishEggPrefetch(generation: generation, shouldHatch: shouldHatch) }
 
         if state.pendingHatchID == nil {
-            let selected = await chooseBase()
+            let selected = chooseBase()
             // await 사이에 부화가 끝났거나(active != nil) 상태가 통째로 교체됐으면(세이브 불러오기)
             // 이 롤을 버린다 — 안 그러면 불러온 알의 pre-roll 을 남의 롤로 덮어쓴다.
             guard isCurrentEgg(generation: generation) else { return }
@@ -1642,7 +1641,6 @@ final class CompanionStore {
                 return
             }
             state.pendingHatchID = id
-            state.pendingForm = rollLineForm(baseID: id)
             save()
         }
         guard let id = state.pendingHatchID else { return }
@@ -1675,13 +1673,6 @@ final class CompanionStore {
         prefetchedLineID = id
         isHatchRetryDelayed = false
         shouldHatch = true
-    }
-
-    /// Draws only for lines with forms, so other species keep their random sequence.
-    private func rollLineForm(baseID: Int) -> PokemonForm? {
-        let forms = PokemonForm.lineForms(baseID: baseID)
-        guard !forms.isEmpty else { return nil }
-        return PokemonForm.roll(rng.next(), among: forms, collected: state.collectedLineForms(baseID: baseID))
     }
 
     /// Warms the localized names the hatch, evolution and graduation messages of this line show.
@@ -1717,26 +1708,14 @@ final class CompanionStore {
 
     // MARK: 메타몽 위장/리빌
 
-    /// 메타몽 위장 롤 판정(순수) — common·≥2형태만, 미리 뽑은 roll 값으로 1/128. (부수효과 없이 xctest)
-    nonisolated static func dittoDisguiseHit(rarity: Rarity, totalForms: Int, roll: UInt64) -> Bool {
-        rarity == .common && totalForms >= 2 && roll % PokemonOdds.dittoDisguiseDenominator == 0
-    }
+    /// 보유한 도색 공구 단계 — Task 4 가 실제 계산으로 교체할 임시값(공구 없음).
+    var toolLevel: Int { 0 }
 
-    /// 이로치 부화 분모 — 부적 보유 48, 없으면 64. 판정과 알림 문구가 같은 값을 쓰도록 여기가 단일 소스다.
-    nonisolated static func shinyDenominator(charmOwned: Bool) -> UInt64 {
-        charmOwned ? ShinyCharm.shinyDenominator : PokemonOdds.shinyDenominator
-    }
-
-    /// 지금 부화하면 적용될 이로치 분모.
-    var shinyDenominator: UInt64 { Self.shinyDenominator(charmOwned: ownsShinyCharm) }
-
-    /// 이로치 부화 판정(순수) — 미리 뽑은 roll 값 % 분모==0. (부수효과 없이 xctest)
-    nonisolated static func rollsShiny(roll: UInt64, charmOwned: Bool) -> Bool {
-        roll % shinyDenominator(charmOwned: charmOwned) == 0
-    }
+    /// 지금 박스를 열면 적용될 전용기(이로치) 분모. 선정(`HatchPlanner`)과 알림 문구가 같은 값을 쓴다.
+    var shinyDenominator: UInt64 { ToolSet.shinyDenominator(toolLevel: toolLevel) }
 
     /// 실제 부화 로직 — isHatching 락은 호출자(hatch / hatchIfNeeded)가 소유·해제한다.
-    private func hatchCore(baseID: Int, generation: Int, form pendingForm: PokemonForm? = nil) async {
+    private func hatchCore(baseID: Int, generation: Int) async {
         let line: EvoLine
         do {
             line = try await provider.line(baseSpeciesID: baseID)
@@ -1777,48 +1756,35 @@ final class CompanionStore {
         state.eggTier = nil   // 보증은 이 부화로 소비된다(다음 알은 다시 무보증)
         let prayers = state.eggPrayers   // 부화체에 옮기고 알 쪽은 비운다
         state.resetEggPrayers()
-        // 개체 롤 — shiny(1/64, 부적 1/48)·성격(25종)은 부화 순간 확정, 진화해도 유지.
-        // 알림 문구는 이 판정과 같은 분모를 보여준다.
+        // 이로치 = 전용기. 롤하지 않는다 — 전용기 여부는 선정(`chooseBase`)에서 이미 정해져 시작 종 id 에 담겨 있다.
+        // 성격·폼·메타몽 위장·전투 프로필은 건프라에 없는 개념이라 만들지 않는다.
+        // 알림 문구는 선정에 쓰인 것과 같은 분모를 보여준다.
         let shinyOdds = shinyDenominator
-        let isShiny = Self.rollsShiny(roll: rng.next(), charmOwned: ownsShinyCharm)
-        let nature = PokemonNature.allCases[Int(rng.next() % UInt64(PokemonNature.allCases.count))]
-        // 메타몽 위장 롤 — common·≥2형태에 한해 1/128. .app 게이트(&& 단락 → 비앱에선 rng 미소비로
-        // 기존 테스트 RNG 시퀀스 무영향). 위장/리빌 로직은 상태 기반으로 별도 테스트한다.
-        var dittoDisguise: Int?
-        if dittoDisguiseRollingEnabled,
-           Self.dittoDisguiseHit(rarity: line.rarity, totalForms: line.totalForms, roll: rng.next()) {
-            dittoDisguise = line.baseID
-        }
+        let isShiny = MachineCatalog.shared.machine(speciesID: line.baseID)?.variantOf != nil
         let evolutionPlan = makeEvolutionPlan(from: line.tree, baseID: line.baseID)
-        var profile = PokemonProfile.generate(seed: rng.next())
-        if let details = pokemonDetailsByID[line.baseID] { profile.enrich(with: details) }
         let hasGrowthBoost = state.hasCollectedFinal(forBaseID: line.baseID)
-        let form = pendingForm ?? rollLineForm(baseID: line.baseID)
-        // 위장 중엔 이로치를 숨긴다 — 부화 알림·연출도 일반체로(정체는 리빌 때 공개).
-        let showShiny = isShiny && dittoDisguise == nil
         activeGeneration += 1
         state.active = MonState(baseID: line.baseID, pathIDs: [line.baseID], plannedPathIDs: evolutionPlan,
                                 stageIndex: 0, usedAtStage: 0, rarity: line.rarity, totalForms: evolutionPlan.count,
-                                isShiny: isShiny, nature: nature, profile: profile, hasGrowthBoost: hasGrowthBoost,
-                                dittoDisguise: dittoDisguise, form: form, prayers: prayers)
-        AppLog.write("hatch: base=\(line.baseID) rarity=\(line.rarity) shiny=\(isShiny) forms=\(evolutionPlan.count) boost=\(hasGrowthBoost) ditto=\(dittoDisguise != nil)")
+                                isShiny: isShiny, hasGrowthBoost: hasGrowthBoost, prayers: prayers)
+        AppLog.write("hatch: base=\(line.baseID) rarity=\(line.rarity) shiny=\(isShiny) forms=\(evolutionPlan.count) boost=\(hasGrowthBoost)")
         let name = formDisplayName(line.localizedName(line.baseID, state.language),
-                                   speciesID: line.baseID, form: form)
+                                   speciesID: line.baseID, form: nil)
         let hatchBody: String
         if let prayers, prayers.count > 0 {
-            hatchBody = l.notifPrayerHatchBody(name, prayers: prayers.count, shiny: showShiny,
+            hatchBody = l.notifPrayerHatchBody(name, prayers: prayers.count, shiny: isShiny,
                                                rarity: line.rarity)
         } else {
-            hatchBody = showShiny ? l.notifShinyHatchBody(name, odds: shinyOdds) : l.notifHatchBody(name)
+            hatchBody = isShiny ? l.notifShinyHatchBody(name, odds: shinyOdds) : l.notifHatchBody(name)
         }
-        notifyCompanionEvent(showShiny ? l.notifShinyHatchTitle : l.notifHatchTitle, hatchBody)
+        notifyCompanionEvent(isShiny ? l.notifShinyHatchTitle : l.notifHatchTitle, hatchBody)
         justEvolvedTo = nil        // 새 부화는 "성장" 문구(진화 아님) — 직전 진화명이 남아 표시되지 않게
         displayState = .levelUp
         eventUntil = clock().addingTimeInterval(4)
         if overflow > 0 { applyUsage(overflow) }   // 이월분 즉시 반영(필요 시 진화/리빌까지)
         // 연출은 이월 진화 뒤에 발화 — 이월 evolve 가 shiny 부화 버스트를 덮지 않도록
         // 마지막 이벤트를 hatch 로 유지한다. 이월로 즉시 졸업한 극단 케이스면 생략(이미 도감행).
-        if state.active != nil { fireCelebration(.hatch(shiny: showShiny)) }
+        if state.active != nil { fireCelebration(.hatch(shiny: isShiny)) }
         save()
         if detailProvider != nil { Task { await self.loadPokemonDetails(speciesID: line.baseID) } }
     }
@@ -1903,63 +1869,17 @@ final class CompanionStore {
         }
     }
 
-    /// 부화 종 선정 — 하드코딩 풀 없이 PokéAPI 1~5세대 base 전체(329종)에서 가중 선택.
-    ///   ① base 인덱스(id + capture_rate)를 GraphQL 1쿼리로 취득(30일 디스크 캐시 → 보통 0콜)
-    ///   ② 가중치 = 공식 capture_rate 그대로(캐터피 255 vs 뮤츠 3 = 85:1, 전설군 ≈ 0.77%)
-    ///      단, 이미 수집한 base 는 가중치 ½(미수집 부스트 — 재부화/shiny 사냥은 열어둠)
-    ///   ③ 누적 가중치에서 정확히 1롤 — 루프/재롤 없음, 시간 상한 확정적
-    /// 인덱스 취득 실패(오프라인 + 캐시 없음) 시 nil → 알 유지, 다음 갱신 틱 재시도.
-    private func chooseBase() async -> Int? {
-        let tier = state.eggTier
-        if let full = try? await provider.baseSpeciesIndex(), !full.isEmpty {
-            // 등급 보증 알은 후보를 먼저 좁힌다 — capture_rate 상한이 곧 등급 하한이므로
-            // (Rarity.captureRateCeiling) 전설도 자연히 포함된다("희귀 이상"에 전설이 들어가는 게 정상).
-            // 좁힌 결과가 비면 보증을 못 지키므로 전체 풀로 폴백하지 말고 알을 유지한다(다음 틱 재시도).
-            let index = tier.map { t in full.filter { t.includes(captureRate: $0.captureRate) } } ?? full
-            guard !index.isEmpty else {
-                AppLog.write("hatch: no candidate for guaranteed \(tier?.rawValue ?? "none") — egg kept, retry next tick")
-                return nil
-            }
-            let weights = index.map { e in
-                CollectionWeight.adjusted(e.captureRate, isCollected: state.hasCollectedFinal(forBaseID: e.id))
-            }
-            let total = weights.reduce(0, +)
-            var r = Int(rng.next() % UInt64(total))
-            for (i, w) in weights.enumerated() {
-                r -= w
-                if r < 0 { return index[i].id }
-            }
-            return index.last?.id   // 도달 불가(방어)
+    /// 부화 기체 선정 — 전용기 여부 먼저 롤 → 졸업 안 한 후보에서 레어도 가중 1롤 → 지난번 도달 등급부터 시작.
+    /// 규칙 본체는 `HatchPlanner`(순수). 전용기 여부는 고른 시작 종 id 에서 다시 유도되므로
+    /// `pendingHatchID` 하나만 영속해도 된다. 카탈로그가 비어 있을 때만 nil → 알 유지.
+    private func chooseBase() -> Int? {
+        let catalog = MachineCatalog.shared
+        guard let choice = HatchPlanner.choose(catalog: catalog, snapshot: state.collectionSnapshot(catalog: catalog),
+                                               tier: state.eggTier, toolLevel: toolLevel, rng: &rng) else {
+            AppLog.write("hatch: no candidate for tier \(state.eggTier?.rawValue ?? "none") — egg kept, retry next tick")
+            return nil
         }
-        // GraphQL base 인덱스 엔드포인트 장애 → REST 폴백. 부화가 한 엔드포인트에 묶이지 않게.
-        AppLog.write("hatch: base index unavailable — REST fallback")
-        return await chooseBaseViaREST()
-    }
-
-    /// REST 폴백 — animated 에셋 지원 범위에서 무작위 id 를 뽑아 base 인지 확인(rejection sampling).
-    /// GraphQL 인덱스가 죽어도 부화가 되게 한다. 가중치(capture_rate)는 생략 — 희귀도는 부화 후
-    /// line() 이 실제 capture_rate 로 계산하므로 결과 개체의 등급은 정확하다. 인덱스 복구 시 가중 선택 재개.
-    private func chooseBaseViaREST() async -> Int? {
-        let tier = state.eggTier
-        for attempt in 1...16 {
-            let ids = PokemonAssets.animatedSpeciesIDs
-            let id = Int(rng.next() % UInt64(ids.count)) + ids.lowerBound
-            do {
-                if let bs = try await provider.baseSpecies(id: id) {
-                    // 등급 보증은 가중 경로와 **같은 기준**으로 여기서도 걸러야 한다 — 이 폴백만 빠지면
-                    // GraphQL 인덱스 장애 때 보증이 조용히 깨진다. 못 찾으면 알 유지(구매 소멸 금지).
-                    if let tier, !tier.includes(captureRate: bs.captureRate) { continue }
-                    AppLog.write("hatch: REST fallback picked base \(id) (cap \(bs.captureRate), \(attempt) tries)")
-                    return id
-                }
-                // nil = base 아님(진화 중간체) → 다음 시도
-            } catch {
-                AppLog.write("hatch: REST fallback network error — retry next tick: \(error)")
-                return nil   // REST 도 불가 → 알 유지, 다음 update 틱 재시도
-            }
-        }
-        AppLog.write("hatch: REST fallback exhausted 16 tries")
-        return nil
+        return choice.startSpeciesID
     }
 
     /// Today's total at the previous refresh, and when a rise in it was last seen. The enrichment scan's

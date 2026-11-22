@@ -6,8 +6,8 @@ import XCTest
 // 보증의 구현은 "capture_rate 상한 = 등급 하한"이라는 등식에 통째로 기대고 있다. 그 등식이 깨지는
 // 경로가 넷이라 각각을 트리거 브랜치로 재현한다:
 //   ① Rarity.captureRateCeiling 과 Rarity.from 의 임계가 갈림       → 전수 불변식 테스트
-//   ② 가중 선택(chooseBase)이 하한 미만을 뽑음                       → 대조군과 함께 반복 부화
-//   ③ REST 폴백(chooseBaseViaREST)만 필터를 안 탐                    → 인덱스를 죽이고 같은 검증
+//   ② 가중 선택(chooseBase → HatchPlanner, 내장 카탈로그)이 하한 미만을 뽑음 → 대조군과 함께 반복 부화
+//   ③ (삭제) REST 폴백 경로 — 건프라판은 네트워크 선정이 없다
 //   ④ 인덱스가 stale 이라 뽑은 종의 실제 등급이 하한 미만            → 부화 직전 최종 관문
 
 /// capture_rate 로 등급이 갈리는 다종 인덱스. 라인의 등급은 인덱스와 **같은 규칙**으로 계산한다.
@@ -32,23 +32,6 @@ private struct TieredProvider: PokeProviding {
                        rarity: Rarity.from(captureRate: e.captureRate,
                                            isLegendary: legendaryIDs.contains(e.id), isMythical: false),
                        names: [e.id: ["en": "M\(e.id)"]])
-    }
-}
-
-/// GraphQL 인덱스는 죽고 REST 만 사는 상황. 모든 id 가 base 이고 capture_rate 는 id 로 결정된다
-/// (3의 배수 = rare 30 · 그 외 짝수 = uncommon 100 · 나머지 = common 255) → 폴백의 rejection sampling 이
-/// 실제로 여러 번 돌면서 필터를 밟는다.
-private struct RestOnlyTieredProvider: PokeProviding {
-    static func captureRate(_ id: Int) -> Int { id % 3 == 0 ? 30 : (id % 2 == 0 ? 100 : 255) }
-    func baseSpeciesIndex() async throws -> [BaseSpecies] { throw URLError(.badServerResponse) }
-    func baseSpecies(id: Int) async throws -> BaseSpecies? {
-        BaseSpecies(id: id, captureRate: Self.captureRate(id))
-    }
-    func line(baseSpeciesID: Int) async throws -> EvoLine {
-        EvoLine(baseID: baseSpeciesID, tree: EvoNode(speciesID: baseSpeciesID, children: []),
-                rarity: Rarity.from(captureRate: Self.captureRate(baseSpeciesID),
-                                    isLegendary: false, isMythical: false),
-                names: [baseSpeciesID: ["en": "M\(baseSpeciesID)"]])
     }
 }
 
@@ -243,10 +226,10 @@ final class PremiumEggTests: XCTestCase {
         var guaranteedRarities: [Rarity] = []
         var controlRarities: [Rarity] = []
         for seed in UInt64(1)...20 {
-            let g = eggStore(tier: .rare, seed: seed, provider: TieredProvider())
+            let g = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.shared)
             await g.hatchIfNeeded()
             if let r = g.state.active?.rarity { guaranteedRarities.append(r) }
-            let c = eggStore(tier: nil, seed: seed, provider: TieredProvider())
+            let c = eggStore(tier: nil, seed: seed, provider: MachineCatalog.shared)
             await c.hatchIfNeeded()
             if let r = c.state.active?.rarity { controlRarities.append(r) }
         }
@@ -267,7 +250,7 @@ final class PremiumEggTests: XCTestCase {
     func testUncommonEggHatchesUncommonAndExcludesOnlyCommon() async {
         var sawUncommon = false
         for seed in UInt64(1)...20 {
-            let s = eggStore(tier: .uncommon, seed: seed, provider: TieredProvider())
+            let s = eggStore(tier: .uncommon, seed: seed, provider: MachineCatalog.shared)
             await s.hatchIfNeeded()
             guard let r = s.state.active?.rarity else { return XCTFail("부화 실패 seed \(seed)") }
             XCTAssertNotEqual(r, .common)
@@ -281,50 +264,11 @@ final class PremiumEggTests: XCTestCase {
     func testLegendaryStillReachableFromPremiumEgg() async {
         var sawLegendary = false
         for seed in UInt64(1)...60 {
-            let s = eggStore(tier: .rare, seed: seed, provider: TieredProvider())
+            let s = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.shared)
             await s.hatchIfNeeded()
             if s.state.active?.rarity == .legendary { sawLegendary = true; break }
         }
         XCTAssertTrue(sawLegendary, "희귀 알 풀에 전설이 남아 있어야 한다(전설 전용 상품만 금지)")
-    }
-
-    // MARK: ③ REST 폴백 단독 — 가중 경로가 통과해도 이 경로가 통과하지는 않는다
-
-    func testRestFallbackRespectsGuarantee() async {
-        var hatched = 0
-        for seed in UInt64(1)...10 {
-            let s = eggStore(tier: .rare, seed: seed, provider: RestOnlyTieredProvider())
-            await s.hatchIfNeeded()
-            guard let r = s.state.active?.rarity else { continue }   // 16회 소진(≈0.15%)은 알 유지가 정상
-            hatched += 1
-            XCTAssertEqual(r, .rare, "REST 폴백이 보증을 무시하고 \(r) 를 뽑음")
-        }
-        XCTAssertGreaterThan(hatched, 0, "폴백 경로가 한 번도 안 돌면 검증이 아니다")
-    }
-
-    /// 폴백 경로도 **산 티어 그대로** 걸러야 한다 — 여기서 tier 를 무시하고 늘 희귀로 좁히면 고급 알이
-    /// 희귀 알과 같은 풀이 된다. common 미출현 + 고급 실제 출현을 함께 못박아 과잉 필터를 잡는다.
-    func testRestFallbackHonoursUncommonTierWithoutOverFiltering() async {
-        var sawUncommon = false
-        for seed in UInt64(1)...20 {
-            let s = eggStore(tier: .uncommon, seed: seed, provider: RestOnlyTieredProvider())
-            await s.hatchIfNeeded()
-            guard let r = s.state.active?.rarity else { continue }
-            XCTAssertNotEqual(r, .common, "REST 폴백이 고급 알에 common 을 내줌")
-            if r == .uncommon { sawUncommon = true }
-        }
-        XCTAssertTrue(sawUncommon, "폴백에서 고급이 한 번도 안 나오면 희귀로 과잉 필터되고 있는 것")
-    }
-
-    /// 대조군 — 같은 폴백 provider 에서 보증이 없으면 common 도 나온다(위 테스트가 필터를 밟는다는 증거).
-    func testRestFallbackWithoutGuaranteeCanHatchCommon() async {
-        var sawCommon = false
-        for seed in UInt64(1)...20 {
-            let s = eggStore(tier: nil, seed: seed, provider: RestOnlyTieredProvider())
-            await s.hatchIfNeeded()
-            if s.state.active?.rarity == .common { sawCommon = true; break }
-        }
-        XCTAssertTrue(sawCommon)
     }
 
     // MARK: ④ 최종 관문 — 인덱스가 거짓말해도 산 보증을 내주지 않는다
@@ -350,7 +294,7 @@ final class PremiumEggTests: XCTestCase {
     // MARK: 보증 소비 — 다음 알로 새면 영구 프리미엄이 된다
 
     func testHatchConsumesGuarantee() async {
-        let s = eggStore(tier: .rare, seed: 1, provider: TieredProvider())
+        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.shared)
         await s.hatchIfNeeded()
         XCTAssertNotNil(s.state.active)
         XCTAssertNil(s.state.eggTier, "부화로 보증 소비")
@@ -360,7 +304,7 @@ final class PremiumEggTests: XCTestCase {
     /// 졸업으로 받는 다음 알은 무료 알이어야 한다 — 보증이 따라가면 산 적 없는 프리미엄이 영구히 붙는다.
     /// 구매→부화→졸업 전 구간에서 보증이 되살아나지 않는지 실제 흐름으로 확인한다.
     func testGuaranteeDoesNotSurviveIntoTheNextEgg() async {
-        let s = eggStore(tier: .rare, seed: 1, provider: TieredProvider())
+        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.shared)
         await s.hatchIfNeeded()
         guard let active = s.state.active else { return XCTFail("부화 실패") }
         XCTAssertNil(s.state.eggTier, "부화 시점에 보증 소비")
@@ -411,7 +355,7 @@ final class PremiumEggTests: XCTestCase {
     /// 전엔 앱을 못 쓴다(디코드가 *성공*하므로 load() 의 .corrupt 복구도 안 걸린다).
     /// **디코드되는지가 아니라 실제로 부화하는지**를 검증한다 — 정규화가 빠지면 여기서 걸린다.
     func testUnsatisfiableGuaranteeIsNormalizedAwayAndEggStillHatches() async {
-        let s = eggStore(tier: .legendary, seed: 1, provider: TieredProvider())
+        let s = eggStore(tier: .legendary, seed: 1, provider: MachineCatalog.shared)
         XCTAssertNil(s.state.eggTier, "만족 불가능한 보증은 읽는 순간 떨어져 나간다")
         await s.hatchIfNeeded()
         XCTAssertNotNil(s.state.active, "알이 정상적으로 부화해야 한다(벽돌 상태 아님)")

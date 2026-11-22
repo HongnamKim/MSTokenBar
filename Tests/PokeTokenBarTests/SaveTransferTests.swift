@@ -34,21 +34,6 @@ private actor TransferSignal {
     }
 }
 
-/// **종 롤**(`baseSpeciesIndex`)에서 멈추는 provider — `hatchIfNeeded` 의 첫 await 창을 재현한다.
-/// 라인 fetch 창(`GatedProvider`)과는 다른 지점이라 별도 스텁이 필요하다.
-private struct GatedIndexProvider: PokeProviding {
-    let entered: TransferSignal
-    let release: TransferSignal
-    let result: EvoLine
-    func line(baseSpeciesID: Int) async throws -> EvoLine { result }
-    func baseSpeciesIndex() async throws -> [BaseSpecies] {
-        await entered.fire()
-        await release.wait()
-        return [BaseSpecies(id: 1, captureRate: 255)]
-    }
-    func baseSpecies(id: Int) async throws -> BaseSpecies? { nil }
-}
-
 /// 라인 fetch 에서 멈춰 있다가 신호를 받고 반환하는 provider — 부화 중 상태 교체를 재현한다.
 private struct GatedProvider: PokeProviding {
     let entered: TransferSignal
@@ -376,45 +361,6 @@ final class SaveTransferTests: XCTestCase {
 
         XCTAssertEqual(s.state.active?.baseID, 403, "뒤늦게 끝난 부화가 불러온 개체를 덮어쓰면 안 된다")
         XCTAssertEqual(s.state.dex.count, imported.dex.count, "도감도 부화 경로에 밀려나면 안 된다")
-    }
-
-    /// [회귀·딥리뷰 B1] 부화의 **첫** await(`chooseBase`) 창에 불러오기가 들어오면, 그 뒤 진입하는
-    /// `hatchCore` 는 *교체 이후*의 세대를 캡처해 자기 가드가 무조건 통과한다 — 옛 롤 결과가 불러온
-    /// 개체를 덮어쓰고 디스크에 박혔다. 위의 `testImportDuringHatchDiscardsTheHatch` 는 `hatch(baseID:)`
-    /// 경로라 이 브랜치를 지나지 않는다(통과하면서 아무것도 지키지 않던 상태).
-    func testImportDuringSpeciesRollDiscardsTheHatch() async throws {
-        let entered = TransferSignal()
-        let release = TransferSignal()
-        let evo = EvoLine(baseID: 1, tree: EvoNode(speciesID: 1, children: []), rarity: .common,
-                          names: [1: ["en": "P1", "ko": "포1", "ja": "ポ1"]])
-        let url = tempURL("rollrace")
-
-        // 알 상태 + 부화 임계 도달 + pre-roll 없음 → `chooseBase()` 로 들어간다.
-        var egg = CompanionState()
-        egg.installBaselineSet = true
-        egg.eggUsage = PokemonBalance.eggHatchThreshold
-        try JSONEncoder().encode(egg).write(to: url)
-
-        let s = CompanionStore(provider: GatedIndexProvider(entered: entered, release: release, result: evo),
-                               clock: { transferNow }, fileURL: url)
-        XCTAssertNil(s.state.active, "전제: 알 상태에서 시작")
-
-        let hatching = Task { await s.hatchIfNeeded() }
-        await entered.wait()   // 종 롤이 인덱스 대기 지점에 도달
-
-        var imported = oldMacState(today: "2026-08-03")
-        imported.active = MonState(baseID: 403, pathIDs: [403], plannedPathIDs: [403],
-                                   stageIndex: 0, usedAtStage: 0, rarity: .common, totalForms: 1)
-        let data = try SaveTransfer.encode(state: imported, appVersion: "2.5.0",
-                                           deviceName: "Old Mac", now: transferNow)
-        try s.applySave(try SaveTransfer.decode(data), todayTokensByProvider: ["test": 1],
-                    todayDate: "2026-08-03", hasUsageData: true)
-
-        await release.fire()
-        await hatching.value
-
-        XCTAssertEqual(s.state.active?.baseID, 403, "종 롤 대기 중 들어온 불러오기를 부화가 덮어쓰면 안 된다")
-        XCTAssertEqual(s.state.dex.count, imported.dex.count)
     }
 
     /// [회귀·딥리뷰 H3] 부화가 폐기된 뒤 불러온 개체의 진화 라인이 다시 로드돼야 한다.

@@ -27,31 +27,10 @@ final class ShinyCharmTests: XCTestCase {
         return CompanionStore(provider: CharmStubProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: seed))
     }
 
-    // MARK: 순수 판정 — 부적 유무로 분모가 48/64 로 바뀌며 판정이 뒤집힌다
-
-    func testRollsShinyFlipsWithCharm() {
-        // roll=48: 부적 있으면 shiny(48%48==0), 없으면 아님(48%64≠0)
-        XCTAssertTrue(CompanionStore.rollsShiny(roll: 48, charmOwned: true))
-        XCTAssertFalse(CompanionStore.rollsShiny(roll: 48, charmOwned: false))
-        // roll=64: 부적 없으면 shiny, 있으면 아님(64%48≠0)
-        XCTAssertTrue(CompanionStore.rollsShiny(roll: 64, charmOwned: false))
-        XCTAssertFalse(CompanionStore.rollsShiny(roll: 64, charmOwned: true))
-        // roll=96: 부적 있으면 shiny(96%48==0), 없으면 아님(96%64≠0)
-        XCTAssertTrue(CompanionStore.rollsShiny(roll: 96, charmOwned: true))
-        XCTAssertFalse(CompanionStore.rollsShiny(roll: 96, charmOwned: false))
-        // roll=0: 둘 다 shiny · roll=1: 둘 다 아님
-        XCTAssertTrue(CompanionStore.rollsShiny(roll: 0, charmOwned: true))
-        XCTAssertTrue(CompanionStore.rollsShiny(roll: 0, charmOwned: false))
-        XCTAssertFalse(CompanionStore.rollsShiny(roll: 1, charmOwned: true))
-        XCTAssertFalse(CompanionStore.rollsShiny(roll: 1, charmOwned: false))
-    }
-
-    /// 알림 문구가 판정과 같은 분모를 쓰는지 — 부화 알림이 부적 보유 중에도 "(1/64)"로 고정돼 있던 결함.
+    /// 알림 문구가 선정과 같은 분모를 쓰는지 — 분모는 이제 도색 공구 단계(`ToolSet`)에서 온다(부적은 무관).
     func testShinyNotificationShowsTheOddsTheHatchUsed() {
-        XCTAssertEqual(CompanionStore.shinyDenominator(charmOwned: false), PokemonOdds.shinyDenominator)
-        XCTAssertEqual(CompanionStore.shinyDenominator(charmOwned: true), ShinyCharm.shinyDenominator)
-        XCTAssertEqual(store(charm: false).shinyDenominator, 64)
-        XCTAssertEqual(store(charm: true).shinyDenominator, 48)
+        XCTAssertEqual(store(charm: false).shinyDenominator, ToolSet.shinyDenominator(toolLevel: 0))
+        XCTAssertEqual(store(charm: true).shinyDenominator, ToolSet.shinyDenominator(toolLevel: 0))
         for language in AppLanguage.allCases {
             let l = L(language)
             let withCharm = l.notifShinyHatchBody("P", odds: 48)
