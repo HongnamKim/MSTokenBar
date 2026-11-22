@@ -14,14 +14,11 @@ final class PreciousCompanionGuardTests: XCTestCase {
     private func store(
         active: Bool = true,
         rarity: Rarity = .common,
-        shiny: Bool = false,
-        dittoDisguise: Int? = nil,
-        dittoRevealed: Bool = false
+        shiny: Bool = false
     ) -> CompanionStore {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("guard-\(UUID().uuidString).json")
-        let disguiseField = dittoDisguise != nil ? ",\"dittoDisguise\":\(dittoDisguise!),\"dittoRevealed\":\(dittoRevealed)" : ""
         let mon = "{\"baseID\":10,\"pathIDs\":[10],\"stageIndex\":0,\"usedAtStage\":200000000,"
-            + "\"rarity\":\"\(rarity.rawValue)\",\"totalForms\":3,\"isShiny\":\(shiny)\(disguiseField)}"
+            + "\"rarity\":\"\(rarity.rawValue)\",\"totalForms\":3,\"isShiny\":\(shiny)}"
         let json = "{\"installBaselineSet\":true,\"usedSinceInstall\":5000000000,\"spentTokens\":0,"
             + "\"lastDate\":\"d\",\"active\":\(active ? mon : "null"),\"dex\":[],\"collectedFinals\":[]}"
         try? json.data(using: .utf8)!.write(to: url)
@@ -71,20 +68,6 @@ final class PreciousCompanionGuardTests: XCTestCase {
         XCTAssertFalse(s.hasActive)
         XCTAssertFalse(s.isHighValueCompanion)
     }
-
-    func testDisguisedDittoDoesNotLeakHighValueStatusBeforeReveal() {
-        // 이로치 메타몽이 일반 포켓몬으로 위장 중인 경우
-        let s = store(rarity: .common, shiny: true, dittoDisguise: 10, dittoRevealed: false)
-        XCTAssertFalse(s.currentIsShiny, "위장 중인 메타몽은 이로치를 숨긴다")
-        XCTAssertEqual(s.rarity, .common, "위장 중인 메타몽의 외견 등급은 common")
-        XCTAssertFalse(s.isHighValueCompanion, "위장 중에는 고가치 확인을 띄워 정체를 누설(leak)하지 않는다")
-
-        // 리빌된 메타몽인 경우
-        let revealed = store(rarity: .rare, shiny: true, dittoDisguise: 10, dittoRevealed: true)
-        XCTAssertTrue(revealed.currentIsShiny)
-        XCTAssertTrue(revealed.isHighValueCompanion, "리빌 후에는 이로치가 드러나 고가치 개체로 판정된다")
-    }
-
     func testLocalizationStringsCoverAllLanguages() {
         for lang in AppLanguage.allCases {
             let l = L(lang)

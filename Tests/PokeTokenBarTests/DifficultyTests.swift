@@ -27,7 +27,6 @@ final class DifficultyTests: XCTestCase {
         return CompanionStore(provider: provider ?? StubDiffProvider(value: line()),
                               clock: { Date(timeIntervalSince1970: 1_700_000_000) },
                               fileURL: url, rng: SeededDiffRNG(seed: 7),
-                              dittoDisguiseRollingEnabled: false,
                               defaults: suite)
     }
 

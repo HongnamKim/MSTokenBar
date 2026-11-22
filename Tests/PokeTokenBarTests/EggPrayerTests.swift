@@ -50,7 +50,6 @@ final class EggPrayerTests: XCTestCase {
     private func rollSignature(_ store: CompanionStore) throws -> Data {
         var mon = try XCTUnwrap(store.state.active)
         mon.prayers = nil
-        mon.profile?.instanceID = ""
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
         return try encoder.encode(mon)

@@ -116,48 +116,6 @@ final class SpriteImageCacheTests: XCTestCase {
             XCTAssertTrue(again === first, "the async path must also reuse the image, not just the byte cache")
         }
     }
-
-    func testItemLoadsShareTheImageCacheInBothDirections() async throws {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("item-cache-\(UUID().uuidString)")
-        let store = SpriteStore(directory: dir)
-        defer { try? FileManager.default.removeItem(at: dir) }
-        let bitmap = try XCTUnwrap(NSBitmapImageRep(
-            bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 2, bitsPerSample: 8,
-            samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
-            bytesPerRow: 0, bitsPerPixel: 0))
-        bitmap.bitmapData?.initialize(repeating: 255, count: bitmap.bytesPerRow * bitmap.pixelsHigh)
-        let png = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
-
-        for asyncFirst in [false, true] {
-            let name = asyncFirst ? "rare-candy" : "shiny-charm"
-            let file = dir.appendingPathComponent("item-\(name).png")
-            XCTAssertNil(SpriteLoader.cachedItemImage(name: name, directory: dir))
-            try png.write(to: file)
-            var result: NSImage?
-            if asyncFirst {
-                var second: NSImage?
-                let firstLoad = Task<Void, Never> { @MainActor in
-                    result = await SpriteLoader.itemImage(name: name, store: store)
-                }
-                let secondLoad = Task<Void, Never> { @MainActor in
-                    second = await SpriteLoader.itemImage(name: name, store: store)
-                }
-                await firstLoad.value
-                await secondLoad.value
-                XCTAssertTrue(second === result, "concurrent item loads must also share their image object")
-            } else {
-                result = SpriteLoader.cachedItemImage(name: name, directory: dir)
-            }
-            let first = try XCTUnwrap(result)
-            // Keep fault injection offline too: a broken image cache may still read the byte cache.
-            _ = await store.data(itemName: name)
-            try FileManager.default.removeItem(at: file)
-            XCTAssertTrue(SpriteLoader.cachedItemImage(name: name, directory: dir) === first)
-            let again = await SpriteLoader.itemImage(name: name, store: store)
-            XCTAssertTrue(again === first)
-        }
-    }
-
     func testAsyncFallbacksStillReachNormalStaticImages() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("sprite-fallback-\(UUID().uuidString)")
         let store = SpriteStore(directory: dir)
@@ -169,7 +127,7 @@ final class SpriteImageCacheTests: XCTestCase {
         bitmap.bitmapData?.initialize(repeating: 255, count: bitmap.bytesPerRow * bitmap.pixelsHigh)
         let png = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
         try png.write(to: dir.appendingPathComponent("25-s.png"))
-        for filename in ["25-sha.gif", "25-shs.png", "25-a.gif", "item-rare-candy.png"] {
+        for filename in ["25-sha.gif", "25-shs.png", "25-a.gif"] {
             // Existing corrupt cache files exercise decode failures without making network requests.
             try Data("invalid image".utf8).write(to: dir.appendingPathComponent(filename))
         }
@@ -178,8 +136,6 @@ final class SpriteImageCacheTests: XCTestCase {
         XCTAssertTrue(SpriteLoader.cachedImage(speciesID: 25, directory: dir) === normal)
         XCTAssertNil(SpriteLoader.imageCache.object(forKey: dir.appendingPathComponent("25-shs.png").path as NSString),
                      "the normal fallback must not poison the shiny cache")
-        let item = await SpriteLoader.itemImage(name: "rare-candy", store: store)
-        XCTAssertNil(item)
 
         // A species outside Gen V has no GIF; that nil path must still try its PNG.
         try png.write(to: dir.appendingPathComponent("1000-s.png"))

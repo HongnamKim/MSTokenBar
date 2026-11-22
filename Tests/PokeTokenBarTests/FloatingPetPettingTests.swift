@@ -292,9 +292,8 @@ final class FloatingPetPettingRenderingTests: XCTestCase {
         }
     }
 
-    /// Real sprites (downloaded into a scratch directory, never the user's cache) under the bubble,
-    /// each rendered twice: plain, and with a green 1pt guide at the computed visible top.
-    /// Logs the numbers behind the anchor. Needs network.
+    /// Bundled Gunpla sprites under the bubble, each rendered twice: plain, and with a green 1pt guide
+    /// at the computed visible top. Logs the numbers behind the anchor. Offline.
     func testRenderRealSpeciesWithHeartBubble() async throws {
         guard let directory = ProcessInfo.processInfo.environment["PTB_PETTING_RENDER_DIR"] else {
             throw XCTSkip("PTB_PETTING_RENDER_DIR not set")
@@ -304,22 +303,16 @@ final class FloatingPetPettingRenderingTests: XCTestCase {
         try FileManager.default.createDirectory(at: sprites, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: sprites) }
         let store = SpriteStore(directory: sprites)
-        let base = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
         let l = L(.en)
 
         // speciesID nil = the egg (loaded through the shared store, as the prayer render does).
-        let cases: [(name: String, species: Int?, form: PokemonForm?)] = [
-            ("pikachu", 25, nil), ("snorlax", 143, nil), ("onix", 95, nil),
-            ("rotom-heat", 479, PokemonForm("heat")), ("egg", nil, nil),
+        let cases: [(name: String, species: Int?)] = [
+            ("sd", GunplaID.encode(machineID: 1, grade: .sd)), ("hg", GunplaID.encode(machineID: 1, grade: .hg)),
+            ("pg", GunplaID.encode(machineID: 1, grade: .pg)), ("box", nil),
         ]
-        for (name, species, form) in cases {
+        for (name, species) in cases {
             if let species {
-                let asset = PokemonForm.assetName(speciesID: species, form: form)
-                let url = try XCTUnwrap(URL(string: base + "versions/generation-v/black-white/animated/\(asset).gif"))
-                let (data, response) = try await URLSession.shared.data(from: url)
-                XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200, name)
-                let key = SpriteStore.cacheKey(speciesID: species, animated: true, shiny: false, form: form)
-                try data.write(to: sprites.appendingPathComponent("\(key).gif"))
+                let data = try XCTUnwrap(BundledSprites.gifData(speciesID: species), name)
                 let frames = GIFDecoder.capFrameRate(GIFDecoder.frames(from: data), floor: 0.4)
                 let fractions = frames.map { SpriteVisibleTop.opaqueTopFraction(of: $0.image) }
                 for petSize in [96.0, 192.0] {
@@ -334,7 +327,7 @@ final class FloatingPetPettingRenderingTests: XCTestCase {
             for petSize in [CGFloat(96), 192] {
                 for guide in [false, true] {
                     let sprite = SpriteView(speciesID: species, size: petSize, animated: species != nil,
-                                            minFrameDelay: 0.4, spriteStore: store, form: form,
+                                            minFrameDelay: 0.4, spriteStore: store,
                                             reportsVisibleTop: true)
                         .frame(width: petSize, height: petSize)
                         .overlayPreferenceValue(SpriteVisibleTopKey.self, alignment: .top) { visibleTop in

@@ -4,11 +4,10 @@ import Vision
 import XCTest
 @testable import PokeTokenBar
 
-private struct OfflineProvider: PokeProviding, PokemonDetailProviding {
+private struct OfflineProvider: PokeProviding {
     func line(baseSpeciesID: Int) async throws -> EvoLine { throw URLError(.notConnectedToInternet) }
     func baseSpeciesIndex() async throws -> [BaseSpecies] { [] }
     func baseSpecies(id: Int) async throws -> BaseSpecies? { nil }
-    func pokemonDetails(speciesID: Int) async throws -> PokemonDetails { throw URLError(.notConnectedToInternet) }
 }
 
 /// The detail page replaces the grid/log, so Back rebuilds them. These drive the real `CollectionView`

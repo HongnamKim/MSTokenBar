@@ -36,7 +36,7 @@ final class MenuGrowthTests: XCTestCase {
                 children: [EvoNode(speciesID: 3, children: [])])]),
             rarity: .common, names: [1: ["en": "Bulbasaur"], 2: ["en": "Ivysaur"], 3: ["en": "Venusaur"]])
         let companion = CompanionStore(provider: StubProvider(value: line), fileURL: file,
-            rng: SeededRNG(seed: 7), dittoDisguiseRollingEnabled: false, defaults: defaults)
+            rng: SeededRNG(seed: 7), defaults: defaults)
         let usage = UsageStore(providers: [], autoRefresh: false, defaults: defaults)
         usage.showTokensInMenu = false
         usage.showCostInMenu = false

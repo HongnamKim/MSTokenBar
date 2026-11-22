@@ -81,18 +81,15 @@ final class DexSearchAndFilterTests: XCTestCase {
 
     /// Sprite → Pokédex page links. Every dex species (graduated chains and the raising Pokémon's
     /// reached stages) links to its dex cell; an unreached evolution and an uncaught species do
-    /// not, so their sprites stay inert. Unown links to its single species cell, not a letter.
+    /// not, so their sprites stay inert.
     func testDexLinkTargetsCoverOnlySpeciesInTheDex() {
-        let unown = DexEntry(id: "entry-unown", baseID: 201, finalID: 201, chainOrder: [201],
-                             rarity: .rare, caughtAt: now, isShiny: false, form: .q)
         let raising = MonState(baseID: 4, pathIDs: [4, 5], plannedPathIDs: [4, 5, 6], stageIndex: 1,
                                usedAtStage: 0, rarity: .common, totalForms: 3)
-        let store = makeStore(dex: [unown] + createTestStore().state.dex, active: raising)
+        let store = makeStore(dex: createTestStore().state.dex, active: raising)
 
         let links = store.dexLinkTargets
         XCTAssertEqual(links[1], "1")
         XCTAssertEqual(links[26], "26")
-        XCTAssertEqual(links[201], "201", "Unown opens its species cell; the letter is chosen on the page")
         XCTAssertEqual(links[5], "5", "the raising Pokémon's current form links (it has a RAISING dex cell)")
         XCTAssertEqual(links[4], "4", "a reached earlier stage links")
         XCTAssertNil(links[6], "an unreached evolution has no dex page")

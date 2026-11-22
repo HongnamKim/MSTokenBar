@@ -264,7 +264,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     /// Praying refreshes usage every 30 prayers (30, 60, 90...), the same step as the hover quip, so the egg's
     /// progress moves without a request per click.
     static let prayersPerRefresh = L.prayersPerQuip
-    /// How long the callout stays up on its own when a hatch / evolution / graduation / Ditto line arrives.
+    /// How long the callout stays up on its own when a hatch / evolution / graduation line arrives.
     static let eventPopDuration: Duration = .seconds(6)
 
     /// Pop the callout only for an event not shown yet, while the pet is on screen and no speech or
@@ -1040,7 +1040,7 @@ struct FloatingPetView: View {
 
             SpriteView(speciesID: subject.speciesID, size: size, animated: animated,
                        shiny: subject.isShiny,
-                       minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore, form: subject.form,
+                       minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore,
                        back: companion.facesBack, reportsVisibleTop: true)
                 // One-shot wobble per prayer; keyframes run once per trigger change, never in a loop.
                 .keyframeAnimator(initialValue: 0.0, trigger: burst.wobbleCount) { sprite, angle in

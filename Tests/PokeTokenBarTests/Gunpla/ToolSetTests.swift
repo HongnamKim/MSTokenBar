@@ -19,7 +19,7 @@ final class ToolSetTests: XCTestCase {
         try JSONEncoder().encode(seeded).write(to: url)
         let fixedNow = now
         return CompanionStore(provider: catalog, clock: { fixedNow }, fileURL: url,
-                              rng: SeededRNG(seed: 1), dittoDisguiseRollingEnabled: false,
+                              rng: SeededRNG(seed: 1),
                               defaults: UserDefaults(suiteName: "toolset-\(UUID().uuidString)")!)
     }
 
@@ -51,7 +51,6 @@ final class ToolSetTests: XCTestCase {
         XCTAssertEqual(ToolSet.order.map(\.fallbackEmoji), ["🩹", "🖊️", "🎨", "💨"])
         XCTAssertEqual(ItemKind.rareCandy.fallbackEmoji, "🧽")
         XCTAssertEqual(ItemKind.rareCandy.rawValue, "rareCandy")
-        for kind in ItemKind.allCases { XCTAssertNil(kind.spriteName) }
         for kind in ToolSet.order { XCTAssertTrue(kind.isPassive) }
         XCTAssertFalse(ItemKind.rareCandy.isPassive)
         XCTAssertEqual(ItemKind.allCases.count, 5)

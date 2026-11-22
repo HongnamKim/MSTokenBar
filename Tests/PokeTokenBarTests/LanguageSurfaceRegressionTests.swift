@@ -17,12 +17,8 @@ final class LanguageSurfaceRegressionTests: XCTestCase {
             let stamp = SettingsView.exportedAtText(date, language: language)
             XCTAssertEqual(stamp, formatter.string(from: date))
             let labels = [l.tokenInput, l.tokenOutput, l.tokenCacheWrite, l.tokenCacheRead,
-                          l.website, l.sponsor, l.evolutionScrollPrevious, l.evolutionScrollNext,
-                          l.moveMethod(.init(method: "light-ball-egg", level: 0)),
-                          l.moveMethod(.init(method: "form-change", level: 0))]
+                          l.website, l.sponsor, l.evolutionScrollPrevious, l.evolutionScrollNext]
             XCTAssertFalse(labels.contains(where: { $0.isEmpty }))
-            XCTAssertFalse(labels.contains("light ball egg"))
-            XCTAssertFalse(labels.contains("form change"))
             let renderer = ImageRenderer(content: VStack(alignment: .leading, spacing: 6) {
                 Text(language.label).bold()
                 ForEach(Array(labels.enumerated()), id: \.offset) { _, label in Text(label) }

@@ -361,10 +361,8 @@ final class CompanionStoreTests: XCTestCase {
     func testDexSpeciesFoldsDuplicateLinesToOneCellPerSpecies() throws {
         let entries = [
             DexEntry(baseID: 1, finalID: 3, chainOrder: [1, 2, 3], rarity: .common, caughtAt: fixedNow,
-                     nature: .rash,
                      names: [1: ["ko": "포1"], 2: ["ko": "포2"], 3: ["ko": "포3"]]),
-            DexEntry(baseID: 1, finalID: 3, chainOrder: [1, 2, 3], rarity: .common, caughtAt: fixedNow,
-                     nature: .lax),
+            DexEntry(baseID: 1, finalID: 3, chainOrder: [1, 2, 3], rarity: .common, caughtAt: fixedNow),
         ]
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-\(UUID().uuidString).json")
         let dexJSON = String(decoding: try JSONEncoder().encode(entries), as: UTF8.self)
@@ -385,7 +383,7 @@ final class CompanionStoreTests: XCTestCase {
     /// 두 오용을 동시에 가드한다.
     func testDexSpeciesCountsOnlyReachedStagesOfActive() throws {
         let active = MonState(baseID: 1, pathIDs: [1, 2], plannedPathIDs: [1, 2, 3], stageIndex: 0,
-                              usedAtStage: 0, rarity: .common, totalForms: 3, nature: .brave)
+                              usedAtStage: 0, rarity: .common, totalForms: 3)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-\(UUID().uuidString).json")
         let json = String(decoding: try JSONEncoder().encode(active), as: UTF8.self)
         try Data(#"{"active":\#(json),"language":"ko"}"#.utf8).write(to: url)
@@ -582,30 +580,6 @@ final class CompanionStoreTests: XCTestCase {
         XCTAssertFalse(s.setRepresentativeSpeciesID(999), "도감 밖 종은 새로 저장할 수도 없다")
     }
 
-    /// 위장 메타몽은 리빌 전까지 이로치를 숨긴다 — 도감도 그 규칙을 따라야 한다
-    /// (currentIsShiny 를 재사용하는 지점. 직접 isShiny 를 읽으면 정체가 미리 새어 나간다).
-    func testDexSpeciesHidesShinyWhileDittoIsDisguised() throws {
-        func store(revealed: Bool) throws -> CompanionStore {
-            let active = MonState(baseID: 1, pathIDs: [1], stageIndex: 0, usedAtStage: 0,
-                                  rarity: .common, totalForms: 3, isShiny: true,
-                                  dittoDisguise: 1, dittoRevealed: revealed)
-            let url = FileManager.default.temporaryDirectory
-                .appendingPathComponent("poke-\(UUID().uuidString).json")
-            let json = String(decoding: try JSONEncoder().encode(active), as: UTF8.self)
-            try Data(#"{"active":\#(json),"language":"ko"}"#.utf8).write(to: url)
-            return CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
-                                  fileURL: url, rng: SeededRNG(seed: 7))
-        }
-        let disguised = try store(revealed: false)
-        XCTAssertTrue(disguised.state.active?.isShiny ?? false, "내부적으론 이로치")
-        XCTAssertEqual(disguised.dexSpecies.first?.isShiny, false, "위장 중엔 도감에도 숨김")
-        XCTAssertEqual(disguised.dexSpecies.first?.hasNormal, true)
-
-        let revealed = try store(revealed: true)
-        XCTAssertEqual(revealed.dexSpecies.first?.isShiny, true, "리빌 후엔 도감에 공개")
-        XCTAssertEqual(revealed.dexSpecies.first?.hasNormal, false)
-    }
-
     /// 지금 키우는 종의 이름은 **로드된 라인**에서 온다 — 졸업분이 아직 없어도 `#id` 로 떨어지지 않는다.
     /// (부화 직후가 이 경로다. 파일 주입 테스트는 currentLine 이 nil 이라 이 분기를 밟지 못한다.)
     func testDexSpeciesNamesActiveSpeciesFromLoadedLine() async {
@@ -691,7 +665,7 @@ final class CompanionStoreTests: XCTestCase {
         let graduated = DexEntry(baseID: 1, finalID: 3, chainOrder: [1, 2, 3], rarity: .common, caughtAt: fixedNow,
                                  names: [1: ["ko": "포1"], 2: ["ko": "포2"], 3: ["ko": "포3"]])
         let active = MonState(baseID: 1, pathIDs: [1, 2, 3], stageIndex: 1,
-                              usedAtStage: 0, rarity: .common, totalForms: 3, nature: .brave)
+                              usedAtStage: 0, rarity: .common, totalForms: 3)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-\(UUID().uuidString).json")
         let dexJSON = String(decoding: try JSONEncoder().encode([graduated]), as: UTF8.self)
         let activeJSON = String(decoding: try JSONEncoder().encode(active), as: UTF8.self)
@@ -726,23 +700,6 @@ final class CompanionStoreTests: XCTestCase {
         XCTAssertEqual(released.chainOrder, [1, 2])
         XCTAssertEqual(released.finalID, 2, "도달한 마지막 형태")
         XCTAssertFalse(s.dexSpecies.contains { $0.id == 3 }, "미도달 진화형은 보유가 아니다")
-    }
-
-    /// 위장 중인 메타몽을 놓아주면 이로치는 계속 숨겨진다 — `currentIsShiny` 단일 판정을 따른다.
-    /// 기록에 `a.isShiny` 를 그대로 쓰면 놓아주는 것이 리빌 수단이 된다.
-    func testReleasingDisguisedDittoKeepsShinyHidden() throws {
-        let active = MonState(baseID: 1, pathIDs: [1], stageIndex: 0, usedAtStage: 0,
-                              rarity: .common, totalForms: 3, isShiny: true,
-                              dittoDisguise: 1, dittoRevealed: false)
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-\(UUID().uuidString).json")
-        let activeJSON = String(decoding: try JSONEncoder().encode(active), as: UTF8.self)
-        try Data(#"{"active":\#(activeJSON),"usedSinceInstall":5000000000}"#.utf8).write(to: url)
-
-        let s = CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
-                               fileURL: url, rng: SeededRNG(seed: 7))
-        XCTAssertTrue(s.buyFreshEgg())
-        let released = try XCTUnwrap(s.state.dex.last)
-        XCTAssertFalse(released.isShiny, "위장 중이면 리빌 전까지 숨김")
     }
 
     /// 이 필드 이전에 저장된 항목은 전부 졸업분으로 읽힌다 — 별도 마이그레이션 없이 nil = 졸업.
@@ -1337,9 +1294,6 @@ final class CompanionStoreTests: XCTestCase {
         XCTAssertTrue([[265, 266, 267], [265, 268, 269]].contains(s.state.active?.plannedPathIDs ?? []))
         XCTAssertEqual(s.state.active?.usedAtStage, 42)
         XCTAssertTrue(s.state.active?.isShiny ?? false)
-        XCTAssertEqual(s.state.active?.nature, .timid)
-        XCTAssertEqual(s.state.active?.dittoDisguise, 265)
-        XCTAssertFalse(s.state.active?.dittoRevealed ?? true)
     }
 
     func testReloadLeafCurrentPlanDoesNotConsumeRNG() async throws {
@@ -1541,10 +1495,8 @@ final class CompanionIdentityTests: XCTestCase {
         let s = try JSONDecoder().decode(CompanionState.self, from: Data(old.utf8))
         XCTAssertEqual(s.active?.plannedPathIDs, [1])
         XCTAssertEqual(s.active?.isShiny, false)
-        XCTAssertNil(s.active?.nature)
         XCTAssertNil(s.claimedTodayTokensByProvider, "구버전 aggregate ledger는 프로바이더별 값으로 추정하지 않는다")
         XCTAssertEqual(s.dex[0].isShiny, false)
-        XCTAssertNil(s.dex[0].nature)
         // 재인코딩 후 재디코딩도 안정적(라운드트립)
         let round = try JSONDecoder().decode(CompanionState.self, from: JSONEncoder().encode(s))
         XCTAssertEqual(round.active?.isShiny, false)
@@ -1727,16 +1679,6 @@ final class CompanionIdentityTests: XCTestCase {
         XCTAssertEqual(SpriteStore.cacheKey(speciesID: 25, animated: false, shiny: true), "25-shs")
     }
 
-    /// 성격 25종 — 모든 지원 언어 명칭이 전부 비어있지 않고 중복 없는지.
-    func testNatureNamesComplete() {
-        XCTAssertEqual(PokemonNature.allCases.count, 25)
-        for lang in AppLanguage.allCases {
-            let names = PokemonNature.allCases.map { $0.name(lang) }
-            XCTAssertEqual(Set(names).count, 25, "\(lang) 중복/누락")
-            XCTAssertFalse(names.contains(where: \.isEmpty))
-        }
-    }
-
     func testLocalizationIncludesDelayedHatchRetry() {
         let expected = [
             "⏳ 개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
@@ -1766,8 +1708,7 @@ final class CompanionIdentityTests: XCTestCase {
             provider: provider,
             clock: { Date() },
             fileURL: url,
-            rng: SeededRNG(seed: 42),
-            dittoDisguiseRollingEnabled: false
+            rng: SeededRNG(seed: 42)
         )
 
         XCTAssertTrue(store.isEgg)
@@ -1796,8 +1737,7 @@ final class CompanionIdentityTests: XCTestCase {
             provider: FailingPokeProvider(),
             clock: { Date() },
             fileURL: url,
-            rng: SeededRNG(seed: 42),
-            dittoDisguiseRollingEnabled: false
+            rng: SeededRNG(seed: 42)
         )
 
         // 오프라인 부화 실패로 플래그 true 설정
@@ -1863,16 +1803,3 @@ private struct FailingPokeProvider: PokeProviding {
     }
 }
 
-// MARK: PokéAPI SSRF 가드 (evolution_chain URL 검증 — 응답 변조 시 임의 호스트 fetch 방지)
-
-final class PokeAPIGuardTests: XCTestCase {
-    func testValidatedChainURLAcceptsPokeapiHttps() {
-        XCTAssertNotNil(PokeAPIClient.validatedChainURL("https://pokeapi.co/api/v2/evolution-chain/1/"))
-    }
-    func testValidatedChainURLRejectsUntrusted() {
-        XCTAssertNil(PokeAPIClient.validatedChainURL("https://evil.example.com/x"), "임의 호스트 거부(SSRF)")
-        XCTAssertNil(PokeAPIClient.validatedChainURL("https://pokeapi.co.evil.com/x"), "유사 호스트 거부")
-        XCTAssertNil(PokeAPIClient.validatedChainURL("http://pokeapi.co/x"), "http 거부(https 고정)")
-        XCTAssertNil(PokeAPIClient.validatedChainURL(""), "빈 문자열 거부")
-    }
-}

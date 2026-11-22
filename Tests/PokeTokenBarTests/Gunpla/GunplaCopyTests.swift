@@ -56,8 +56,6 @@ final class GunplaCopyTests: XCTestCase {
                 ("dexOpenEntryHint", l.dexOpenEntryHint), ("filterShinyOnly", l.filterShinyOnly),
                 ("noSearchResults", l.noSearchResults), ("sortDexNumberAsc", l.sortDexNumberAsc),
                 ("sortDexNumberDesc", l.sortDexNumberDesc), ("hangarTierComplete", l.hangarTierComplete),
-                ("loadingPokemonDetails", l.loadingPokemonDetails),
-                ("pokemonDetailsUnavailable", l.pokemonDetailsUnavailable),
                 // companion status
                 ("finalForm", l.finalForm), ("stage", l.stage(1, 3)), ("unknownNextEvolution", l.unknownNextEvolution),
                 ("eggIncubating", l.eggIncubating), ("eggToHatch", l.eggToHatch("1M")),
@@ -73,9 +71,6 @@ final class GunplaCopyTests: XCTestCase {
                 ("notifShinyHatchBody", l.notifShinyHatchBody("RX-78-2", odds: 64)),
                 ("notifEvolveTitle", l.notifEvolveTitle), ("notifEvolveBody", l.notifEvolveBody(from: "A", to: "B")),
                 ("notifGraduateTitle", l.notifGraduateTitle), ("notifGraduateBody", l.notifGraduateBody("RX-78-2")),
-                ("notifDittoRevealTitle", l.notifDittoRevealTitle), ("notifDittoRevealBody", l.notifDittoRevealBody("A")),
-                ("notifShinyDittoRevealTitle", l.notifShinyDittoRevealTitle),
-                ("notifShinyDittoRevealBody", l.notifShinyDittoRevealBody("A")),
                 ("notifCandyTitle", l.notifCandyTitle(item: l.itemName(.rareCandy), count: 2)),
                 ("notifCandyBody", l.notifCandyBody(window: "5h")),
                 ("notifPrayerHatchBody.legendaryCustom", l.notifPrayerHatchBody("A", prayers: 90, shiny: true, rarity: .legendary)),

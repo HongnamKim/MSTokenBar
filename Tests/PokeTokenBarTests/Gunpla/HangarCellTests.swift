@@ -74,4 +74,64 @@ final class HangarCellTests: XCTestCase {
         XCTAssertEqual(s.dexCompletions.first { $0.seriesID == "first" }?.variantOwnedCells, 1)
         XCTAssertEqual(s.earnedDexBadges, [.series("zeta")])
     }
+
+    // Representative selection / raising flag / release — behavior carried over from the removed Unown tests.
+
+    func test_representativeIsTheExactGradeAndPersists() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("hangar-rep-\(UUID().uuidString).json")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        var state = CompanionState()
+        state.dex = [entry(1, [.sd, .hg]), entry(2, [.mg])]
+        try JSONEncoder().encode(state).write(to: url)
+        let s = CompanionStore(provider: catalog, fileURL: url)
+
+        XCTAssertTrue(s.setRepresentativeSpeciesID(id(1, .hg)))
+        XCTAssertTrue(s.isRepresentative(try XCTUnwrap(s.hangarCell(machineID: 1))))
+        XCTAssertFalse(s.isRepresentative(try XCTUnwrap(s.hangarCell(machineID: 2))))
+        XCTAssertEqual(s.representativeDexSpecies?.id, id(1, .hg))
+        XCTAssertFalse(s.setRepresentativeSpeciesID(id(2, .pg)), "an unowned grade cannot be chosen")
+        XCTAssertEqual(s.representativeSpeciesID, id(1, .hg), "a refused request keeps the earlier choice")
+
+        let restored = CompanionStore(provider: catalog, fileURL: url)
+        XCTAssertEqual(restored.representativeSpeciesID, id(1, .hg))
+        XCTAssertTrue(restored.setRepresentativeSpeciesID(nil))
+        XCTAssertNil(restored.representativeDexSpecies)
+    }
+
+    func test_releasingTheActiveMachineKeepsRepresentativeAndRecordsReachedGrades() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("hangar-rel-\(UUID().uuidString).json")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        var state = CompanionState()
+        state.dex = [entry(1, [.sd])]
+        state.active = MonState(baseID: id(2, .hg), pathIDs: [id(2, .hg), id(2, .rg)], stageIndex: 0,
+                                usedAtStage: 5, rarity: .common, totalForms: 2)
+        state.representativeSpeciesID = id(2, .hg)
+        state.usedSinceInstall = FreshEgg.price
+        try JSONEncoder().encode(state).write(to: url)
+        let s = CompanionStore(provider: catalog, fileURL: url)
+        XCTAssertTrue(try XCTUnwrap(s.hangarCell(machineID: 2)).isRaising)
+
+        XCTAssertTrue(s.buyFreshEgg())
+        XCTAssertEqual(s.representativeSpeciesID, id(2, .hg), "the released machine is still owned")
+        XCTAssertTrue(s.hangarCells.allSatisfy { !$0.isRaising })
+        let released = try XCTUnwrap(s.state.dex.last)
+        XCTAssertTrue(released.isReleased)
+        XCTAssertEqual(released.chainOrder, [id(2, .hg)], "only the reached grade is recorded")
+        XCTAssertTrue(s.state.collectedFinals.isEmpty, "releasing is not graduating")
+        XCTAssertEqual(s.hangarCell(machineID: 2)?.ownedGrades, [.hg])
+    }
+
+    func test_detailIndividualsAndRaisingFlagAreScopedToTheExactGrade() throws {
+        let active = MonState(baseID: id(1, .hg), pathIDs: [id(1, .hg), id(1, .rg)], stageIndex: 0,
+                              usedAtStage: 0, rarity: .common, totalForms: 2)
+        let s = try store(dex: [entry(1, [.sd, .hg]), entry(1, [.hg]), entry(2, [.hg])], active: active)
+
+        let hgIndividuals = s.pokemonIndividuals(speciesID: id(1, .hg))
+        XCTAssertEqual(hgIndividuals.count, 3, "two graduated HG builds of machine 1 plus the one raised now")
+        XCTAssertTrue(hgIndividuals.allSatisfy { $0.finalID == id(1, .hg) })
+        XCTAssertEqual(hgIndividuals.filter { s.isActiveDexEntry($0) }.count, 1)
+        XCTAssertEqual(s.pokemonIndividuals(speciesID: id(1, .sd)).count, 0, "SD is only a reached stage of those builds")
+        XCTAssertEqual(s.pokemonIndividuals(speciesID: id(2, .hg)).count, 1)
+        XCTAssertEqual(s.dexSpecies.filter(\.isRaising).map(\.id), [id(1, .hg)])
+    }
 }

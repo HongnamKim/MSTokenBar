@@ -3,18 +3,6 @@ import SwiftUI
 import XCTest
 @testable import PokeTokenBar
 
-private struct PrayerRenderProvider: PokeProviding, PokemonDetailProviding {
-    func line(baseSpeciesID: Int) async throws -> EvoLine { throw URLError(.notConnectedToInternet) }
-    func baseSpeciesIndex() async throws -> [BaseSpecies] { [] }
-    func baseSpecies(id: Int) async throws -> BaseSpecies? { nil }
-    func pokemonDetails(speciesID: Int) async throws -> PokemonDetails {
-        PokemonDetails(speciesID: speciesID, name: "parasect", height: 10, weight: 295,
-            baseExperience: 142, genderRate: 4, types: ["bug", "grass"],
-            baseStats: ["hp": 60, "attack": 95, "defense": 80, "special-attack": 60, "special-defense": 80, "speed": 30],
-            abilities: [PokemonAbilityOption(name: "effect-spore", slot: 1, isHidden: false)], moves: [])
-    }
-}
-
 /// Writes PNGs of the prayer UI when `PTB_PRAYER_RENDER_DIR` names an existing folder; skipped otherwise.
 /// Sample data only: sprites come from an empty directory, so no network is used.
 @MainActor
@@ -39,14 +27,15 @@ final class EggPrayerRenderTests: XCTestCase {
             state.eggUsage = 1_000_000
             state.eggPrayers = prayers
         } else {
-            state.dex = [DexEntry(id: "fixture", baseID: 46, finalID: 47, chainOrder: [46, 47], rarity: .common,
+            let sd = GunplaID.encode(machineID: 1, grade: .sd), hg = GunplaID.encode(machineID: 1, grade: .hg)
+            state.dex = [DexEntry(id: "fixture", baseID: sd, finalID: hg, chainOrder: [sd, hg], rarity: .common,
                                   caughtAt: Date(timeIntervalSince1970: 1_700_000_000),
-                                  profile: PokemonProfile.generate(seed: 1, instanceID: "fixture"),
-                                  names: [47: ["en": "Parasect", "ko": "파라섹트"]], prayers: prayers)]
+                                  names: [sd: ["en": "SD Gundam", "ko": "SD 건담"], hg: ["en": "HG Gundam", "ko": "HG 건담"]],
+                                  prayers: prayers)]
         }
         let file = directory.appendingPathComponent("state.json")
         try JSONEncoder().encode(state).write(to: file)
-        let store = CompanionStore(provider: PrayerRenderProvider(), fileURL: file, defaults: defaults)
+        let store = CompanionStore(provider: MachineCatalog.shared, fileURL: file, defaults: defaults)
         return store
     }
 
@@ -85,7 +74,7 @@ final class EggPrayerRenderTests: XCTestCase {
         for (language, tag) in [(AppLanguage.ko, "ko"), (.en, "en")] {
             for (record, name) in [(nil, "detail-no-prayers"), (prayed, "detail-37-prayers")] as [(PrayerRecord?, String)] {
                 let store = try await store(language: language, prayers: record, egg: false)
-                let species = try XCTUnwrap(store.dexSpecies.first { $0.id == 47 })
+                let species = try XCTUnwrap(store.dexSpecies.first { $0.id == GunplaID.encode(machineID: 1, grade: .hg) })
                 let spriteDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("prayer-sprites-\(UUID())")
                 try FileManager.default.createDirectory(at: spriteDirectory, withIntermediateDirectories: true)
                 addTeardownBlock { try? FileManager.default.removeItem(at: spriteDirectory) }

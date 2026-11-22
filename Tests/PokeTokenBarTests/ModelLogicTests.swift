@@ -36,16 +36,6 @@ final class EvoLineNameTests: XCTestCase {
     }
 }
 
-final class PokeAPILanguageTests: XCTestCase {
-    func testFetchedLanguageCodesMatchAppLanguageAPICodesWithoutDuplicates() {
-        let expected = AppLanguage.allCases.flatMap(\.apiCodes)
-
-        XCTAssertEqual(PokeAPIClient.langCodes, expected)
-        XCTAssertEqual(Set(PokeAPIClient.langCodes).count, PokeAPIClient.langCodes.count)
-        XCTAssertEqual(PokeAPIClient.langCodes, ["ko", "en", "ja-hrkt", "ja"])
-    }
-}
-
 // MARK: EvoLine 에셋 지원 범위
 
 final class EvoLineAssetTests: XCTestCase {

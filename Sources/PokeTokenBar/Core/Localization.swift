@@ -2,7 +2,7 @@ import Foundation
 
 /// 앱 전체 UI 문자열 — 언어별. 단일 소스(AppLanguage)에서 파생한다.
 /// 뷰는 `companion.l.<key>` 로 접근하며, language 변경 시 @Observable 로 자동 재렌더된다.
-/// 포켓몬 이름은 PokéAPI 다국어 데이터(EvoLine.localizedName)에서 별도로 온다.
+/// 기체 이름은 번들 카탈로그의 다국어 names(EvoLine.localizedName)에서 별도로 온다.
 struct L {
     let lang: AppLanguage
     init(_ lang: AppLanguage) { self.lang = lang }
@@ -1106,26 +1106,14 @@ struct L {
     /// 포획 로그 = 개체 단위 기록(같은 라인 중복이 정상). 도감 = 종 단위 집계.
     var catchLogTitle: String { t("제작 기록", "Build Log", "製作記録") }
     /// 도감 총계는 개체가 아니라 종 수 — 로그의 dexTotal("총 N마리")과 단위가 다르다.
-    func formsCollected(_ count: Int, of total: Int) -> String {
-        t("폼 \(count)/\(total)", "Forms \(count)/\(total)", "フォルム \(count)/\(total)",
-          "Formas \(count)/\(total)", "Formes \(count)/\(total)", "Formas \(count)/\(total)",
-          "Formen \(count)/\(total)",
-          "Формы: \(count)/\(total)")
-    }
     var chooseForm: String {
         t("폼 선택", "Choose form", "フォルムを選択", "Elegir forma", "Choisir une forme", "Escolher forma", "Form auswählen", "Выбрать форму")
     }
     /// Usual look of a species whose official data names no form (Castform, Rotom, Kyurem, Genesect).
-    var normalForm: String {
-        t("노말폼", "Normal Form", "ノーマルフォルム", "Forma Normal", "Forme Normale", "Forma Normal", "Normalform", "Обычная форма")
-    }
     var defaultFormDataNote: String {
         t("정보는 기본 폼 기준", "Data uses the default form", "データは基本フォルムに基づきます",
           "Datos de la forma predeterminada", "Données de la forme par défaut", "Dados da forma padrão",
           "Daten der Standardform", "Данные обычной формы")
-    }
-    var formNotCollected: String {
-        t("미수집", "Not collected", "未収集", "Sin conseguir", "Non collectionnée", "Não coletada", "Noch nicht gesammelt", "Не собрано")
     }
     func dexPageLabel(_ page: Int, _ total: Int) -> String {
         t("\(total)페이지 중 \(page)페이지", "Page \(page) of \(total)", "\(total)ページ中 \(page)ページ", "Página \(page) de \(total)", "Page \(page) sur \(total)", "Página \(page) de \(total)", "Seite \(page) von \(total)", "Страница \(page) из \(total)")
@@ -1179,55 +1167,8 @@ struct L {
     var dexNormalLabel: String { t("일반", "Normal", "通常", "Normal", "Normal", "Normal", "Normal", "Обычный") }
     var dexAppearance: String { t("모습", "Appearance", "姿", "Aspecto", "Apparence", "Aparência", "Aussehen", "Внешний вид") }
     var dexAppearancePreview: String { t("수집한 모습 · 종 정보", "Collected appearance · species reference", "収集した姿・種情報", "Aspecto coleccionado · datos de especie", "Apparence collectionnée · données de l’espèce", "Aparência coletada · dados da espécie", "Gesammeltes Aussehen · Speziesdaten", "Собранный облик · образец вида") }
-    // MARK: Pokémon 상세
-    var loadingPokemonDetails: String { t("기체 정보를 불러오는 중…", "Loading suit details…", "機体情報を読み込み中…") }
-    var pokemonDetailsUnavailable: String { t("기체 정보를 불러오지 못했어요.", "Suit details could not be loaded.", "機体情報を読み込めませんでした。") }
+    // MARK: 기체 상세
     var pokemonIndividual: String { t("개체", "Individual", "個体", "Ejemplar", "Individu", "Indivíduo", "Individuum", "Особь") }
-    var level: String { t("레벨", "Level", "レベル", "Nivel", "Niveau", "Nível", "Level", "Уровень") }
-    var gender: String { t("성별", "Gender", "性別", "Sexo", "Sexe", "Gênero", "Geschlecht", "Пол") }
-    var ability: String { t("특성", "Ability", "特性", "Habilidad", "Talent", "Habilidade", "Fähigkeit", "Способность") }
-    var hiddenAbility: String { t("숨겨진 특성", "Hidden Ability", "隠れ特性", "Habilidad oculta", "Talent caché", "Habilidade oculta", "Versteckte Fähigkeit", "Скрытая способность") }
-    var hidden: String { t("숨김", "Hidden", "隠れ", "Oculta", "Caché", "Oculta", "Versteckt", "Скрытая") }
-    var activeMoves: String { t("배운 기술", "Known moves", "覚えている技", "Movimientos conocidos", "Capacités connues", "Golpes conhecidos", "Erlernte Attacken", "Изученные приёмы") }
-    var noLevelMoves: String { t("현재 레벨에서 배운 기술이 없어요.", "No level-up moves learned at this level.", "現在のレベルで覚えた技はありません。", "No hay movimientos aprendidos a este nivel.", "Aucune capacité apprise à ce niveau.", "Nenhum golpe aprendido neste nível.", "Auf diesem Level wurden keine Attacken erlernt.", "На этом уровне ещё нет приёмов, изучаемых по уровню.") }
-    var actualStats: String { t("실제 능력치", "Actual stats", "実能力値", "Estadísticas reales", "Stats réelles", "Atributos reais", "Tatsächliche Werte", "Фактические характеристики") }
-    var baseStats: String { t("기본 능력치", "Base stats", "種族値", "Estadísticas base", "Stats de base", "Atributos base", "Basiswerte", "Базовые характеристики") }
-    var speciesData: String { t("종 정보", "Species data", "種情報", "Datos de especie", "Données de l’espèce", "Dados da espécie", "Speziesdaten", "Данные вида") }
-    var height: String { t("키", "Height", "高さ", "Altura", "Taille", "Altura", "Größe", "Рост") }
-    var weight: String { t("몸무게", "Weight", "重さ", "Peso", "Poids", "Peso", "Gewicht", "Вес") }
-    var baseStatTotal: String { t("합계", "Base total", "合計", "Total base", "Total de base", "Total base", "Basiswertsumme", "Сумма базовых") }
-    var possibleAbilities: String { t("가능한 특성", "Possible abilities", "可能な特性", "Habilidades posibles", "Talents possibles", "Habilidades possíveis", "Mögliche Fähigkeiten", "Возможные способности") }
-    func completeMoveList(_ count: Int) -> String { t("전체 기술 목록 \(count)개", "Complete move list · \(count)", "全技リスト・\(count)", "Lista completa · \(count)", "Liste complète · \(count)", "Lista completa · \(count)", "Vollständige Attackenliste · \(count)", "Все приёмы · \(count)") }
-    func genderLabel(_ gender: PokemonGender?) -> String {
-        switch gender {
-        case .male: return t("수컷", "Male", "オス", "Macho", "Mâle", "Macho", "Männlich", "Самец")
-        case .female: return t("암컷", "Female", "メス", "Hembra", "Femelle", "Fêmea", "Weiblich", "Самка")
-        case .genderless: return t("무성", "Genderless", "性別不明", "Sin género", "Asexué", "Sem gênero", "Geschlechtslos", "Бесполый")
-        case nil: return "—"
-        }
-    }
-    func statLabel(_ stat: String) -> String {
-        switch stat {
-        case "hp": return "HP"
-        case "attack": return t("공격", "Attack", "こうげき", "Ataque", "Attaque", "Ataque", "Angriff", "Атака")
-        case "defense": return t("방어", "Defense", "ぼうぎょ", "Defensa", "Défense", "Defesa", "Vert.", "Защита")
-        case "special-attack": return t("특공", "Sp. Atk", "とくこう", "At. Esp.", "Atq. Spé.", "Atq. Esp.", "Sp.-Ang.", "Сп. атака")
-        case "special-defense": return t("특방", "Sp. Def", "とくぼう", "Def. Esp.", "Déf. Spé.", "Def. Esp.", "Sp.-Vert.", "Сп. защита")
-        case "speed": return t("스피드", "Speed", "すばやさ", "Velocidad", "Vitesse", "Velocidade", "Initiative", "Скорость")
-        default: return stat
-        }
-    }
-    func moveMethod(_ detail: PokemonMoveLearnMethod) -> String {
-        switch detail.method {
-        case "level-up": return detail.level > 0 ? "Lv. \(detail.level)" : t("시작", "Start", "基本", "Inicio", "Départ", "Inicial", "Start", "Старт")
-        case "machine": return "TM"
-        case "egg": return t("교배", "Egg", "タマゴ", "Huevo", "Œuf", "Ovo", "Ei", "Яйцо")
-        case "light-ball-egg": return t("전기구 교배", "Light Ball breeding", "でんきだま遺伝", "Crianza con Bola Luminosa", "Reproduction avec Balle Lumière", "Cruzamento com Bola de Luz", "Zucht mit Kugelblitz", "Разведение со Световым шаром")
-        case "form-change": return t("폼 체인지", "Form change", "フォルムチェンジ", "Cambio de forma", "Changement de forme", "Mudança de forma", "Formwechsel", "Смена формы")
-        case "tutor": return t("가르침", "Tutor", "教え", "Tutor", "Maître", "Tutor", "Tutor", "Наставник")
-        default: return detail.method.replacingOccurrences(of: "-", with: " ")
-        }
-    }
     func rarityLabel(_ r: Rarity) -> String {
         switch r {
         case .common:    return rarityCommon
@@ -1322,12 +1263,6 @@ struct L {
     var notifEvolveTitle: String { t("✨ 등급 업!", "✨ Grade Up!", "✨ グレードアップ！") }
     /// Both names, so the notification and the floating pet's hover line say who evolved into what.
     func notifEvolveBody(from old: String, to new: String) -> String { t("\(KoreanParticle.subject.attach(to: old)) \(KoreanParticle.direction.attach(to: new)) 등급 업했어요!", "\(old) graded up to \(new)!", "\(old) が \(new) にグレードアップしました！") }
-    // 메타몽 위장 리빌 — 진화 못 하는 메타몽이 첫 진화 순간 정체를 드러낸다.
-    var notifDittoRevealTitle: String { t("🎭 어라? 숨은 기체!", "🎭 Huh? A hidden suit!", "🎭 あれ？隠し機体！") }
-    func notifDittoRevealBody(_ disguise: String) -> String { t("\(disguise)인 줄 알았는데 — 사실은 다른 기체였어요!", "You thought it was \(disguise) — it was a different suit all along!", "\(disguise) だと思ってた… 実は別の機体でした！") }
-    var notifShinyDittoRevealTitle: String { t("🎭✨ 어라? 전용기!", "🎭✨ Huh? A Custom unit!", "🎭✨ あれ？専用機！") }
-    /// 확률을 적지 않는다 — 이로치는 부화 때 굴렸고, 그때의 부적 보유 여부는 저장되지 않는다.
-    func notifShinyDittoRevealBody(_ disguise: String) -> String { t("\(disguise)인 줄 알았는데 — 전용기였어요!", "You thought it was \(disguise) — it was a Custom unit!", "\(disguise) だと思ってた… 専用機でした！") }
     var notifGraduateTitle: String { t("🏁 완성!", "🏁 Complete!", "🏁 完成！") }
     func notifGraduateBody(_ name: String) -> String { t("\(name) — 격납고에 보존! 새 건프라 박스가 도착했어요.", "\(name) — saved to your Hangar! A new Kit Box has arrived.", "\(name) — 格納庫に保存！新しいキットボックスが届きました。") }
 
@@ -1696,11 +1631,11 @@ struct L {
         case .maskingTape, .panelLinePen, .paintSet, .airbrush:
             return t("전용기 확률이 영구히 올라가요",
                      "Permanently raises the custom-unit chance",
-                     "カスタム機の出現率が永続的に上がります")
+                     "専用機の出現率が永続的に上がります")
         }
     }
     /// 가방/상점의 보유 공구 효과 표시.
-    var toolEffectHint: String { t("전용기 확률 ↑ · 적용 중", "Custom-unit odds ↑ · active", "カスタム機率↑ · 適用中") }
+    var toolEffectHint: String { t("전용기 확률 ↑ · 적용 중", "Custom-unit odds ↑ · active", "専用機率↑ · 適用中") }
     /// 아직 살 수 없는 공구(앞 단계 미보유)의 안내.
     var toolLockedHint: String { t("앞의 공구를 먼저 사야 해요", "Buy the previous tool first", "前の工具を先に購入してください") }
     /// 이 등급 이상 키트를 모두 졸업해 박스를 살 수 없을 때의 안내.

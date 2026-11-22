@@ -14,7 +14,6 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         let fixedNow = now
         return CompanionStore(provider: catalog, clock: { fixedNow },
                               fileURL: fileURL ?? tempURL(), rng: rng,
-                              dittoDisguiseRollingEnabled: false,
                               defaults: UserDefaults(suiteName: "gunpla-\(UUID().uuidString)")!)
     }
 
@@ -60,10 +59,6 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertEqual(active.stageIndex, 0)
         XCTAssertEqual(active.totalForms, machine.grades.count)
         XCTAssertEqual(active.rarity, machine.rarity)
-        XCTAssertNil(active.nature)
-        XCTAssertNil(active.form)
-        XCTAssertNil(active.profile)
-        XCTAssertNil(active.dittoDisguise)
         XCTAssertNil(s.state.pendingHatchID)
     }
 

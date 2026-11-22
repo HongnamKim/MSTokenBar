@@ -189,22 +189,6 @@ final class SulkStateTests: XCTestCase {
 
 @MainActor
 final class BackSpriteTests: XCTestCase {
-    private let base = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon"
-
-    func testBackURLs() {
-        let gif = "\(base)/versions/generation-v/black-white/animated"
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: false, back: true).absoluteString,
-                       "\(gif)/back/25.gif")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: true, back: true).absoluteString,
-                       "\(gif)/back/shiny/25.gif")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: false, shiny: false, back: true).absoluteString,
-                       "\(base)/back/25.png")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: false, shiny: true, back: true).absoluteString,
-                       "\(base)/back/shiny/25.png")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: false).absoluteString,
-                       "\(gif)/25.gif")   // front is unchanged
-    }
-
     func testBackCacheKeyDiffersFromFrontAndFrontKeyIsUnchanged() {
         for animated in [false, true] {
             for shiny in [false, true] {
