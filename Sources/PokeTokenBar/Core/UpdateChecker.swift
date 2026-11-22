@@ -44,7 +44,7 @@ final class UpdateChecker {
             ?? (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "0"
         self.clock = clock
         self.defaults = defaults
-        self.fetchLatest = fetchLatest ?? { await Self.liveLatestRelease(repo: "chattymin/MSTokenBar") }
+        self.fetchLatest = fetchLatest ?? { await Self.liveLatestRelease(repo: "HongnamKim/MSTokenBar") }
     }
 
     var settingsNotice: SettingsNotice {
