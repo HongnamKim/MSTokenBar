@@ -49,9 +49,9 @@ final class CatalogProviderTests: XCTestCase {
         XCTAssertNil(one)
     }
 
-    func test_nonKoEnJaLanguageFallsBackToEnglishName() async throws {
+    func test_englishNameForUnnamedLanguageFallback() async throws {
         let id = GunplaID.encode(machineID: 2, grade: .hg)
         let line = try await MachineCatalog.shared.line(baseSpeciesID: id)
-        XCTAssertTrue(line.localizedName(id, .de).hasPrefix("HG "))
+        XCTAssertTrue(line.localizedName(id, .en).hasPrefix("HG "))
     }
 }

@@ -48,7 +48,8 @@ struct SettingsView: View {
         guard let species = companion.representativeDexSpecies else {
             return l.representativeFollowCurrent
         }
-        return "#\(species.id) \(species.name)\(species.isShiny ? " ✨" : "")"
+        let model = companion.catalog.machine(species.id)?.modelNumber
+        return "\(model.map { "\($0) " } ?? "")\(species.name)\(species.isShiny ? " ✨" : "")"
     }
 
     /// 세이브 봉투에 남길 출처 표기 — 어느 Mac에서 내보낸 파일인지 나중에 알아보기 위한 것.

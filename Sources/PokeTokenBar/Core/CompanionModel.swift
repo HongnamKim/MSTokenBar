@@ -6,26 +6,26 @@ enum CompanionStateKind: String, Sendable {
     case egg, idle, working, focus, tired, sleep, sulk, levelUp
 }
 
-/// 앱 언어. 포켓몬 이름은 PokéAPI 다국어 names 에서 가져온다.
+/// 앱 언어. 기체 이름은 번들 카탈로그의 다국어 names 에서 가져온다. ko / en / ja 세 가지만 지원한다.
 enum AppLanguage: String, Codable, Sendable, CaseIterable {
-    case ko, en, ja, es, fr, pt, de, ru
-    /// PokéAPI language.name 후보(첫 매칭 사용)
+    case ko, en, ja
+
+    /// 저장된 값이 es/fr/pt/de/ru 처럼 더는 지원하지 않는 언어여도 디코딩은 실패하지 않고 영어가 된다.
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = AppLanguage(rawValue: raw) ?? .en
+    }
+
+    /// 이름 언어 코드 후보(첫 매칭 사용)
     var apiCodes: [String] {
         switch self {
         case .ko: return ["ko"]
         case .en: return ["en"]
         case .ja: return ["ja-hrkt", "ja"]
-        case .es: return ["es"]
-        case .fr: return ["fr"]
-        case .pt: return ["pt-br", "pt"]
-        case .de: return ["de"]
-        // 공식 러시아어 이름(Пикачу·Иви 등)은 있지만 PokéAPI 에 ru 데이터가 아직 없어 지금은 영어로 폴백된다 —
-        // 데이터 부재에 따른 임시 범위이지 러시아의 표기 관행이 아니다. PokéAPI 가 ru 를 제공하면 그대로 쓰인다.
-        case .ru: return ["ru"]
         }
     }
     var label: String {
-        switch self { case .ko: return "한국어"; case .en: return "English"; case .ja: return "日本語"; case .es: return "Español"; case .fr: return "Français"; case .pt: return "Português"; case .de: return "Deutsch"; case .ru: return "Русский" }
+        switch self { case .ko: return "한국어"; case .en: return "English"; case .ja: return "日本語" }
     }
 
     var displayLocale: Locale { Locale(identifier: rawValue) }
@@ -35,8 +35,8 @@ enum AppLanguage: String, Codable, Sendable, CaseIterable {
         PokemonNameLocalization.resolve(byLang, preferredCodes: apiCodes)
     }
 
-    /// 신규 설치 기본 언어 — 시스템 선호 언어에서 유추(글로벌 출시: 한국어 강제 금지).
-    /// ko/ja/es/fr/pt/de/ru 만 매칭, 그 외 전부 영어(fallback-of-fallback). 기존 사용자는 저장된 언어를 그대로 쓴다.
+    /// 신규 설치 기본 언어 — 시스템 선호 언어에서 유추. ko/ja 만 매칭, 그 외 전부 영어.
+    /// 기존 사용자는 저장된 언어를 그대로 쓴다.
     static var systemDefault: AppLanguage {
         systemDefault(for: Locale.preferredLanguages.first)
     }
@@ -46,11 +46,6 @@ enum AppLanguage: String, Codable, Sendable, CaseIterable {
         switch preferredLanguage?.prefix(2).lowercased() {
         case "ko": return .ko
         case "ja": return .ja
-        case "es": return .es
-        case "fr": return .fr
-        case "pt": return .pt
-        case "de": return .de
-        case "ru": return .ru
         default:   return .en
         }
     }
@@ -420,7 +415,7 @@ enum PokemonNature: String, Codable, Sendable, CaseIterable {
         case .careful: names = ("신중", "Careful", "しんちょう", "Cauta", "Prudent", "Cautelosa", "Sacht", "Внимательный")
         case .quirky:  names = ("변덕", "Quirky", "きまぐれ", "Rara", "Bizarre", "Excêntrica", "Kauzig", "Ловкий")
         }
-        switch lang { case .ko: return names.0; case .en: return names.1; case .ja: return names.2; case .es: return names.3; case .fr: return names.4; case .pt: return names.5; case .de: return names.6; case .ru: return names.7 }
+        switch lang { case .ko: return names.0; case .en: return names.1; case .ja: return names.2 }
     }
 }
 

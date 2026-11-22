@@ -368,9 +368,7 @@ final class UsageRecapRenderingTests: XCTestCase {
 
     func testCurrentPeriodLabelsFollowTheScopeInEveryLanguage() {
         let expectedYears: [AppLanguage: String] = [
-            .ko: "올해", .en: "This year", .ja: "今年", .es: "Este año",
-            .fr: "Cette année", .pt: "Este ano", .de: "Dieses Jahr",
-            .ru: "Этот год",
+            .ko: "올해", .en: "This year", .ja: "今年",
         ]
         XCTAssertEqual(expectedYears.count, AppLanguage.allCases.count)
         for language in AppLanguage.allCases {

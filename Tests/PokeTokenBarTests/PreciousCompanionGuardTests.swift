@@ -85,7 +85,7 @@ final class PreciousCompanionGuardTests: XCTestCase {
         XCTAssertTrue(revealed.isHighValueCompanion, "리빌 후에는 이로치가 드러나 고가치 개체로 판정된다")
     }
 
-    func testLocalizationStringsCoverAllSevenLanguages() {
+    func testLocalizationStringsCoverAllLanguages() {
         for lang in AppLanguage.allCases {
             let l = L(lang)
             XCTAssertFalse(l.freshEggLegendaryWarning.isEmpty, "전설 경고 문구가 모든 언어(\(lang))에 존재해야 함")
@@ -94,7 +94,7 @@ final class PreciousCompanionGuardTests: XCTestCase {
         }
 
         // 한국어와 영어 문구 특정 검증
-        XCTAssertTrue(L(.ko).freshEggLegendaryWarning.contains("전설 포켓몬"))
+        XCTAssertTrue(L(.ko).freshEggLegendaryWarning.contains("전설 등급 기체"))
         XCTAssertEqual(L(.ko).freshEggDiscardValuable, "놓아주기")
         XCTAssertTrue(L(.en).freshEggLegendaryWarning.contains("Legendary"))
         XCTAssertEqual(L(.en).freshEggDiscardValuable, "Send off")

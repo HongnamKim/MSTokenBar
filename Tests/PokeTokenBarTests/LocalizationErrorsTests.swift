@@ -62,7 +62,7 @@ final class LocalizationErrorsTests: XCTestCase {
         await store.refresh(scheduleEmptyRetry: false)
         let diagnostic = store.lastErrorDescription!
         XCTAssertEqual(store.lastErrorMessage(L(.ko)), L(.ko).usageRefreshError + "\n" + diagnostic)
-        XCTAssertEqual(store.lastErrorMessage(L(.de)), L(.de).usageRefreshError + "\n" + diagnostic)
+        XCTAssertEqual(store.lastErrorMessage(L(.en)), L(.en).usageRefreshError + "\n" + diagnostic)
         XCTAssertEqual(store.lastErrorDescription, diagnostic)
     }
 }

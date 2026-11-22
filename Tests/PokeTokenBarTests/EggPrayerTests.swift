@@ -190,17 +190,17 @@ final class EggPrayerTests: XCTestCase {
     func testPrayerHatchNotificationFollowsTheOutcome() {
         let ko = L(.ko), en = L(.en)
         XCTAssertEqual(ko.notifPrayerHatchBody("뮤", prayers: 37, shiny: true, rarity: .legendary),
-                       "기도 37번… 하늘이 진심이었다. 이로치 뮤!")
+                       "기도 37번… 하늘이 진심이었다. 전용기 뮤!")
         XCTAssertEqual(en.notifPrayerHatchBody("Mew", prayers: 37, shiny: true, rarity: .legendary),
-                       "37 prayers… heaven went all in. Shiny Mew!")
+                       "37 prayers… heaven went all in. Custom Mew!")
         XCTAssertEqual(ko.notifPrayerHatchBody("뮤", prayers: 37, shiny: false, rarity: .legendary),
                        "기도 37번… 통했다?! 뮤가 나왔어요!")
         XCTAssertEqual(en.notifPrayerHatchBody("Mew", prayers: 37, shiny: false, rarity: .legendary),
-                       "37 prayers… it worked?! Mew hatched!")
+                       "37 prayers… it worked?! Mew came out!")
         XCTAssertEqual(ko.notifPrayerHatchBody("피카츄", prayers: 37, shiny: true, rarity: .rare),
-                       "기도 37번에 이로치까지?! 피카츄가 나왔어요!")
+                       "기도 37번에 전용기까지?! 피카츄가 나왔어요!")
         XCTAssertEqual(en.notifPrayerHatchBody("Pikachu", prayers: 37, shiny: true, rarity: .common),
-                       "37 prayers AND it's shiny?! Pikachu hatched!")
+                       "37 prayers AND it's a Custom?! Pikachu came out!")
         for rarity in [Rarity.uncommon, .rare] {
             XCTAssertEqual(ko.notifPrayerHatchBody("피카츄", prayers: 37, shiny: false, rarity: rarity),
                            "기도 37번 끝에 피카츄가 나왔어요. 반은 통한 걸로 칩시다.")
@@ -252,12 +252,12 @@ final class EggPrayerTests: XCTestCase {
         XCTAssertEqual(L(.ko).prayerHoverLine(30), "기도 30회 · 하늘이 아직 확인 안 함")
         XCTAssertEqual(L(.ko).prayerHoverLine(150), "기도 150회 · 하늘 대기열 3,812번째")
         XCTAssertEqual(L(.ko).prayerHoverLine(240), "기도 240회 · 하늘: \"접수했습니다. 검토 후 답변드릴게요\"")
-        XCTAssertEqual(L(.ko).prayerHoverLine(299), "기도 299회 · 알이 방금 \"그만…\"이라고 한 것 같음")
+        XCTAssertEqual(L(.ko).prayerHoverLine(299), "기도 299회 · 박스가 방금 \"그만…\"이라고 한 것 같음")
         XCTAssertEqual(L(.en).prayerHoverLine(1), "1 prayer · just trying it out")
         XCTAssertEqual(L(.en).prayerHoverLine(31), "31 prayers · heaven hasn't checked yet")
         XCTAssertEqual(L(.en).prayerHoverLine(120), "120 prayers · heaven's servers are lagging")
         XCTAssertEqual(L(.en).prayerHoverLine(180), "180 prayers · your palms are wearing thin")
-        XCTAssertEqual(L(.en).prayerHoverLine(300), "300 prayers · if a legendary hatches, that's pure skill")
+        XCTAssertEqual(L(.en).prayerHoverLine(300), "300 prayers · if a legendary drops, that's pure skill")
     }
 
     func testDetailCopy() {

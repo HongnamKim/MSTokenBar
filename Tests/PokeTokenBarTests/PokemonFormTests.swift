@@ -281,24 +281,24 @@ final class PokemonFormTests: XCTestCase {
     func testUnnamedUsualLooksUseLocalizedNormalForm() {
         let names = PokemonNameDisplayStore()
         for id in [351, 479, 646, 649] {
-            XCTAssertEqual(PokemonForm.label(speciesID: id, form: nil, language: .fr, names: names), "Forme Normale")
+            XCTAssertEqual(PokemonForm.label(speciesID: id, form: nil, language: .en, names: names), L(.en).normalForm)
         }
-        XCTAssertEqual(PokemonForm.label(speciesID: 479, form: PokemonForm("normal"), language: .de, names: names),
-                       "Normalform")
-        XCTAssertEqual(PokemonForm.label(speciesID: 479, form: PokemonForm("heat"), language: .fr, names: names),
+        XCTAssertEqual(PokemonForm.label(speciesID: 479, form: PokemonForm("normal"), language: .ko, names: names),
+                       L(.ko).normalForm)
+        XCTAssertEqual(PokemonForm.label(speciesID: 479, form: PokemonForm("heat"), language: .en, names: names),
                        "Heat", "Named forms keep the PokéAPI name")
-        XCTAssertEqual(PokemonForm.displayName("Motisma", speciesID: 479, form: nil, language: .fr), "Motisma")
+        XCTAssertEqual(PokemonForm.displayName("Motisma", speciesID: 479, form: nil, language: .en), "Motisma")
     }
 
     func testDisplayNameShowsOnlyNonDefaultFormsExceptUnown() async {
         let names = PokemonNameDisplayStore()
         let skyName = PokemonForm.nameResource(speciesID: 492, form: sky)!
-        XCTAssertEqual(PokemonForm.label(speciesID: 492, form: sky, language: .fr, names: names), "Sky",
+        XCTAssertEqual(PokemonForm.label(speciesID: 492, form: sky, language: .en, names: names), "Sky",
                        "Identifier until PokéAPI answers")
         _ = await names.load(skyName, provider: FixedNames(names: ["fr": "Forme Céleste", "en": "Sky Forme"]))
-        XCTAssertEqual(PokemonForm.label(speciesID: 492, form: sky, language: .fr, names: names), "Forme Céleste")
-        XCTAssertEqual(PokemonForm.label(speciesID: 201, form: .question, language: .fr, names: names), "?")
-        XCTAssertNil(PokemonForm.label(speciesID: 25, form: sky, language: .fr, names: names))
+        XCTAssertEqual(PokemonForm.label(speciesID: 492, form: sky, language: .en, names: names), "Sky Forme")
+        XCTAssertEqual(PokemonForm.label(speciesID: 201, form: .question, language: .en, names: names), "?")
+        XCTAssertNil(PokemonForm.label(speciesID: 25, form: sky, language: .en, names: names))
 
         XCTAssertEqual(PokemonForm.displayName("Shaymin", speciesID: 492, form: sky, label: "Forme Céleste"),
                        "Shaymin [Forme Céleste]")

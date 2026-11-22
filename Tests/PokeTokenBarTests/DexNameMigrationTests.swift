@@ -77,7 +77,7 @@ final class DexNameMigrationTests: XCTestCase {
         XCTAssertEqual(calls, 1, "Duplicate catches and stale row values must reuse the refreshed names")
 
         let restored = CompanionStore(provider: provider, fileURL: url)
-        restored.setLanguage(.pt) // No Portuguese names in the API response: English is complete fallback.
+        restored.setLanguage(.ja) // No Japanese names in the API response: English is complete fallback.
         await restored.backfillMissingDexNames()
         XCTAssertEqual(restored.dexStoredChainNames(restored.state.dex[0])?[1], "Bulbasaur")
         let restoredCalls = await provider.calls

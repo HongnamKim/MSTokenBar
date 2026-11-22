@@ -567,7 +567,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let img = NSImage(size: NSSize(width: h, height: h))
         img.lockFocus()
         let off: CGFloat = up ? 1 : 0
-        let s = "🥚" as NSString
+        let s = "📦" as NSString
         s.draw(in: NSRect(x: 2, y: off, width: h - 2, height: h - 2),
                withAttributes: [.font: NSFont.systemFont(ofSize: 15)])
         img.unlockFocus()

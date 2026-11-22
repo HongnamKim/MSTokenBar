@@ -1346,12 +1346,12 @@ final class ClaudeTrackedAccountStoreTests: XCTestCase {
         let both = makeStore(primary: fullStatus(fiveHour: 40, sevenDay: 10, email: "me@corp.example", org: "Corp"),
                              personal: fullStatus(fiveHour: 61, sevenDay: 21, email: "me@example.com"),
                              lastPrompt: ["personal": Date()])
-        both.localizationLanguage = .fr
+        both.localizationLanguage = .en
         both.showLimitInMenu = false
         await both.refresh(scheduleEmptyRetry: false)
         XCTAssertNil(both.menuToolTip, "no percentage in the menu bar, nothing to name")
         both.showLimitInMenu = true
-        XCTAssertEqual(both.menuToolTip, "Compte Claude suivi : me@example.com")
+        XCTAssertEqual(both.menuToolTip, "Tracked Claude account: me@example.com")
 
         let idle = makeStore(primary: fullStatus(fiveHour: 40, sevenDay: 10, email: "me@corp.example", org: "Corp"),
                              personal: fullStatus(fiveHour: 61, sevenDay: 21, email: "me@example.com"),

@@ -255,7 +255,7 @@ struct SpriteView: View {
             } else if let img = subject.image {
                 fitted(animated && speciesID != nil ? SpriteLoader.animationPlaceholder(img) : img)
             } else {
-                Text("🥚").font(.system(size: size * 0.62)).frame(width: size, height: size)
+                Text("📦").font(.system(size: size * 0.62)).frame(width: size, height: size)
             }
         }
         // GIF 재생 중엔 bob 정지(프레임 자체가 움직임) — 폴백/정적일 때만 상하 움직임

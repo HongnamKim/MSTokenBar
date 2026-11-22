@@ -1037,9 +1037,9 @@ final class CompanionStoreTests: XCTestCase {
     }
 
     func testUnknownNextEvolutionAccessibilityLabelLocalized() {
-        XCTAssertEqual(L(.ko).unknownNextEvolution, "알 수 없는 다음 진화")
-        XCTAssertEqual(L(.en).unknownNextEvolution, "Unknown next evolution")
-        XCTAssertEqual(L(.ja).unknownNextEvolution, "次の進化先は不明")
+        XCTAssertEqual(L(.ko).unknownNextEvolution, "알 수 없는 다음 등급")
+        XCTAssertEqual(L(.en).unknownNextEvolution, "Unknown next grade")
+        XCTAssertEqual(L(.ja).unknownNextEvolution, "次のグレードは不明")
     }
 
     func testEggOverflowCarriesToHatchedMon() async {
@@ -1420,49 +1420,11 @@ final class CompanionStoreTests: XCTestCase {
 // MARK: 표시 로케일 (자동 생성 문장)
 
 final class AppLanguageTests: XCTestCase {
-    func testGermanLanguageMetadata() {
-        XCTAssertEqual(AppLanguage.de.rawValue, "de")
-        XCTAssertEqual(AppLanguage.de.apiCodes, ["de"])
-        XCTAssertEqual(AppLanguage.de.label, "Deutsch")
-    }
-
-    func testGermanLanguagePersistsInCompanionState() throws {
-        var state = CompanionState()
-        state.language = .de
-
-        let data = try JSONEncoder().encode(state)
-        XCTAssertTrue(String(decoding: data, as: UTF8.self).contains(#""language":"de""#))
-        XCTAssertEqual(try JSONDecoder().decode(CompanionState.self, from: data).language, .de)
-    }
-
-    func testGermanPreferredLanguagesMapToGerman() {
-        for identifier in ["de", "de-DE", "de-AT", "DE-de"] {
-            XCTAssertEqual(AppLanguage.systemDefault(for: identifier), .de, identifier)
-        }
+    func testKoreanAndJapanesePreferredLanguagesMapToThemselves() {
+        for identifier in ["ko", "ko-KR", "KO-kr"] { XCTAssertEqual(AppLanguage.systemDefault(for: identifier), .ko, identifier) }
+        for identifier in ["ja", "ja-JP", "JA-jp"] { XCTAssertEqual(AppLanguage.systemDefault(for: identifier), .ja, identifier) }
         XCTAssertEqual(AppLanguage.systemDefault(for: "it-IT"), .en)
         XCTAssertEqual(AppLanguage.systemDefault(for: nil), .en)
-    }
-
-    func testRussianLanguageMetadata() {
-        XCTAssertEqual(AppLanguage.ru.rawValue, "ru")
-        XCTAssertEqual(AppLanguage.ru.apiCodes, ["ru"])
-        XCTAssertEqual(AppLanguage.ru.label, "Русский")
-    }
-
-    func testRussianLanguagePersistsInCompanionState() throws {
-        var state = CompanionState()
-        state.language = .ru
-
-        let data = try JSONEncoder().encode(state)
-        XCTAssertTrue(String(decoding: data, as: UTF8.self).contains(#""language":"ru""#))
-        XCTAssertEqual(try JSONDecoder().decode(CompanionState.self, from: data).language, .ru)
-    }
-
-    func testRussianPreferredLanguagesMapToRussian() {
-        for identifier in ["ru", "ru-RU", "ru-KZ", "RU-ru"] {
-            XCTAssertEqual(AppLanguage.systemDefault(for: identifier), .ru, identifier)
-        }
-        XCTAssertEqual(AppLanguage.systemDefault(for: "uk-UA"), .en)
     }
 }
 
@@ -1475,8 +1437,6 @@ final class DisplayLocaleTests: XCTestCase {
         XCTAssertEqual(AppLanguage.ko.displayLocale.identifier, "ko")
         XCTAssertEqual(AppLanguage.en.displayLocale.identifier, "en")
         XCTAssertEqual(AppLanguage.ja.displayLocale.identifier, "ja")
-        XCTAssertEqual(AppLanguage.de.displayLocale.identifier, "de")
-        XCTAssertEqual(AppLanguage.ru.displayLocale.identifier, "ru")
     }
 
     func testRelativeTimeFollowsAppLanguageNotSystem() {
@@ -1492,10 +1452,8 @@ final class DisplayLocaleTests: XCTestCase {
         XCTAssertTrue(relative(.en).contains("hour"), "영어: \(relative(.en))")
         XCTAssertTrue(relative(.ko).contains("시간"), "한국어: \(relative(.ko))")
         XCTAssertTrue(relative(.ja).contains("時間"), "일본어: \(relative(.ja))")
-        XCTAssertTrue(relative(.de).lowercased().contains("stund"), "독일어: \(relative(.de))")
-        XCTAssertTrue(relative(.ru).contains("час"), "러시아어: \(relative(.ru))")
-        // 다섯 언어가 서로 달라야 한다 — 하나로 고정돼 있으면 매핑이 죽은 것이다.
-        XCTAssertEqual(Set([relative(.en), relative(.ko), relative(.ja), relative(.de), relative(.ru)]).count, 5)
+        // 세 언어가 서로 달라야 한다 — 하나로 고정돼 있으면 매핑이 죽은 것이다.
+        XCTAssertEqual(Set([relative(.en), relative(.ko), relative(.ja)]).count, 3)
     }
 }
 
@@ -1769,31 +1727,6 @@ final class CompanionIdentityTests: XCTestCase {
         XCTAssertEqual(SpriteStore.cacheKey(speciesID: 25, animated: false, shiny: true), "25-shs")
     }
 
-    func testGermanNatureNamesMatchOfficialMainlineNames() {
-        let expected = [
-            "Robust", "Solo", "Mutig", "Hart", "Frech",
-            "Kühn", "Sanft", "Locker", "Pfiffig", "Lasch",
-            "Scheu", "Hastig", "Ernst", "Froh", "Naiv",
-            "Mäßig", "Mild", "Ruhig", "Zaghaft", "Hitzig",
-            "Still", "Zart", "Forsch", "Sacht", "Kauzig",
-        ]
-
-        XCTAssertEqual(PokemonNature.allCases.map { $0.name(.de) }, expected)
-    }
-
-    /// 본가 러시아어판이 없어 공식 명칭이 없다 — `PokemonNature.name(_:)` 주석의 커뮤니티 표기 규약을 고정한다.
-    func testRussianNatureNamesFollowDocumentedCommunityConvention() {
-        let expected = [
-            "Выносливый", "Одинокий", "Храбрый", "Непреклонный", "Непослушный",
-            "Смелый", "Послушный", "Расслабленный", "Проказливый", "Беспечный",
-            "Робкий", "Торопливый", "Серьёзный", "Весёлый", "Наивный",
-            "Скромный", "Мягкий", "Тихий", "Застенчивый", "Опрометчивый",
-            "Спокойный", "Кроткий", "Нахальный", "Внимательный", "Ловкий",
-        ]
-
-        XCTAssertEqual(PokemonNature.allCases.map { $0.name(.ru) }, expected)
-    }
-
     /// 성격 25종 — 모든 지원 언어 명칭이 전부 비어있지 않고 중복 없는지.
     func testNatureNamesComplete() {
         XCTAssertEqual(PokemonNature.allCases.count, 25)
@@ -1806,14 +1739,9 @@ final class CompanionIdentityTests: XCTestCase {
 
     func testLocalizationIncludesDelayedHatchRetry() {
         let expected = [
-            "⏳ 부화가 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
-            "⏳ Hatching is delayed — retrying on the next refresh",
-            "⏳ 孵化が遅れています。次回の更新時に再試行します",
-            "⏳ La eclosión se retrasa; se reintentará en la próxima actualización",
-            "⏳ L’éclosion est retardée — nouvel essai au prochain rafraîchissement",
-            "⏳ A eclosão está atrasada — nova tentativa na próxima atualização",
-            "⏳ Das Schlüpfen verzögert sich — neuer Versuch bei der nächsten Aktualisierung",
-            "⏳ Вылупление задерживается — повторим при следующем обновлении",
+            "⏳ 개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
+            "⏳ Unboxing is delayed — retrying on the next refresh",
+            "⏳ 開封が遅れています。次回の更新時に再試行します",
         ]
         XCTAssertEqual(AppLanguage.allCases.count, expected.count)
         for (lang, copy) in zip(AppLanguage.allCases, expected) {

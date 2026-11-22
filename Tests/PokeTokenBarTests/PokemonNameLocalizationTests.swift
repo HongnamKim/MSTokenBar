@@ -49,11 +49,9 @@ final class PokemonNameLocalizationTests: XCTestCase {
         let names = ["en": "Tackle", "ko": "몸통박치기", "ja-Hrkt": "たいあたり", "ja": "体当たり", "pt_BR": "Investida"]
         XCTAssertEqual(AppLanguage.ko.resolveName(names), "몸통박치기")
         XCTAssertEqual(AppLanguage.ja.resolveName(names), "たいあたり")
-        XCTAssertEqual(AppLanguage.pt.resolveName(names), "Investida")
-        XCTAssertEqual(AppLanguage.de.resolveName(names), "Tackle")
+        XCTAssertEqual(AppLanguage.en.resolveName(["de": "Tackle", "en": "Tackle EN"]), "Tackle EN")
         XCTAssertEqual(AppLanguage.ko.resolveName(["ko": " \n", "en": " Tackle "]), "Tackle")
         XCTAssertNil(AppLanguage.ko.resolveName(["fr": "Charge"]))
-        XCTAssertEqual(AppLanguage.pt.apiCodes, ["pt-br", "pt"])
         XCTAssertEqual(AppLanguage.ja.apiCodes, ["ja-hrkt", "ja"])
         XCTAssertEqual(PokeAPIClient.langCodes, AppLanguage.allCases.flatMap(\.apiCodes))
     }
@@ -227,7 +225,7 @@ final class PokemonNameLocalizationTests: XCTestCase {
         // A newly created view can resolve the snapshot synchronously, before its .task runs.
         XCTAssertEqual(PokemonNameText(items: items, language: .ko, names: store.names).text, "몸통박치기")
         XCTAssertEqual(PokemonNameText(items: items, language: .en, names: store.names).text, "Tackle")
-        XCTAssertEqual(PokemonNameText(items: items, language: .pt, names: store.names).text, "Tackle")
+        XCTAssertEqual(PokemonNameText(items: items, language: .en, names: store.names).text, "Tackle")
         let joined = items + [PokemonNameItem(resource: .init(kind: .type, name: "grass"))]
         XCTAssertEqual(PokemonNameText(items: joined, language: .ko, names: store.names).text, "몸통박치기 · …")
     }
@@ -258,7 +256,7 @@ final class PokemonNameLocalizationTests: XCTestCase {
         let items = [PokemonNameItem(resource: ability), PokemonNameItem(resource: resource), PokemonNameItem(resource: type)]
         let korean = PokemonNameText(items: items, language: .ko, names: maps)
         XCTAssertEqual(korean.text, "심록 · 몸통박치기 · 풀")
-        XCTAssertEqual(PokemonNameText(items: items, language: .pt, names: maps).text, "Overgrow · Tackle · Grass")
+        XCTAssertEqual(PokemonNameText(items: items, language: .en, names: maps).text, "Overgrow · Tackle · Grass")
         XCTAssertEqual(PokemonNameText(items: items, language: .ko, names: [:]).text, "… · … · …")
         let hidden = PokemonNameText(items: [.init(resource: ability, suffix: " (숨겨진 특성)")], language: .ko, names: maps)
         XCTAssertEqual(hidden.text, "심록 (숨겨진 특성)")

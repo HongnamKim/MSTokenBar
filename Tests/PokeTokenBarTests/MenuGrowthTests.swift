@@ -47,13 +47,13 @@ final class MenuGrowthTests: XCTestCase {
 
     func testEggEvolutionAndGraduationUseCurrentStageProgress() async throws {
         try await fixture { usage, companion in
-            XCTAssertEqual(MenuBarContent.lines(store: usage, companion: companion), ["Hatch 0%"])
+            XCTAssertEqual(MenuBarContent.lines(store: usage, companion: companion), ["Unbox 0%"])
             companion.update(todayTokensByProvider: ["test": 0], todayDate: "d", monthTotal: 0,
                              burnTier: .idle, limitWarning: false, hasUsageData: true)
             companion.update(todayTokensByProvider: ["test": companion.eggHatchThreshold * 2 / 5],
                              todayDate: "d", monthTotal: 0, burnTier: .idle,
                              limitWarning: false, hasUsageData: true)
-            XCTAssertEqual(companion.menuGrowthText, "Hatch 40%")
+            XCTAssertEqual(companion.menuGrowthText, "Unbox 40%")
             await companion.hatch(baseID: 1)
             XCTAssertEqual(companion.menuGrowthText, "Growth 0%")
             companion.applyUsage(companion.threshold / 2)
@@ -67,7 +67,7 @@ final class MenuGrowthTests: XCTestCase {
             XCTAssertEqual(companion.menuGrowthText, "Growth 50%")
             companion.applyUsage(companion.tokensToNext)
             XCTAssertTrue(companion.isEgg)
-            XCTAssertEqual(companion.menuGrowthText, "Hatch 0%")
+            XCTAssertEqual(companion.menuGrowthText, "Unbox 0%")
         }
     }
 
@@ -87,7 +87,7 @@ final class MenuGrowthTests: XCTestCase {
                 XCTAssertTrue(companion.isEgg)
                 XCTAssertEqual(companion.state.eggUsage, credits)
                 XCTAssertEqual(MenuBarContent.lines(store: usage, companion: companion),
-                               ["부화 \(percent)%"], "credits=\(credits)")
+                               ["개봉 \(percent)%"], "credits=\(credits)")
                 XCTAssertTrue(CompanionHeader.progressDetail(used: credits, total: companion.eggHatchThreshold)
                     .hasSuffix(" · \(percent)%"), "Home and menu must agree for credits=\(credits)")
             }
@@ -129,10 +129,10 @@ final class MenuGrowthTests: XCTestCase {
             companion.setLanguage(.ko)
             XCTAssertTrue(language.changed)
             XCTAssertEqual(companion.menuGrowthText, "성장 80%")
-            let russian = observe(usage, companion)
-            companion.setLanguage(.ru)
-            XCTAssertTrue(russian.changed)
-            XCTAssertEqual(MenuBarContent.lines(store: usage, companion: companion), ["Рост 80%"])
+            let japanese = observe(usage, companion)
+            companion.setLanguage(.ja)
+            XCTAssertTrue(japanese.changed)
+            XCTAssertEqual(MenuBarContent.lines(store: usage, companion: companion), ["成長 80%"])
             let toggle = observe(usage, companion)
             usage.showGrowthInMenu = false
             XCTAssertTrue(toggle.changed)

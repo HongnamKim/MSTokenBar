@@ -60,13 +60,13 @@ final class PetEventLineTests: XCTestCase {
         XCTAssertNil(store.latestEvent)
 
         await store.hatch(baseID: 1)
-        XCTAssertEqual(store.latestEvent?.text, "Bulb hatched from the egg!")
+        XCTAssertEqual(store.latestEvent?.text, "Bulb came out of the box!")
         XCTAssertEqual(store.latestEvent?.at, now)
         let hatchSeq = store.latestEvent?.seq
 
         current = now.addingTimeInterval(120)
         store.applyUsage(PokemonBalance.phaseThreshold(rarity: .common, totalForms: 3, stageIndex: 0))
-        XCTAssertEqual(store.latestEvent?.text, "Bulb evolved into Ivy!")
+        XCTAssertEqual(store.latestEvent?.text, "Bulb graded up to Ivy!")
         XCTAssertEqual(store.latestEvent?.at, current)
         XCTAssertNotEqual(store.latestEvent?.seq, hatchSeq, "a new event gets a new id")
     }
@@ -84,10 +84,10 @@ final class PetEventLineTests: XCTestCase {
 
     func testEvolutionLineNamesBothWithTheRightKoreanParticles() {
         let ko = L(.ko)
-        XCTAssertEqual(ko.notifEvolveBody(from: "피카츄", to: "라이츄"), "피카츄가 라이츄로 진화했어요!")
-        XCTAssertEqual(ko.notifEvolveBody(from: "리자드", to: "리자몽"), "리자드가 리자몽으로 진화했어요!")
-        XCTAssertEqual(ko.notifEvolveBody(from: "이상해씨", to: "이상해풀"), "이상해씨가 이상해풀로 진화했어요!")
-        XCTAssertEqual(L(.en).notifEvolveBody(from: "Pichu", to: "Pikachu"), "Pichu evolved into Pikachu!")
+        XCTAssertEqual(ko.notifEvolveBody(from: "피카츄", to: "라이츄"), "피카츄가 라이츄로 등급 업했어요!")
+        XCTAssertEqual(ko.notifEvolveBody(from: "리자드", to: "리자몽"), "리자드가 리자몽으로 등급 업했어요!")
+        XCTAssertEqual(ko.notifEvolveBody(from: "이상해씨", to: "이상해풀"), "이상해씨가 이상해풀로 등급 업했어요!")
+        XCTAssertEqual(L(.en).notifEvolveBody(from: "Pichu", to: "Pikachu"), "Pichu graded up to Pikachu!")
         for language in AppLanguage.allCases {
             let text = L(language).notifEvolveBody(from: "AAA", to: "BBB")
             XCTAssertTrue(text.contains("AAA") && text.contains("BBB"), "\(language) drops a name")

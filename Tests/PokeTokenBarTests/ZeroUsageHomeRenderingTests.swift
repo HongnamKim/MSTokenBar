@@ -54,13 +54,9 @@ final class ZeroUsageHomeRenderingTests: XCTestCase {
     }
 
     func testRecapLabelKeepsPeriodCostsOnOneLine() async throws {
-        for language in [AppLanguage.en, .de] {
+        for language in [AppLanguage.en] {
             try await render(history: true, language: language, costs: .source)
         }
-    }
-
-    func testUnavailablePeriodCostsKeepGermanHomeWithinPopover() async throws {
-        try await render(history: true, language: .de, costs: .unavailable)
     }
 
     private func render(history: Bool, language: AppLanguage = .ko, costs: CostCoverage? = nil) async throws {
@@ -141,7 +137,6 @@ final class ZeroUsageHomeRenderingTests: XCTestCase {
         let request = VNRecognizeTextRequest()
         switch language {
         case .en: request.recognitionLanguages = ["en-US"]
-        case .de: request.recognitionLanguages = ["de-DE", "en-US"]
         default: request.recognitionLanguages = ["ko-KR", "en-US"]
         }
         request.recognitionLevel = .accurate
