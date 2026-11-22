@@ -217,6 +217,14 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(checker.settingsNotice, .offer("2.5.4"))
     }
 
+    /// No MSTokenBar cask exists yet; upgrading the upstream `poke-token-bar` cask would install another app.
+    /// Until a fork cask ships, every update falls back to opening the release page.
+    func testBrewUpgradePathIsDisabledUntilAForkCaskExists() {
+        XCTAssertNil(UpdateChecker.brewCask)
+        XCTAssertNil(UpdateChecker.brewCaskPath())
+        XCTAssertFalse(UpdateChecker.detachedUpgradeScript.contains("poke-token-bar"))
+    }
+
     func testDetachedUpgradeScriptUsesPositionalParameters() {
         let script = UpdateChecker.detachedUpgradeScript
         XCTAssertTrue(script.contains("\"$1\" update"), "must execute brew via $1 positional arg")
