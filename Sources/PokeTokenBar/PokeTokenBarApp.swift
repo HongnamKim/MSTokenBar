@@ -99,13 +99,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         // Tooltips show 40% sooner than AppKit's 1 s default; the app's hover hints are short and
         // the popover closes quickly. Registration domain only, so a user `defaults write` still wins.
         UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 600])
-        Self.migrateLegacyStorageIfNeeded()   // TokenMac → PokeTokenBar 리네임: 기존 companion/캐시 보존
         if AppEnv.isBundledApp {
             LoginItem.system.migrateFromLegacyAgentIfNeeded()
         }
         store = UsageStore()
-        companion = CompanionStore()
-        Task { await companion.preparePokemonProfiles() }
+        companion = CompanionStore(provider: MachineCatalog.shared)
         updater = UpdateChecker()
         store.localizationLanguage = companion.language   // 알림 현지화용 미러 시드
         store.onRefresh = { [weak self] in self?.onStoreRefreshed() }   // 한도 로드 후 companion·사탕 지급
@@ -145,7 +143,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         withObservationTracking {
             _ = MenuBarContent.lines(store: store, companion: companion)
             _ = store.menuToolTip
-            _ = store.alwaysFacesBack   // mirrored into the companion by `updateCompanion`
             // The mode and thresholds can change the colors while the text stays the same.
             _ = store.menuLimitColorRuns()
         } onChange: { [weak self] in
@@ -158,7 +155,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     /// 대표 스프라이트 정체성(종/shiny/fps 하한) 관찰 — 대표 선택·해제와 애니메이션 품질 변경뿐 아니라
-    /// 사탕 진화·졸업(BagView), 세이브 가져오기, 부화·메타몽 리빌 async 완료처럼 store 갱신 틱 없이
+    /// 사탕 진화·졸업(BagView), 세이브 가져오기, 부화 async 완료처럼 store 갱신 틱 없이
     /// companion 만 바뀌는 경로에서도 메뉴바를 즉시 갱신한다. 성장률 표시가 꺼져 있어도 스프라이트는
     /// 바로 갱신되어야 한다(사탕 졸업 후 메뉴바 잔상 리포트 — UsageStore.onRefresh 주석과 같은 부류).
     ///
@@ -270,7 +267,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     /// UsageStore 값 → CompanionStore (사용량 적립 + 표시 상태). 매 관찰 변경 시 호출.
     private func updateCompanion() {
-        companion.alwaysFacesBack = store.alwaysFacesBack
         companion.update(
             todayTokensByProvider: store.todayTokensByProvider,
             todayDate: LocalUsageReader.todayKey(),
@@ -320,9 +316,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let subject = companion.representativeSubject
         let id = subject.speciesID
         let shiny = subject.isShiny
-        let form = subject.form
         let back = companion.facesBack
-        let key = id.map { Self.menuSpriteKey(id: $0, shiny: shiny, floor: menuFrameFloor, form: form, back: back) }
+        let key = id.map { Self.menuSpriteKey(id: $0, shiny: shiny, floor: menuFrameFloor, back: back) }
         if key == menuSpriteKey, !menuFrames.isEmpty { return }   // 이미 이 개체로 애니메이션 중
         menuLoadTask?.cancel()
         menuLoadTask = nil
@@ -335,7 +330,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             return
         }
         // Seed from the PNG cache immediately; a missing PNG must not delay the first GIF request.
-        let cached = SpriteLoader.cachedImage(speciesID: id, shiny: shiny, form: form, back: back)
+        let cached = SpriteLoader.cachedImage(speciesID: id, shiny: shiny, back: back)
         setMenuFrames(cached.map { Self.bobFrames(from: $0) } ?? Self.eggFrames())
 
         // One owned task applies its static fallback before retrying GIFs. A late PNG response
@@ -344,10 +339,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             guard let self, gen == self.menuLoadGen else { return }
             defer { if gen == self.menuLoadGen { self.menuLoadTask = nil } }
             let raw = await SpriteLoader.recoveringAnimationFrames(
-                speciesID: id, shiny: shiny, form: form, back: back,
+                speciesID: id, shiny: shiny, back: back,
                 onUnavailable: {
                     guard cached == nil, !Task.isCancelled, gen == self.menuLoadGen else { return }
-                    let sprite = await SpriteLoader.image(speciesID: id, shiny: shiny, form: form, back: back)
+                    let sprite = await SpriteLoader.image(speciesID: id, shiny: shiny, back: back)
                     guard !Task.isCancelled, gen == self.menuLoadGen, let sprite else { return }
                     self.setMenuFrames(Self.bobFrames(from: sprite))
                 })
@@ -500,10 +495,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     /// **하한(fps 설정)이 반드시 들어가야 한다.** 프레임은 하한에 맞춰 솎아낸 결과물이라, 키가
     /// 종·이로치만 담으면 설정을 바꿔도 다음 진화까지 옛 fps 로 계속 돈다(설계 시 확인된 함정).
     /// 순수·테스트용: `testIdentityKeysIncludeTheFrameFloor`.
-    static func menuSpriteKey(id: Int, shiny: Bool, floor: TimeInterval, form: PokemonForm? = nil,
+    static func menuSpriteKey(id: Int, shiny: Bool, floor: TimeInterval,
                               back: Bool = false) -> String {
-        let form = PokemonForm.resolved(speciesID: id, form: form)
-        let key = "\(id)-\(shiny)-\(floor)-\(form?.rawValue ?? "")"
+        let key = "\(id)-\(shiny)-\(floor)"
         return back ? key + "-back" : key
     }
 
@@ -551,24 +545,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         return img
     }
 
-    /// TokenMac→PokeTokenBar 리네임에 따른 1회 이전: 기존 Application Support 폴더를
-    /// 새 이름으로 옮겨 companion 진행상황·스프라이트 캐시·스냅샷을 보존한다(신규 폴더 없을 때만).
-    private static func migrateLegacyStorageIfNeeded() {
-        let fm = FileManager.default
-        let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let old = base.appendingPathComponent("TokenMac")
-        let new = base.appendingPathComponent("PokeTokenBar")
-        guard fm.fileExists(atPath: old.path), !fm.fileExists(atPath: new.path) else { return }
-        try? fm.moveItem(at: old, to: new)
-    }
-
     /// 스프라이트가 아직 없을 때(부화 전/로딩 중) 메뉴바에 표시하는 알 글리프.
     private static func eggImage(up: Bool) -> NSImage {
         let h: CGFloat = 22
         let img = NSImage(size: NSSize(width: h, height: h))
         img.lockFocus()
         let off: CGFloat = up ? 1 : 0
-        let s = "🥚" as NSString
+        let s = "📦" as NSString
         s.draw(in: NSRect(x: 2, y: off, width: h - 2, height: h - 2),
                withAttributes: [.font: NSFont.systemFont(ofSize: 15)])
         img.unlockFocus()
@@ -606,7 +589,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let entries = StatusItemMenu.entries(
             l: companion.l, todayTokens: store.todayTotalTokens,
             todayCost: store.showsCost ? store.todayUsageCost : nil,
-            floatingPetEnabled: store.floatingPetEnabled, alwaysFacesBack: store.alwaysFacesBack)
+            floatingPetEnabled: store.floatingPetEnabled)
         // Attaching the menu only for this click keeps left click on the popover. performClick
         // tracks the menu synchronously, with the button highlighted like any other status menu.
         statusItem.menu = StatusItemMenu.build(entries, target: self, selector: #selector(handleStatusMenu(_:)))
@@ -620,7 +603,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         case .openDex: showPopover { $0.openRepresentativeDex() }
         case .openSettings: showPopover { $0.showSettings = true }
         case .toggleFloatingPet: store.floatingPetEnabled.toggle()
-        case .toggleBackView: store.alwaysFacesBack.toggle()
         case .quit: NSApp.terminate(nil)
         case nil: break
         }

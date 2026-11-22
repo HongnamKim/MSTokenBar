@@ -541,17 +541,13 @@ final class MonthDailyTrendTests: XCTestCase {
         XCTAssertTrue(stamp(.ko).contains("월"), stamp(.ko))
         XCTAssertTrue(stamp(.en).contains("Mon"), stamp(.en))
         XCTAssertTrue(stamp(.ja).contains("月"), stamp(.ja))
-        XCTAssertTrue(stamp(.es).lowercased().contains("lun"), stamp(.es))
 
-        // 월·일 **순서**도 로케일을 따른다 — 직접 "\(month)/\(day)" 로 조립하면 프랑스어에서도
-        // 미국식 8/24 가 강제되는데, 그 언어는 24/08 이 맞다.
+        // 월·일 **순서**도 로케일을 따른다 — 직접 "\(month)/\(day)" 로 조립하지 않는다.
         XCTAssertTrue(stamp(.en).contains("8/24"), stamp(.en))
-        XCTAssertTrue(stamp(.fr).contains("24/08"), stamp(.fr))
-        XCTAssertTrue(stamp(.pt).contains("24/08"), stamp(.pt))
 
-        // 여섯 언어가 서로 달라야 한다 — 전부 같으면 로케일이 무시되고 있다는 뜻이다.
-        let all = [stamp(.ko), stamp(.en), stamp(.ja), stamp(.es), stamp(.fr), stamp(.pt)]
-        XCTAssertEqual(Set(all).count, 6, all.description)
+        // 세 언어가 서로 달라야 한다 — 전부 같으면 로케일이 무시되고 있다는 뜻이다.
+        let all = [stamp(.ko), stamp(.en), stamp(.ja)]
+        XCTAssertEqual(Set(all).count, 3, all.description)
         XCTAssertEqual(DailyTrendMetrics.dayStamp("nope", language: .ko), "")
     }
 

@@ -48,7 +48,8 @@ struct SettingsView: View {
         guard let species = companion.representativeDexSpecies else {
             return l.representativeFollowCurrent
         }
-        return "#\(species.id) \(species.name)\(species.isShiny ? " ✨" : "")"
+        let model = companion.catalog.machine(speciesID: species.id)?.modelNumber
+        return "\(model.map { "\($0) " } ?? "")\(species.name)\(species.isShiny ? " ✨" : "")"
     }
 
     /// 세이브 봉투에 남길 출처 표기 — 어느 Mac에서 내보낸 파일인지 나중에 알아보기 위한 것.
@@ -165,12 +166,7 @@ struct SettingsView: View {
         HStack(spacing: 5) {
             Text("v\(Self.appVersion)")
             Text("·")
-            footerLink("GitHub", "https://github.com/chattymin/PokeTokenBar")
-            Text("·")
-            footerLink(l.website, "https://chattymin.github.io/PokeTokenBar/")
-            Text("·")
-            // 개발자 후원 — 기능 잠금·너지 없는 푸터 링크
-            footerLink("♥ " + l.sponsor, "https://github.com/sponsors/chattymin")
+            footerLink("GitHub", "https://github.com/HongnamKim/MSTokenBar")
             Spacer()
         }
         .font(.caption2)
@@ -359,17 +355,6 @@ struct SettingsView: View {
                 Toggle(l.floatingPetEnableLabel, isOn: $store.floatingPetEnabled)
                     .labelsHidden().toggleStyle(.switch).controlSize(.small)
             }
-            Divider()
-            groupRow {
-                // Also reachable from both right-click menus. Applies to every surface, not only the pet.
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(l.backViewLabel)
-                    Text(l.backViewHint).font(.caption2).foregroundStyle(.tertiary)
-                }
-                Spacer()
-                Toggle(l.backViewLabel, isOn: $store.alwaysFacesBack)
-                    .labelsHidden().toggleStyle(.switch).controlSize(.small)
-            }
             if store.floatingPetEnabled {
                 Divider()
                 groupRow {
@@ -550,8 +535,7 @@ struct SettingsView: View {
         groupRow {
             HStack(spacing: 8) {
                 if let speciesID = snapshot.currentSpeciesID {
-                    SpriteView(speciesID: speciesID, size: 28, shiny: snapshot.currentIsShiny,
-                               form: snapshot.currentForm)
+                    SpriteView(speciesID: speciesID, size: 28, shiny: snapshot.currentIsShiny)
                         .frame(width: 28, height: 28)
                 } else {
                     SpriteView(speciesID: nil, size: 28)

@@ -8,7 +8,7 @@ import Foundation
 /// 성공한 뒤 도감이 빈 상태가 되어, 사용자에겐 "앱이 내 진행을 지웠다"로 보인다.
 /// 봉투의 `format`/`schema` 는 관대 디코딩 대상이 아니라(기본값 없음) 이 오인을 먼저 차단한다.
 struct SaveEnvelope: Codable, Sendable {
-    static let formatID = "poketokenbar.save"
+    static let formatID = "mstokenbar.save"
     /// v2 adds persistent generated Pokémon profiles (IVs, gender, ability, level and moves).
     static let schemaVersion = 2
 
@@ -75,7 +75,7 @@ enum SaveTransfer {
 
     /// 내보내기 파일명 — 날짜가 들어가야 여러 번 내보내도 덮어쓰지 않는다.
     static func suggestedFileName(date: Date) -> String {
-        "PokeTokenBar-Save-\(dayStamp(date)).json"
+        "MSTokenBar-Save-\(dayStamp(date)).json"
     }
 
     /// 백업 파일명 — 불러올 때마다 새 슬롯. 하나만 유지하면 두 번째 불러오기가 **원본**을 덮어써,
@@ -158,7 +158,6 @@ enum SaveTransfer {
             prayers.count = clampToken(prayers.count)
             s.eggPrayers = prayers
         }
-        s.pendingForm = PokemonForm.resolved(baseID: s.pendingHatchID ?? 0, form: s.pendingForm)
         // 만족시킬 수 없는 보증은 알을 영구히 못 깨게 만든다 — 전설은 capture_rate 로 표현할 수 없어
         // (captureRateCeiling == nil) 두 롤 경로 모두 후보를 0개로 만들고, 부화가 없으니 보증도 소비되지
         // 않으며, 새 알 구매는 `hasActive` 게이트에 막혀 빠져나갈 수단이 없다. 디코드는 *성공*하므로
@@ -181,12 +180,10 @@ enum SaveTransfer {
             active.plannedPathIDs = deduped(active.plannedPathIDs)
             active.stageIndex = active.pathIDs.firstIndex(of: currentID) ?? active.stageIndex
             active.stageIndex = min(active.stageIndex, max(0, active.pathIDs.count - 1))
-            active.profile?.sanitize()
             s.active = active
         }
         for index in s.dex.indices {
             s.dex[index].chainOrder = deduped(s.dex[index].chainOrder)
-            s.dex[index].profile?.sanitize()
         }
         s.reconcileRepresentativeSelection()
         return s
@@ -196,7 +193,7 @@ enum SaveTransfer {
     ///
     /// `CompanionState` 의 필드는 이전 관점에서 세 부류다.
     ///  - **진행**: 어느 기기에서든 참(`usedSinceInstall`·`dex`·`inventory`·`active`·`eggUsage`·`eggTier`·
-    ///    `pendingHatchID`·`pendingForm`·`eggPrayers`·`representativeSpeciesID`·`representativeForm`…)
+    ///    `pendingHatchID`·`eggPrayers`·`representativeSpeciesID`…)
     ///    → 그대로. 알 보증(`eggTier`)은 산 물건이지 이 기기의 장부가 아니라 기기를 옮겨도 따라간다.
     ///  - **로컬 장부**: *그 기기가* 어디까지 적립했나(`claimedTodayTokensByProvider`·`lastDate`·`installBaselineSet`)
     ///    → 새 기기 기준으로 다시 잡는다. 그대로 들여오면 옛 기기의 오늘 총량이 문턱이 되어

@@ -44,7 +44,7 @@ final class UpdateChecker {
             ?? (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "0"
         self.clock = clock
         self.defaults = defaults
-        self.fetchLatest = fetchLatest ?? { await Self.liveLatestRelease(repo: "chattymin/PokeTokenBar") }
+        self.fetchLatest = fetchLatest ?? { await Self.liveLatestRelease(repo: "HongnamKim/MSTokenBar") }
     }
 
     var settingsNotice: SettingsNotice {
@@ -150,8 +150,8 @@ final class UpdateChecker {
             // brew cask 설치본이면 분리(detached) 스크립트가 앱 종료 후 tap 갱신→업그레이드→재오픈.
             // 그 외(brew 미설치/비-cask 설치)면 릴리스 페이지를 연다.
             let brew = await Task.detached { Self.brewCaskPath() }.value
-            if let brew {
-                Self.launchDetachedUpgrade(brew: brew)
+            if let brew, let cask = Self.brewCask {
+                Self.launchDetachedUpgrade(brew: brew, cask: cask)
                 NSApp.terminate(nil)
             } else {
                 isUpdating = false
@@ -177,12 +177,16 @@ final class UpdateChecker {
 
     // MARK: brew 적용 (nonisolated — 블로킹 Process 는 detached 에서)
 
-    /// poke-token-bar 가 brew cask 로 설치돼 있으면 brew 경로 반환, 아니면 nil(→ 릴리스 페이지 폴백).
-    private nonisolated static func brewCaskPath() -> String? {
-        guard let brew = BinaryLocator.resolve("brew", staticPaths: [
+    /// MSTokenBar 의 brew cask 토큰. 포크용 cask 가 아직 없어 nil — 업스트림 `poke-token-bar` 를 올리면
+    /// 다른 앱이 설치된다. nil 인 동안 업데이트는 항상 릴리스 페이지로 폴백한다.
+    nonisolated static let brewCask: String? = nil
+
+    /// 앱이 brew cask(`brewCask`)로 설치돼 있으면 brew 경로 반환, 아니면 nil(→ 릴리스 페이지 폴백).
+    nonisolated static func brewCaskPath() -> String? {
+        guard let cask = brewCask, let brew = BinaryLocator.resolve("brew", staticPaths: [
             "/opt/homebrew/bin/brew", "/usr/local/bin/brew",
         ]) else { return nil }
-        return run(brew, ["list", "--cask", "poke-token-bar"], timeout: 20) ? brew : nil
+        return run(brew, ["list", "--cask", cask], timeout: 20) ? brew : nil
     }
 
     private nonisolated static func run(_ binary: String, _ args: [String], timeout: TimeInterval) -> Bool {
@@ -206,11 +210,11 @@ final class UpdateChecker {
     ///   `pgrep -x` 대신 특정 PID를 감시하여 중복 인스턴스가 실행 중일 때도 20s 타임아웃 없이 즉시 진행 (#175).
     /// - brew 를 백그라운드+워치독(≤300s)으로 감싸 hang 시에도 reopen 이 반드시 실행되게 함
     ///   (앱이 종료된 채 영영 안 돌아오는 것 방지). 종료 직후 재오픈 실패 대비 `open` 재시도.
-    /// 인자는 positional($1=brew, $2=bundlePath, $3=pid)로 전달 — 셸 인젝션 차단.
+    /// 인자는 positional($1=brew, $2=bundlePath, $3=pid, $4=cask)로 전달 — 셸 인젝션 차단.
     nonisolated static let detachedUpgradeScript = """
     for i in $(seq 1 40); do kill -0 "$3" 2>/dev/null || break; sleep 0.5; done
     export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-    ( "$1" update; "$1" upgrade --cask poke-token-bar ) &
+    ( "$1" update; "$1" upgrade --cask "$4" ) &
     brew_pid=$!
     for i in $(seq 1 300); do kill -0 "$brew_pid" 2>/dev/null || break; sleep 1; done
     kill "$brew_pid" 2>/dev/null
@@ -222,12 +226,13 @@ final class UpdateChecker {
 
     nonisolated static func launchDetachedUpgrade(
         brew: String,
+        cask: String,
         pid: pid_t = ProcessInfo.processInfo.processIdentifier,
         bundlePath: String = Bundle.main.bundlePath
     ) {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
-        task.arguments = ["-c", detachedUpgradeScript, "sh", brew, bundlePath, String(pid)]
+        task.arguments = ["-c", detachedUpgradeScript, "sh", brew, bundlePath, String(pid), cask]
         try? task.run()
     }
 }

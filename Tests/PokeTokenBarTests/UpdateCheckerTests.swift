@@ -41,7 +41,7 @@ final class UpdateCheckerTests: XCTestCase {
 
     // MARK: - Cooldown stamps only after a successful, validated check
 
-    private static let releaseURL = "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.5"
+    private static let releaseURL = "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.5"
 
     @MainActor
     private func isolatedDefaults() -> UserDefaults {
@@ -174,7 +174,7 @@ final class UpdateCheckerTests: XCTestCase {
         defer { box.removePersistentDomain(forName: suite) }
         let checker = UpdateChecker(currentVersion: "2.5.3", defaults: box)
 
-        checker.consider(latest: "2.5.4", url: "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.4")
+        checker.consider(latest: "2.5.4", url: "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.4")
         XCTAssertEqual(checker.available?.version, "2.5.4")
         XCTAssertNil(checker.skipped)
         XCTAssertEqual(checker.settingsNotice, .offer("2.5.4"))
@@ -185,16 +185,16 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(checker.settingsNotice, .skipped("2.5.4"))
         XCTAssertEqual(box.string(forKey: "skippedUpdateVersion"), "2.5.4")
 
-        checker.consider(latest: "v2.5.4", url: "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.4")
+        checker.consider(latest: "v2.5.4", url: "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.4")
         XCTAssertNil(checker.available)
         XCTAssertEqual(checker.settingsNotice, .skipped("2.5.4"), "a skipped version is not the latest installed")
 
-        checker.consider(latest: "2.5.5", url: "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.5")
+        checker.consider(latest: "2.5.5", url: "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.5")
         XCTAssertEqual(checker.available?.version, "2.5.5")
         XCTAssertNil(checker.skipped)
         XCTAssertEqual(checker.settingsNotice, .offer("2.5.5"))
 
-        checker.consider(latest: "2.5.3", url: "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.3")
+        checker.consider(latest: "2.5.3", url: "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.3")
         XCTAssertEqual(checker.settingsNotice, .current, "the installed release is the latest")
     }
 
@@ -204,7 +204,7 @@ final class UpdateCheckerTests: XCTestCase {
         let box = UserDefaults(suiteName: suite)!
         defer { box.removePersistentDomain(forName: suite) }
         let checker = UpdateChecker(currentVersion: "2.5.3", defaults: box)
-        let url = "https://github.com/chattymin/PokeTokenBar/releases/tag/v2.5.4"
+        let url = "https://github.com/HongnamKim/MSTokenBar/releases/tag/v2.5.4"
         checker.consider(latest: "2.5.4", url: url)
         checker.skipCurrent()
 
@@ -217,6 +217,14 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(checker.settingsNotice, .offer("2.5.4"))
     }
 
+    /// No MSTokenBar cask exists yet; upgrading the upstream `poke-token-bar` cask would install another app.
+    /// Until a fork cask ships, every update falls back to opening the release page.
+    func testBrewUpgradePathIsDisabledUntilAForkCaskExists() {
+        XCTAssertNil(UpdateChecker.brewCask)
+        XCTAssertNil(UpdateChecker.brewCaskPath())
+        XCTAssertFalse(UpdateChecker.detachedUpgradeScript.contains("poke-token-bar"))
+    }
+
     func testDetachedUpgradeScriptUsesPositionalParameters() {
         let script = UpdateChecker.detachedUpgradeScript
         XCTAssertTrue(script.contains("\"$1\" update"), "must execute brew via $1 positional arg")
@@ -225,7 +233,7 @@ final class UpdateCheckerTests: XCTestCase {
     }
 
     func testDetachedUpgradeReopensAppEvenWhenLegacyJobCanBeSubmitted() throws {
-        let bundlePath = "/fake directory/PokeTokenBar.app"
+        let bundlePath = "/fake directory/MSTokenBar.app"
         let process = Process()
         let output = Pipe()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")

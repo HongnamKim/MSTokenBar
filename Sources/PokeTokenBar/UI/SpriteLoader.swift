@@ -1,102 +1,64 @@
 import AppKit
+import ImageIO
+import UniformTypeIdentifiers
 
-/// 포켓몬 스프라이트를 런타임에 받아 로컬(Application Support)에 캐시. 레포/번들에 미포함.
+/// 스프라이트 저장소. 건프라 아트는 번들에서 읽고(`BundledSprites`), 네트워크는 쓰지 않는다.
 actor SpriteStore {
     static let shared = SpriteStore()
-    private static let base = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon"
-    private let itemBase = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items"
     private var mem: [String: Data] = [:]
     private var memOrder: [String] = []   // LRU 순서(최근 접근이 뒤). 상한 초과 시 앞(오래된 것)부터 evict
     // 원본 PNG/GIF 바이트의 LRU 상한 — 도감 한 페이지(24칸)보다 넉넉히 유지하되,
     // 세션 중 종 변경으로 무한 누적되지 않게 한다. NSImage 캐시는 SpriteLoader 가 별도로 관리한다.
     private let memLimit = 64
-    // Keys the server answered 404 for this session. A back sprite that does not exist is final (use the
-    // front one); any other failure is transient and must be retried instead of settling on the front.
-    private var confirmedMissing: Set<String> = []
     nonisolated let directory: URL
 
     init(directory: URL? = nil) {
         let d = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("PokeTokenBar/sprites")
+            .appendingPathComponent("MSTokenBar/sprites")
         self.directory = d
         try? FileManager.default.createDirectory(at: d, withIntermediateDirectories: true)
     }
 
-    /// 기본 폼은 구캐시 키 그대로 유지. 다른 폼은 폼·이로치·애니메이션을 모두 구분한다.
     /// `back` sprites (the companion turned away) get their own `-back` segment; front keys are unchanged.
-    static func cacheKey(speciesID: Int, animated: Bool, shiny: Bool, form: PokemonForm? = nil,
-                         back: Bool = false) -> String {
-        let name = PokemonForm.assetName(speciesID: speciesID, form: form)
-        return "\(name)-\(back ? "back-" : "")\(shiny ? "sh" : "")\(animated ? "a" : "s")"
+    static func cacheKey(speciesID: Int, animated: Bool, shiny: Bool, back: Bool = false) -> String {
+        "\(speciesID)-\(back ? "back-" : "")\(shiny ? "sh" : "")\(animated ? "a" : "s")"
     }
 
-    /// PokeAPI names form GIFs `201-b`/`492-sky`; static PNGs of separate varieties use the variety
-    /// id (`10006.png`). Cache files keep the `<id>-<form>` name either way.
-    /// Back sprites sit in a `back/` folder in front of `shiny/`, for both GIFs and PNGs.
-    static func spriteURL(speciesID: Int, animated: Bool, shiny: Bool, form: PokemonForm? = nil,
-                          back: Bool = false) -> URL {
-        let name = animated ? PokemonForm.assetName(speciesID: speciesID, form: form)
-                            : PokemonForm.staticAssetName(speciesID: speciesID, form: form)
-        let path = animated ? "versions/generation-v/black-white/animated/" : ""
-        let facing = back ? "back/" : ""
-        let color = shiny ? "shiny/" : ""
-        let ext = animated ? "gif" : "png"
-        return URL(string: "\(base)/\(path)\(facing)\(color)\(name).\(ext)")!
-    }
-
-    func data(speciesID: Int, animated: Bool, shiny: Bool = false, form: PokemonForm? = nil,
-              back: Bool = false) async -> Data? {
-        if animated, !PokemonAssets.hasAnimatedSprite(speciesID: speciesID) { return nil }
-        let key = Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny, form: form, back: back)
+    /// Gunpla art comes from the bundle. Any other id can only be served from files already on disk
+    /// (nothing downloads them any more), so a miss is final.
+    func data(speciesID: Int, animated: Bool, shiny: Bool = false, back: Bool = false) async -> Data? {
+        if GunplaID.isGunpla(speciesID) { return gunplaData(speciesID: speciesID, animated: animated, back: back) }
+        let key = Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny, back: back)
         if let d = mem[key] { touch(key); return d }
-        let ext = animated ? "gif" : "png"
-        let file = directory.appendingPathComponent("\(key).\(ext)")
-        if let d = try? Data(contentsOf: file) { remember(key, d); return d }
-        if confirmedMissing.contains(key) { return nil }
-        let url = Self.spriteURL(speciesID: speciesID, animated: animated, shiny: shiny, form: form, back: back)
-        guard let (d, resp) = try? await URLSession.shared.data(from: url) else { return nil }
-        let status = (resp as? HTTPURLResponse)?.statusCode
-        if back, status == 404 { confirmedMissing.insert(key) }
-        guard status == 200, !d.isEmpty else { return nil }
-        try? d.write(to: file, options: .atomic)   // torn write 방지 — 크래시/강제종료 시 손상 캐시가 남지 않게
+        let file = directory.appendingPathComponent("\(key).\(animated ? "gif" : "png")")
+        guard let d = try? Data(contentsOf: file) else { return nil }
         remember(key, d)
         return d
     }
 
-    /// True once the server answered 404 for this sprite in this session.
-    func isConfirmedMissing(speciesID: Int, animated: Bool, shiny: Bool, form: PokemonForm?, back: Bool) -> Bool {
-        confirmedMissing.contains(Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny,
-                                                form: form, back: back))
+    /// Gunpla art is bundled: no network, no disk cache. There is no back view, so `back` reports "missing"
+    /// and callers fall back to the front. Static requests get the GIF's first frame as PNG.
+    private func gunplaData(speciesID: Int, animated: Bool, back: Bool) -> Data? {
+        back ? nil : Self.bundledGunplaData(speciesID: speciesID, animated: animated)
     }
 
-    /// 아이템 스프라이트(정적 PNG, 이름 기반). 포켓몬과 같은 메모리/디스크 캐시 사용(키 "item-<name>",
-    /// 포켓몬 파일 "<id>-..." 과 안 겹침). 미제공(404)/오프라인이면 nil → 뷰가 이모지로 폴백.
-    func data(itemName: String) async -> Data? {
-        let key = "item-\(itemName)"
-        if let d = mem[key] { touch(key); return d }
-        let file = directory.appendingPathComponent("\(key).png")
-        if let d = try? Data(contentsOf: file) { remember(key, d); return d }
-        guard let url = URL(string: "\(itemBase)/\(itemName).png"),
-              let (d, resp) = try? await URLSession.shared.data(from: url),
-              (resp as? HTTPURLResponse)?.statusCode == 200, !d.isEmpty else { return nil }
-        try? d.write(to: file, options: .atomic)
-        remember(key, d)
-        return d
+    /// Bundled Gunpla front art: the GIF, or its first frame as PNG. Local and small, so sync callers may read it.
+    static func bundledGunplaData(speciesID: Int, animated: Bool) -> Data? {
+        guard let gif = BundledSprites.gifData(speciesID: speciesID) else { return nil }
+        return animated ? gif : firstFramePNG(of: gif)
     }
 
-    /// 알 스프라이트(정적, pokemon/egg.png) — 애니메이션 알은 없음. 포켓몬/아이템과 같은 메모리·디스크 캐시(키 "egg").
-    func eggData() async -> Data? {
-        let key = "egg"
-        if let d = mem[key] { touch(key); return d }
-        let file = directory.appendingPathComponent("egg.png")
-        if let d = try? Data(contentsOf: file) { remember(key, d); return d }
-        guard let url = URL(string: "\(Self.base)/egg.png"),
-              let (d, resp) = try? await URLSession.shared.data(from: url),
-              (resp as? HTTPURLResponse)?.statusCode == 200, !d.isEmpty else { return nil }
-        try? d.write(to: file, options: .atomic)
-        remember(key, d)
-        return d
+    private static func firstFramePNG(of gif: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(gif as CFData, nil),
+              let frame = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
+        let out = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(out, UTType.png.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(dest, frame, nil)
+        return CGImageDestinationFinalize(dest) ? out as Data : nil
     }
+
+    /// 박스 스프라이트(정적, 번들). 없으면 nil → 뷰가 🥚 로 폴백.
+    func eggData() async -> Data? { BundledSprites.boxPNG() }
 
     /// in-memory 캐시에 넣고 LRU 상한 유지(#H1) — 세션 중 종이 여러 번 바뀌어도 무한 성장 방지.
     private func remember(_ key: String, _ data: Data) {
@@ -118,7 +80,7 @@ actor SpriteStore {
 enum SpriteLoader {
     static let cacheDir: URL = {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("PokeTokenBar/sprites")
+            .appendingPathComponent("MSTokenBar/sprites")
     }()
 
     /// 동기 시드와 async 로드가 NSImage 를 공유해 파일 읽기와 이미지 객체 생성을 반복하지 않는다.
@@ -133,25 +95,27 @@ enum SpriteLoader {
     /// shiny 캐시 미스는 일반 캐시로 폴백 — 오프라인에서 live mon 이 알 글리프로 보이는 것 방지.
     /// back 캐시 미스는 앞모습으로 폴백 — 뒷모습이 없어도 화면이 비지 않게.
     static func cachedImage(speciesID: Int, animated: Bool = false, shiny: Bool = false,
-                            directory: URL = cacheDir, form: PokemonForm? = nil,
-                            back: Bool = false) -> NSImage? {
+                            directory: URL = cacheDir, back: Bool = false) -> NSImage? {
         let ext = animated ? "gif" : "png"
-        let key = SpriteStore.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny, form: form, back: back)
+        let key = SpriteStore.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny, back: back)
         let f = directory.appendingPathComponent("\(key).\(ext)")
         let imageKey = f.path as NSString
         if let img = imageCache.object(forKey: imageKey) { return img }
-        if let d = try? Data(contentsOf: f), let img = NSImage(data: d) {
+        // Gunpla art never lands on disk; seed from the bundle so the first render has no placeholder.
+        let bundled = GunplaID.isGunpla(speciesID) && !back
+            ? SpriteStore.bundledGunplaData(speciesID: speciesID, animated: animated) : nil
+        if let d = (try? Data(contentsOf: f)) ?? bundled, let img = NSImage(data: d) {
             imageCache.setObject(img, forKey: imageKey)
             return img
         }
         // 폴백은 일반색 키에만 저장한다 — 나중에 받은 이로치 이미지를 가리지 않게.
         if shiny, let plain = cachedImage(speciesID: speciesID, animated: animated, shiny: false,
-                                          directory: directory, form: form, back: back) {
+                                          directory: directory, back: back) {
             return plain
         }
         guard back else { return nil }
         return cachedImage(speciesID: speciesID, animated: animated, shiny: shiny,
-                           directory: directory, form: form, back: false)
+                           directory: directory, back: false)
     }
 
     private final class AnimationFrames {
@@ -167,12 +131,13 @@ enum SpriteLoader {
 
     /// First render and playback share the exact GIF pixels, including its canvas and delays.
     /// A missing back GIF returns [] — callers keep the front fallback until it loads.
-    static func cachedFrames(speciesID: Int, shiny: Bool, directory: URL = cacheDir, form: PokemonForm? = nil,
-                             back: Bool = false) -> [(image: NSImage, delay: TimeInterval)] {
-        let key = SpriteStore.cacheKey(speciesID: speciesID, animated: true, shiny: shiny, form: form, back: back)
+    static func cachedFrames(speciesID: Int, shiny: Bool, directory: URL = cacheDir, back: Bool = false) -> [(image: NSImage, delay: TimeInterval)] {
+        let key = SpriteStore.cacheKey(speciesID: speciesID, animated: true, shiny: shiny, back: back)
         let file = directory.appendingPathComponent("\(key).gif")
         if let cached = animationCache.object(forKey: file.path as NSString) { return cached.frames }
-        guard let data = try? Data(contentsOf: file) else { return [] }
+        let bundled = GunplaID.isGunpla(speciesID) && !back
+            ? SpriteStore.bundledGunplaData(speciesID: speciesID, animated: true) : nil
+        guard let data = (try? Data(contentsOf: file)) ?? bundled else { return [] }
         return rememberFrames(data, file: file)
     }
 
@@ -184,28 +149,16 @@ enum SpriteLoader {
 
     /// With `back`, the back GIF is tried first (shiny, then plain) and the front GIF is the fallback.
     static func animationFrames(speciesID: Int, shiny: Bool, store: SpriteStore = .shared,
-                                form: PokemonForm? = nil, back: Bool = false) async
-        -> [(image: NSImage, delay: TimeInterval)] {
-        var backFailedTransiently = false
+                                back: Bool = false) async -> [(image: NSImage, delay: TimeInterval)] {
         for facing in back ? [true, false] : [false] {
-            // A transient back failure returns [] so the caller's retry loop tries the back GIF again,
-            // rather than settling on the front GIF. Only a 404 (no such back sprite) falls through.
-            if !facing, backFailedTransiently { return [] }
             for variant in shiny ? [true, false] : [false] {
                 guard !Task.isCancelled else { return [] }
                 let cached = cachedFrames(speciesID: speciesID, shiny: variant,
-                                          directory: store.directory, form: form, back: facing)
+                                          directory: store.directory, back: facing)
                 if !cached.isEmpty { return cached }
                 guard let data = await store.data(speciesID: speciesID, animated: true,
-                                                 shiny: variant, form: form, back: facing) else {
-                    if facing, !(await store.isConfirmedMissing(speciesID: speciesID, animated: true,
-                                                                shiny: variant, form: form, back: true)) {
-                        backFailedTransiently = true
-                    }
-                    continue
-                }
-                let key = SpriteStore.cacheKey(speciesID: speciesID, animated: true,
-                                                shiny: variant, form: form, back: facing)
+                                                 shiny: variant, back: facing) else { continue }
+                let key = SpriteStore.cacheKey(speciesID: speciesID, animated: true, shiny: variant, back: facing)
                 let frames = rememberFrames(data, file: store.directory.appendingPathComponent("\(key).gif"))
                 if !frames.isEmpty { return frames }
             }
@@ -213,37 +166,22 @@ enum SpriteLoader {
         return []
     }
 
-    /// Keep the caller's static fallback visible while a transient GIF failure recovers.
-    /// The caller owns this await: cancelling its view/load task also cancels requests and backoff.
+    /// Animation frames for a subject, or [] after `onUnavailable` has shown the static fallback.
+    /// There is nothing to retry: every sprite is bundled or already on disk, so a miss is final.
+    /// The caller owns this await: cancelling its view/load task also cancels the load.
     static func recoveringAnimationFrames(
-        speciesID: Int, shiny: Bool, store: SpriteStore = .shared, form: PokemonForm? = nil,
-        back: Bool = false,
-        waitBeforeRetry: (Duration) async throws -> Void = { try await Task.sleep(for: $0) },
+        speciesID: Int, shiny: Bool, store: SpriteStore = .shared, back: Bool = false,
         onUnavailable: () async -> Void
     ) async -> [(image: NSImage, delay: TimeInterval)] {
         guard !Task.isCancelled else { return [] }
-        // Unsupported species have no GIF endpoint; a static fallback is their final state.
         guard PokemonAssets.hasAnimatedSprite(speciesID: speciesID) else {
             await onUnavailable()
             return []
         }
-        var retryDelay = Duration.seconds(2)
-        var showedFallback = false
-        while !Task.isCancelled {
-            let frames = await animationFrames(speciesID: speciesID, shiny: shiny, store: store,
-                                               form: form, back: back)
-            guard !Task.isCancelled else { return [] }
-            if frames.count > 1 { return frames }
-            if !showedFallback {
-                await onUnavailable()
-                showedFallback = true
-            }
-            guard !Task.isCancelled else { return [] }
-            do { try await waitBeforeRetry(retryDelay) } catch { return [] }
-            // No attempt limit: cap request frequency during a long outage while keeping recovery
-            // within 30 seconds of the next successful request (plus download time).
-            retryDelay = min(retryDelay * 2, .seconds(30))
-        }
+        let frames = await animationFrames(speciesID: speciesID, shiny: shiny, store: store, back: back)
+        guard !Task.isCancelled else { return [] }
+        if frames.count > 1 { return frames }
+        await onUnavailable()
         return []
     }
 
@@ -265,14 +203,14 @@ enum SpriteLoader {
     /// shiny=true 는 색이 다른 스프라이트 — 미제공 종이면 일반으로 폴백.
     /// back=true 는 뒷모습을 먼저 시도하고, 없으면 앞모습으로 폴백한다.
     static func image(speciesID: Int, animated: Bool = false, shiny: Bool = false,
-                      store: SpriteStore = .shared, form: PokemonForm? = nil, back: Bool = false) async -> NSImage? {
+                      store: SpriteStore = .shared, back: Bool = false) async -> NSImage? {
         for moving in animated ? [true, false] : [false] {
-            let key = SpriteStore.cacheKey(speciesID: speciesID, animated: moving, shiny: shiny, form: form, back: back)
+            let key = SpriteStore.cacheKey(speciesID: speciesID, animated: moving, shiny: shiny, back: back)
             let ext = moving ? "gif" : "png"
             let imageKey = store.directory.appendingPathComponent("\(key).\(ext)").path as NSString
             if let img = imageCache.object(forKey: imageKey) { return img }
             guard let d = await store.data(speciesID: speciesID, animated: moving,
-                                          shiny: shiny, form: form, back: back) else { continue }
+                                          shiny: shiny, back: back) else { continue }
             // await 중 같은 종의 다른 행이 로드를 끝냈으면 그 객체를 재사용한다.
             if let img = imageCache.object(forKey: imageKey) { return img }
             guard let img = NSImage(data: d) else { continue }
@@ -281,34 +219,11 @@ enum SpriteLoader {
         }
         // shiny 미제공 → 일반 폴백, 그다음 back 미제공 → 앞모습 폴백
         if shiny, let plain = await image(speciesID: speciesID, animated: animated, shiny: false,
-                                          store: store, form: form, back: back) {
+                                          store: store, back: back) {
             return plain
         }
         guard back else { return nil }
-        return await image(speciesID: speciesID, animated: animated, shiny: shiny, store: store, form: form)
-    }
-
-    /// 아이템 스프라이트 — 메모리·디스크 캐시 동기 조회(없으면 nil). 아이콘 즉시 표시용.
-    static func cachedItemImage(name: String, directory: URL = cacheDir) -> NSImage? {
-        let f = directory.appendingPathComponent("item-\(name).png")
-        let imageKey = f.path as NSString
-        if let img = imageCache.object(forKey: imageKey) { return img }
-        if let d = try? Data(contentsOf: f), let img = NSImage(data: d) {
-            imageCache.setObject(img, forKey: imageKey)
-            return img
-        }
-        return nil
-    }
-
-    /// 아이템 스프라이트 — 런타임 로드(+캐시). 미제공/실패면 nil(뷰가 이모지로 폴백).
-    static func itemImage(name: String, store: SpriteStore = .shared) async -> NSImage? {
-        let imageKey = store.directory.appendingPathComponent("item-\(name).png").path as NSString
-        if let img = imageCache.object(forKey: imageKey) { return img }
-        guard let d = await store.data(itemName: name) else { return nil }
-        if let img = imageCache.object(forKey: imageKey) { return img }
-        guard let img = NSImage(data: d) else { return nil }
-        imageCache.setObject(img, forKey: imageKey)
-        return img
+        return await image(speciesID: speciesID, animated: animated, shiny: shiny, store: store)
     }
 
     /// 알 스프라이트는 96×96 캔버스에 실제 알이 28×30(≈29%)만 차지 — 그대로 쓰면 프레임에서 아주 작게

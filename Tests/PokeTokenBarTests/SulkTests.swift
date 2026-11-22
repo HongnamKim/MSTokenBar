@@ -47,25 +47,19 @@ final class SulkStateTests: XCTestCase {
         XCTAssertEqual(threshold, 3 * 3600)
     }
 
-    func testFacesBackTruthTable() async {
+    func testFacesBackOnlyWhileSulking() async {
         let store = await makeStore()
-        for (always, idle, expected) in [(false, 0.0, false), (false, threshold, true),
-                                         (true, 0.0, true), (true, threshold, true)] {
-            store.alwaysFacesBack = always
+        for (idle, expected) in [(0.0, false), (threshold, true)] {
             update(store, idle: idle)
-            XCTAssertEqual(store.facesBack, expected, "always=\(always) idle=\(idle)")
-            XCTAssertEqual(store.displayState, idle >= threshold ? .sulk : .sleep,
-                           "the preference never changes the state kind")
-            XCTAssertEqual(store.sulkIdle, idle >= threshold ? idle : 0, "nor the sulk text input")
+            XCTAssertEqual(store.facesBack, expected, "idle=\(idle)")
         }
     }
 
-    func testAlwaysFacesBackDoesNotAffectAnEgg() {
+    func testAnEggNeverFacesBack() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-sulk-\(UUID().uuidString).json")
         let line = EvoLine(baseID: 1, tree: EvoNode(speciesID: 1, children: []), rarity: .common, names: [:])
         let store = CompanionStore(provider: StubProvider(value: line), clock: { sulkNow },
                                    fileURL: url, rng: SeededRNG(seed: 1))
-        store.alwaysFacesBack = true
         XCTAssertFalse(store.facesBack)
     }
 
@@ -189,22 +183,6 @@ final class SulkStateTests: XCTestCase {
 
 @MainActor
 final class BackSpriteTests: XCTestCase {
-    private let base = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon"
-
-    func testBackURLs() {
-        let gif = "\(base)/versions/generation-v/black-white/animated"
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: false, back: true).absoluteString,
-                       "\(gif)/back/25.gif")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: true, back: true).absoluteString,
-                       "\(gif)/back/shiny/25.gif")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: false, shiny: false, back: true).absoluteString,
-                       "\(base)/back/25.png")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: false, shiny: true, back: true).absoluteString,
-                       "\(base)/back/shiny/25.png")
-        XCTAssertEqual(SpriteStore.spriteURL(speciesID: 25, animated: true, shiny: false).absoluteString,
-                       "\(gif)/25.gif")   // front is unchanged
-    }
-
     func testBackCacheKeyDiffersFromFrontAndFrontKeyIsUnchanged() {
         for animated in [false, true] {
             for shiny in [false, true] {

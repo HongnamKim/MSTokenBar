@@ -18,7 +18,7 @@ final class DifficultySaveTests: XCTestCase {
             var mon = MonState(baseID: 1, pathIDs: [1], plannedPathIDs: [1, 2, 3],
                                stageIndex: 0, usedAtStage: 0, rarity: .common, totalForms: 3,
                                hasGrowthBoost: boost)
-            mon.usedAtStage = Int(Double(mon.phaseThreshold) * difficulty * fraction)
+            mon.usedAtStage = Int(Double(mon.phaseThreshold(catalog: .shared)) * difficulty * fraction)
             state.active = mon
         }
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("difficulty-save-\(UUID()).json")
@@ -26,8 +26,7 @@ final class DifficultySaveTests: XCTestCase {
         let defaults = try XCTUnwrap(UserDefaults(suiteName: "difficulty-save-\(UUID())"))
         defaults.set(difficulty, forKey: "growthDifficulty")
         defaults.set(20.0, forKey: "shopDifficulty")
-        let store = CompanionStore(provider: DifficultySaveProvider(), fileURL: url,
-                                   dittoDisguiseRollingEnabled: false, defaults: defaults)
+        let store = CompanionStore(provider: DifficultySaveProvider(), fileURL: url, defaults: defaults)
         return (store, url, defaults)
     }
 
@@ -59,12 +58,10 @@ final class DifficultySaveTests: XCTestCase {
                 let (s, _, _) = try fixture(egg: egg, boost: boost)
                 let ledger = s.state.claimedTodayTokensByProvider
                 let wallet = s.availableTokens
-                let profile = s.state.active?.profile
                 for difficulty in [0.1, 2.0, 0.5, 1.0] {
                     s.setGrowthDifficulty(difficulty)
                     XCTAssertEqual(egg ? s.eggProgress : s.progress, 0.5, accuracy: 0.000001)
                     XCTAssertEqual(s.state.active?.stageIndex, egg ? nil : 0)
-                    XCTAssertEqual(s.state.active?.profile, profile)
                     XCTAssertEqual(s.state.usedSinceInstall, 900_000_000)
                     XCTAssertEqual(s.state.spentTokens, 123_000_000)
                     XCTAssertEqual(s.availableTokens, wallet)
@@ -88,11 +85,9 @@ final class DifficultySaveTests: XCTestCase {
                 XCTAssertEqual(egg ? s.eggProgress : s.progress, 0.5, accuracy: 0.000001)
                 let activeCredits = s.state.active?.usedAtStage
                 let eggCredits = s.state.eggUsage
-                let profile = s.state.active?.profile
                 let again = CompanionStore(provider: DifficultySaveProvider(), fileURL: url, defaults: defaults)
                 XCTAssertEqual(again.state.active?.usedAtStage, activeCredits)
                 XCTAssertEqual(again.state.eggUsage, eggCredits)
-                XCTAssertEqual(again.state.active?.profile, profile)
                 XCTAssertEqual(again.state.usedSinceInstall, 900_000_000)
                 XCTAssertTrue(again.state.dex.isEmpty)
             }

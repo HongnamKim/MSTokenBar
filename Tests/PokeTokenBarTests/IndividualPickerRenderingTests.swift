@@ -3,17 +3,6 @@ import SwiftUI
 import XCTest
 @testable import PokeTokenBar
 
-private struct PickerRenderProvider: PokeProviding, PokemonDetailProviding {
-    func line(baseSpeciesID: Int) async throws -> EvoLine { throw URLError(.notConnectedToInternet) }
-    func baseSpeciesIndex() async throws -> [BaseSpecies] { [] }
-    func baseSpecies(id: Int) async throws -> BaseSpecies? { nil }
-    func pokemonDetails(speciesID: Int) async throws -> PokemonDetails {
-        PokemonDetails(speciesID: speciesID, name: "parasect", height: 10, weight: 295,
-            baseExperience: 142, genderRate: 4, types: ["bug", "grass"],
-            baseStats: ["hp": 60, "attack": 95, "defense": 80, "special-attack": 60, "special-defense": 80, "speed": 30],
-            abilities: [PokemonAbilityOption(name: "effect-spore", slot: 1, isHidden: false)], moves: [])
-    }
-}
 @MainActor
 final class IndividualPickerRenderingTests: XCTestCase {
     func testMountedSingleAndMultipleIndividuals() async throws {
@@ -24,16 +13,15 @@ final class IndividualPickerRenderingTests: XCTestCase {
             let file = dir.appendingPathComponent("state.json")
             var state = CompanionState()
             state.language = .en
+            let sd = GunplaID.encode(machineID: 1, grade: .sd), hg = GunplaID.encode(machineID: 1, grade: .hg)
             state.dex = (0..<count).map { i in
-                DexEntry(id: "fixture-\(i)", baseID: 46, finalID: 47, chainOrder: [46,47], rarity: .common,
+                DexEntry(id: "fixture-\(i)", baseID: sd, finalID: hg, chainOrder: [sd, hg], rarity: .common,
                     caughtAt: Date(timeIntervalSince1970: 1700000000 + Double(i)),
-                    profile: PokemonProfile.generate(seed: UInt64(i + 1), instanceID: "fixture-\(i)"),
-                    names: [47: ["en": "Parasect"]])
+                    names: [sd: ["en": "SD Gundam"], hg: ["en": "HG Gundam"]])
             }
             try JSONEncoder().encode(state).write(to: file)
-            let store = CompanionStore(provider: PickerRenderProvider(), fileURL: file)
-            await store.loadPokemonDetails(speciesID: 47)
-            let species = try XCTUnwrap(store.dexSpecies.first { $0.id == 47 })
+            let store = CompanionStore(provider: MachineCatalog.shared, fileURL: file)
+            let species = try XCTUnwrap(store.dexSpecies.first { $0.id == hg })
             let view = PokemonDetailView(store: store, species: species, onBack: {},
                 spriteStore: SpriteStore(directory: dir))
                 .frame(width: PopoverMetrics.contentWidth, height: 520)

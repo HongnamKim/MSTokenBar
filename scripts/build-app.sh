@@ -1,10 +1,11 @@
 #!/bin/bash
-# PokeTokenBar.app 번들 조립 + /Applications 설치
+# MSTokenBar.app 번들 조립 + /Applications 설치
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="2.5.7"
-APP_NAME="PokeTokenBar"
+APP_NAME="MSTokenBar"
+SWIFT_PRODUCT="PokeTokenBar"   # SwiftPM 타깃/실행파일 이름은 업스트림 병합을 위해 유지
 BUILD_DIR="build"
 APP="$BUILD_DIR/$APP_NAME.app"
 
@@ -20,7 +21,7 @@ SLICES=()
 for arch in "${ARCHS[@]}"; do
     echo "==> swift build -c release --arch $arch"
     swift build -c release --arch "$arch"
-    SLICES+=("$(swift build -c release --arch "$arch" --show-bin-path)/$APP_NAME")
+    SLICES+=("$(swift build -c release --arch "$arch" --show-bin-path)/$SWIFT_PRODUCT")
 done
 
 echo "==> $APP 조립"
@@ -32,13 +33,18 @@ echo "   archs: $(lipo -archs "$APP/Contents/MacOS/$APP_NAME")"
 # 심볼 strip — 릴리스 바이너리 1.84MB → 0.80MB(-57%). codesign 전에 수행(서명 무효화 방지).
 strip -rSTx "$APP/Contents/MacOS/$APP_NAME" 2>/dev/null || strip -rSx "$APP/Contents/MacOS/$APP_NAME"
 cp assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+# SwiftPM 리소스 번들(건프라 스프라이트·카탈로그). GunplaResources.bundle 이 Contents/Resources 에서 찾는다.
+# 번들은 아키텍처와 무관하므로 마지막 슬라이스의 bin 경로에서 복사한다.
+RES_BUNDLE="$(dirname "${SLICES[${#SLICES[@]}-1]}")/${SWIFT_PRODUCT}_${SWIFT_PRODUCT}.bundle"
+[[ -d "$RES_BUNDLE" ]] || { echo "   ✗ 리소스 번들 없음: $RES_BUNDLE" >&2; exit 1; }
+cp -R "$RES_BUNDLE" "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleIdentifier</key><string>io.github.chattymin.poketokenbar</string>
+    <key>CFBundleIdentifier</key><string>io.github.hongnamkim.mstokenbar</string>
     <key>CFBundleName</key><string>$APP_NAME</string>
     <key>CFBundleExecutable</key><string>$APP_NAME</string>
     <key>CFBundlePackageType</key><string>APPL</string>
@@ -51,8 +57,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
-            <key>CFBundleURLName</key><string>io.github.chattymin.poketokenbar.agent</string>
-            <key>CFBundleURLSchemes</key><array><string>poketokenbar</string></array>
+            <key>CFBundleURLName</key><string>io.github.hongnamkim.mstokenbar.agent</string>
+            <key>CFBundleURLSchemes</key><array><string>mstokenbar</string></array>
         </dict>
     </array>
 </dict>
@@ -62,12 +68,12 @@ PLIST
 # Keep the old LaunchAgent definition so SMAppService can query and unregister it
 # when upgrading. New login items register the main app.
 mkdir -p "$APP/Contents/Library/LaunchAgents"
-cat > "$APP/Contents/Library/LaunchAgents/io.github.chattymin.poketokenbar.login.plist" <<AGENT
+cat > "$APP/Contents/Library/LaunchAgents/io.github.hongnamkim.mstokenbar.login.plist" <<AGENT
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Label</key><string>io.github.chattymin.poketokenbar.login</string>
+    <key>Label</key><string>io.github.hongnamkim.mstokenbar.login</string>
     <key>ProgramArguments</key>
     <array>
         <string>/Applications/$APP_NAME.app/Contents/MacOS/$APP_NAME</string>
@@ -85,7 +91,7 @@ cat > "$APP/Contents/Library/LaunchAgents/io.github.chattymin.poketokenbar.login
 AGENT
 
 echo "==> codesign"
-SIGN_IDENTITY="${CODESIGN_IDENTITY:-PokeTokenBar Local}"
+SIGN_IDENTITY="${CODESIGN_IDENTITY:-MSTokenBar Local}"
 # 안정적 Keychain ACL 을 위해서는 인증서 존재가 아니라 유효한 codesigning identity 가 필요하다.
 if security find-identity -v -p codesigning | grep -F "\"$SIGN_IDENTITY\"" >/dev/null; then
     # 안정적 자체 서명 신원 → 재빌드해도 Keychain "항상 허용" 유지

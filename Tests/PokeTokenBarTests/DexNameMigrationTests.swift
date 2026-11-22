@@ -29,7 +29,7 @@ final class DexNameMigrationTests: XCTestCase {
 
     private func entry(_ id: String = "old-catch") -> DexEntry {
         DexEntry(id: id, baseID: 1, finalID: 2, chainOrder: [1, 2], rarity: .common,
-                 caughtAt: Date(timeIntervalSince1970: 123), isShiny: true, nature: .brave,
+                 caughtAt: Date(timeIntervalSince1970: 123), isShiny: true,
                  names: [1: ["en": "Bulbasaur"], 2: ["en": "Ivysaur"]])
     }
 
@@ -65,19 +65,18 @@ final class DexNameMigrationTests: XCTestCase {
         XCTAssertEqual(store.state.dex[0].id, old.id)
         XCTAssertEqual(store.state.dex[0].caughtAt, old.caughtAt)
         XCTAssertEqual(store.state.dex[0].isShiny, old.isShiny)
-        XCTAssertEqual(store.state.dex[0].nature, old.nature)
         XCTAssertEqual(store.state.usedSinceInstall, 1234567)
         XCTAssertEqual(store.state.inventory["rareCandy"], 3)
         XCTAssertTrue(store.state.dex.allSatisfy { !$0.needsNamesRefresh })
         XCTAssertEqual(store.dexStoredChainNames(store.state.dex[0])?[1], "이상해씨")
-        XCTAssertEqual(PokemonNameLocalization.resolve(store.state.dex[0].names![2]!, preferredCodes: ["it"]), "Ivysaur")
+        XCTAssertEqual(store.state.dex[0].names?[2]?["it"], "Ivysaur")
         _ = await store.dexResolveChainNames(old) // A mounted row can still hold its old value.
         await store.backfillMissingDexNames()
         let calls = await provider.calls
         XCTAssertEqual(calls, 1, "Duplicate catches and stale row values must reuse the refreshed names")
 
         let restored = CompanionStore(provider: provider, fileURL: url)
-        restored.setLanguage(.pt) // No Portuguese names in the API response: English is complete fallback.
+        restored.setLanguage(.ja) // No Japanese names in the API response: English is complete fallback.
         await restored.backfillMissingDexNames()
         XCTAssertEqual(restored.dexStoredChainNames(restored.state.dex[0])?[1], "Bulbasaur")
         let restoredCalls = await provider.calls

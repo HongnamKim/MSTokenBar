@@ -502,14 +502,17 @@ final class RareCandyStoreTests: XCTestCase {
         XCTAssertEqual(s.state.active?.stageIndex, 1, "최대 1단계")
     }
 
+    /// 건프라: 기체 4(커먼, HG·MG)를 졸업한 뒤 다시 나온 개체(반복 성장 부스트)에도 사탕 1개 = 최대 1단계.
     func testSingleCandyAdvancesAtMostOneBoostedStage() async {
-        let s = store(rcLinear3)
-        await s.hatch(baseID: 1)
-        for stage in 0..<3 {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("rc-\(UUID().uuidString).json")
+        let s = CompanionStore(provider: MachineCatalog.shared, clock: { rcNow }, fileURL: url, rng: SeededRNG(seed: 7))
+        let start = GunplaID.encode(machineID: 4, grade: .hg)
+        await s.hatch(baseID: start)
+        for stage in 0..<2 {
             s.applyUsage(PokemonBalance.phaseThreshold(
-                rarity: .common, totalForms: 3, stageIndex: stage))
+                rarity: .common, totalForms: 2, stageIndex: stage))
         }
-        await s.hatch(baseID: 1)
+        await s.hatch(baseID: start)
         XCTAssertTrue(s.state.active?.hasGrowthBoost == true)
 
         let firstThreshold = s.threshold
@@ -1023,7 +1026,7 @@ final class CandyNotificationCopyTests: XCTestCase {
         let l = L(.ko)
         let one = l.notifCandyTitle(item: l.itemName(.rareCandy), count: 1)
         let five = l.notifCandyTitle(item: l.itemName(.rareCandy), count: 5)
-        XCTAssertTrue(one.contains("이상한 사탕"))
+        XCTAssertTrue(one.contains("스펀지 사포"))
         XCTAssertTrue(one.contains("1개"), one)
         XCTAssertTrue(five.contains("5개"), five)
     }

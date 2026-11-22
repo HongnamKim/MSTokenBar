@@ -111,36 +111,21 @@ final class PopoverNavigationTests: XCTestCase {
 }
 
 final class RepresentativeLocalizationTests: XCTestCase {
-    func testGermanSettingsLabelsIncludeLatestMainStrings() {
-        let l = L(.de)
+    func testEnglishSettingsLabelsIncludeLatestMainStrings() {
+        let l = L(.en)
 
-        XCTAssertEqual(l.todayTokensShort, "Heutige Tokens")
-        XCTAssertEqual(l.todayCost, "Heutige Kosten ($)")
+        XCTAssertEqual(l.todayTokensShort, "Today's tokens")
         XCTAssertEqual(l.limitPercent, "Limit %")
-        XCTAssertEqual(l.animationQualityLabel, "Animation")
-        XCTAssertEqual(l.animationQualityHint, "Flüssigere Animationen verbrauchen mehr Batterie")
-        XCTAssertEqual(l.animationPowerSaver, "Energiesparmodus")
-        XCTAssertEqual(l.animationBalanced, "Ausgewogen")
-        XCTAssertEqual(l.animationSmooth, "Flüssig")
     }
 
-    /// 대표 포켓몬은 메뉴바와 플로팅 펫에 함께 쓰이는 독립 개념이다. 모든 언어가 pet 전용 표현으로
-    /// 되돌아가거나 스페인어 추가 뒤 한 언어만 빠지지 않도록 사용자가 보는 핵심 액션을 고정한다.
+    /// 대표 기체는 메뉴바와 플로팅 펫에 함께 쓰이는 독립 개념이다. 모든 언어가 pet 전용 표현으로
+    /// 되돌아가거나 언어 추가 뒤 한 언어만 빠지지 않도록 사용자가 보는 핵심 액션을 고정한다.
     func testRepresentativeActionsAreLocalizedInEverySupportedLanguage() {
         let expected: [(AppLanguage, label: String, follow: String, choose: String, set: String)] = [
-            (.ko, "대표 포켓몬", "현재 포켓몬 따라가기", "도감에서 선택…", "대표로 설정"),
-            (.en, "Representative Pokémon", "Follow current companion", "Choose in Pokédex…",
+            (.ko, "대표 기체", "현재 기체 따라가기", "격납고에서 선택…", "대표로 설정"),
+            (.en, "Representative Mobile Suit", "Follow current suit", "Choose in Hangar…",
              "Set as representative"),
-            (.ja, "代表ポケモン", "現在のポケモンに合わせる", "図鑑で選ぶ…", "代表ポケモンに設定"),
-            (.es, "Pokémon representativo", "Seguir al compañero actual", "Elegir en la Pokédex…",
-             "Establecer como representante"),
-            (.fr, "Pokémon représentatif", "Suivre le compagnon actuel", "Choisir dans le Pokédex…",
-             "Définir comme représentatif"),
-            (.pt, "Pokémon representativo", "Seguir o companheiro atual", "Escolher na Pokédex…",
-             "Definir como representante"),
-            (.de, "Repräsentatives Pokémon", "Aktuellem Begleiter folgen", "Im Pokédex auswählen…",
-             "Als repräsentativ festlegen"),
-            (.ru, "Основной покемон", "Текущий компаньон", "Выбрать в Покедексе…", "Сделать основным"),
+            (.ja, "代表機体", "現在の機体に合わせる", "格納庫で選ぶ…", "代表機体に設定"),
         ]
 
         XCTAssertEqual(expected.map(\.0), AppLanguage.allCases)

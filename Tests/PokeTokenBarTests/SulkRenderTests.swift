@@ -233,15 +233,12 @@ final class SulkRenderTests: XCTestCase {
     func testRenderMenuIllustrations() async throws {
         let directory = try outputDirectory()
         let l = L(.en)
-        for checked in [false, true] {
-            let rows = [MenuRow(title: l.floatingPetMenuOpen), MenuRow(title: l.floatingPetMenuHide),
-                        MenuRow(title: l.backViewLabel, checked: checked)]
-            try await writeIllustration(menuIllustration(rows, width: 220),
-                                        name: "illustration-pet-menu-\(checked ? "checked" : "unchecked")-en.png",
-                                        size: CGSize(width: 244, height: 120), to: directory)
-        }
+        let petRows = [MenuRow(title: l.floatingPetMenuOpen), MenuRow(title: l.floatingPetMenuHide)]
+        try await writeIllustration(menuIllustration(petRows, width: 220),
+                                    name: "illustration-pet-menu-en.png",
+                                    size: CGSize(width: 244, height: 120), to: directory)
         let entries = StatusItemMenu.entries(l: l, todayTokens: 19_400_000, todayCost: nil,
-                                             floatingPetEnabled: false, alwaysFacesBack: true)
+                                             floatingPetEnabled: false)
         let rows = entries.map { entry -> MenuRow in
             guard let entry else { return MenuRow(title: "", isSeparator: true) }
             return MenuRow(title: entry.title, checked: entry.isChecked,
@@ -249,7 +246,7 @@ final class SulkRenderTests: XCTestCase {
                            enabled: entry.action != nil)
         }
         try await writeIllustration(menuIllustration(rows, width: 280),
-                                    name: "illustration-status-menu-checked-en.png",
+                                    name: "illustration-status-menu-en.png",
                                     size: CGSize(width: 304, height: 240), to: directory)
     }
 

@@ -126,18 +126,18 @@ final class ShopTests: XCTestCase {
     /// 최대 수량 = 잔액 ÷ 가격(내림). 가격 미만이면 0.
     func testMaxBuyCountIsFloorOfWalletOverPrice() {
         XCTAssertEqual(store(used: 1_200_000_000).maxBuyCount(.rareCandy), 2)
-        XCTAssertEqual(store(used: 1_200_000_000).maxBuyCount(.mint), 12)
+        XCTAssertEqual(store(used: 3_000_000_000).maxBuyCount(.rareCandy), 6)
         XCTAssertEqual(store(used: RareCandy.price - 1).maxBuyCount(.rareCandy), 0)
     }
 
     /// 보유형은 잔액이 여러 개 값이어도 최대 1, 보유 후엔 0(재구매 불가).
     func testMaxBuyCountCapsPassiveAtOne() {
-        let s = store(used: 10 * ShinyCharm.price)
-        XCTAssertEqual(s.maxBuyCount(.shinyCharm), 1)
-        XCTAssertFalse(s.buy(.shinyCharm, count: 2), "보유형 2개 구매는 거부")
+        let s = store(used: 10 * ToolSet.prices[.airbrush]!)
+        XCTAssertEqual(s.maxBuyCount(.maskingTape), 1)
+        XCTAssertFalse(s.buy(.maskingTape, count: 2), "보유형 2개 구매는 거부")
         XCTAssertEqual(s.state.spentTokens, 0)
-        XCTAssertTrue(s.buy(.shinyCharm))
-        XCTAssertEqual(s.maxBuyCount(.shinyCharm), 0)
+        XCTAssertTrue(s.buy(.maskingTape))
+        XCTAssertEqual(s.maxBuyCount(.maskingTape), 0)
     }
 
     /// N개 구매 = 지갑 price×N 차감, 인벤토리 +N(기존 재고에 합산), 성장 미터 불변.
@@ -182,40 +182,39 @@ final class ShopTests: XCTestCase {
             + "\"lastDate\":\"d\",\"dex\":[],\"collectedFinals\":[]}"
         try? json.data(using: .utf8)!.write(to: url)
         let s1 = CompanionStore(provider: ShopNoProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 1))
-        XCTAssertTrue(s1.buy(.mint, count: 4))
+        XCTAssertTrue(s1.buy(.rareCandy, count: 2))
 
         let s2 = CompanionStore(provider: ShopNoProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 1))
-        XCTAssertEqual(s2.itemCount(.mint), 4, "재고 영속")
-        XCTAssertEqual(s2.state.spentTokens, 4 * Mint.price, "지출 영속")
+        XCTAssertEqual(s2.itemCount(.rareCandy), 2, "재고 영속")
+        XCTAssertEqual(s2.state.spentTokens, 2 * RareCandy.price, "지출 영속")
     }
 
     // MARK: 정렬 (가격 저렴한 순 + 구매 완료 보유형 맨 아래)
 
-    /// 상점 목록은 가격 오름차순(민트 100M < 사탕 500M < 이로치 부적 3B).
+    /// 상점 목록은 가격 오름차순(스펀지 500M < 마스킹 테이프 1B < 먹선펜 1.5B < 도료 세트 2B < 에어브러시 3B).
     func testItemsSortedByPriceAscending() {
         let items = store(used: 0).purchasableItems
-        XCTAssertEqual(items, [.mint, .rareCandy, .shinyCharm])
+        XCTAssertEqual(items, [.rareCandy, .maskingTape, .panelLinePen, .paintSet, .airbrush])
         let prices = items.compactMap(\.shopPrice)
         XCTAssertEqual(prices, prices.sorted(), "shopPrice 오름차순 — 가격 상수가 바뀌어도 정렬 불변식 유지")
     }
 
-    /// 구매 완료한 보유형(이로치 부적)은 맨 아래로. 재구매 불가라 상단에 둘 이유 없음.
-    /// (현재 부적이 최고가라 가격순 결과와 일치하지만, 향후 저가 보유형이 생겨도 규칙이 유지되도록 게이트.)
+    /// 구매 완료한 보유형(마스킹 테이프)은 맨 아래로 — 가격순이면 맨 위에 올 저가 공구라 규칙이 실제로 검증된다.
     func testOwnedPassiveSinksToBottom() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("shop-sort-\(UUID().uuidString).json")
         let json = "{\"installBaselineSet\":true,\"usedSinceInstall\":0,\"spentTokens\":0,"
-            + "\"lastDate\":\"d\",\"dex\":[],\"collectedFinals\":[],\"inventory\":{\"shinyCharm\":1}}"
+            + "\"lastDate\":\"d\",\"dex\":[],\"collectedFinals\":[],\"inventory\":{\"maskingTape\":1}}"
         try? json.data(using: .utf8)!.write(to: url)
         let s = CompanionStore(provider: ShopNoProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 1))
-        XCTAssertTrue(s.itemCount(.shinyCharm) > 0)
-        XCTAssertEqual(s.purchasableItems.last, .shinyCharm, "구매 완료 보유형은 최하단")
+        XCTAssertTrue(s.itemCount(.maskingTape) > 0)
+        XCTAssertEqual(s.purchasableItems.last, .maskingTape, "구매 완료 보유형은 최하단")
     }
 
     // MARK: shopEntries (판매 아이템 + 알 3종을 하나의 가격 오름차순 목록으로 병합)
 
     /// 활성 포켓몬이 있으면 알 3종이 각자의 가격 위치에 끼워져 전체가 가격 오름차순.
-    /// (회귀: 알이 ForEach 밖에서 무조건 맨 아래로 append 돼 3B 부적보다 아래에 놓이던 표시.)
-    /// 등급 알을 인접 그룹으로 묶지 **않는** 것이 의도다 — 그러면 4B 희귀 알이 3B 부적 위로 올라가
+    /// (회귀: 알이 ForEach 밖에서 무조건 맨 아래로 append 돼 3B 에어브러시보다 아래에 놓이던 표시.)
+    /// 등급 알을 인접 그룹으로 묶지 **않는** 것이 의도다 — 그러면 4B 희귀 알이 3B 에어브러시 위로 올라가
     /// 위 회귀를 부분적으로 되살린다. 티어 관계는 카드의 등급 배지로 읽힌다.
     func testShopEntriesInterleavesFreshEggByPrice() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("shop-entries-\(UUID().uuidString).json")
@@ -227,12 +226,14 @@ final class ShopTests: XCTestCase {
         let s = CompanionStore(provider: ShopNoProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 1))
         XCTAssertTrue(s.hasActive)
         XCTAssertEqual(s.shopEntries,
-                       [.item(.mint),        // 100M
-                        .item(.rareCandy),   // 500M
-                        .egg(nil),           // 1B
-                        .egg(.uncommon),     // 2.5B
-                        .item(.shinyCharm),  // 3B
-                        .egg(.rare)])        // 4B
+                       [.item(.rareCandy),    // 500M
+                        .item(.maskingTape),  // 1B
+                        .egg(nil),            // 1B
+                        .item(.panelLinePen), // 1.5B
+                        .item(.paintSet),     // 2B
+                        .egg(.uncommon),      // 2.5B
+                        .item(.airbrush),     // 3B
+                        .egg(.rare)])         // 4B
         let prices = s.shopEntries.map(\.price)
         XCTAssertEqual(prices, prices.sorted(), "가격 상수가 바뀌어도 오름차순 불변식 유지")
     }
@@ -244,12 +245,14 @@ final class ShopTests: XCTestCase {
         let s = store(used: 5_000_000_000)   // active 없음, 잔액은 전 티어 가격 이상
         XCTAssertFalse(s.hasActive)
         XCTAssertEqual(s.shopEntries,
-                       [.item(.mint),        // 100M
-                        .item(.rareCandy),   // 500M
-                        .egg(nil),           // 1B
-                        .egg(.uncommon),     // 2.5B
-                        .item(.shinyCharm),  // 3B
-                        .egg(.rare)])        // 4B
+                       [.item(.rareCandy),    // 500M
+                        .item(.maskingTape),  // 1B
+                        .egg(nil),            // 1B
+                        .item(.panelLinePen), // 1.5B
+                        .item(.paintSet),     // 2B
+                        .egg(.uncommon),      // 2.5B
+                        .item(.airbrush),     // 3B
+                        .egg(.rare)])         // 4B
         for tier in FreshEgg.shopTiers {
             XCTAssertTrue(s.shopEntries.contains(.egg(tier)), "알 상태에서도 \(tier?.rawValue ?? "기본") 알은 노출 유지")
             XCTAssertFalse(s.canBuyEgg(tier), "노출은 되지만 \(tier?.rawValue ?? "기본") 알 구매는 hasActive 게이트로 차단")

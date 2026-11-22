@@ -33,16 +33,16 @@ final class KoreanParticleTests: XCTestCase {
     /// 실제 문구 — 스크린샷으로 보고된 "유니란이(가)"·"듀란(으)로"·"란쿨루스(으)로"가 사라진다.
     func testKoreanCopyUsesTheMatchingParticle() {
         let l = L(.ko)
-        XCTAssertEqual(l.notifHatchBody("유니란"), "알에서 유니란이 나왔어요!")
-        XCTAssertEqual(l.notifShinyHatchBody("뚜벅쵸", odds: 48), "이로치 뚜벅쵸가 태어났어요! (1/48)")
-        XCTAssertEqual(l.notifEvolveBody(from: "솔록", to: "듀란"), "솔록이 듀란으로 진화했어요!")
-        XCTAssertEqual(l.statusEvolved("란쿨루스"), "란쿨루스로 진화했어요!")
-        XCTAssertEqual(l.eggConfirm("레트라", l.eggName(.rare)), "레트라를 놓아주고 희귀 알로 바꿀까요?")
+        XCTAssertEqual(l.notifHatchBody("유니란"), "박스에서 유니란이 나왔어요!")
+        XCTAssertEqual(l.notifShinyHatchBody("뚜벅쵸", odds: 48), "전용기 뚜벅쵸가 나왔어요! (1/48)")
+        XCTAssertEqual(l.notifEvolveBody(from: "솔록", to: "듀란"), "솔록이 듀란으로 등급 업했어요!")
+        XCTAssertEqual(l.statusEvolved("란쿨루스"), "란쿨루스로 등급 업했어요!")
+        XCTAssertEqual(l.eggConfirm("레트라", l.eggName(.rare)), "레트라를 놓아주고 레어 박스로 바꿀까요?")
     }
 
     /// 조사 선택은 한국어 문구에만 적용된다.
     func testOtherLanguagesAreUntouched() {
-        XCTAssertEqual(L(.en).notifHatchBody("Unfezant"), "Unfezant hatched from the egg!")
-        XCTAssertEqual(L(.ja).notifEvolveBody(from: "デスマス", to: "デスカーン"), "デスマス が デスカーン に進化しました！")
+        XCTAssertEqual(L(.en).notifHatchBody("Unfezant"), "Unfezant came out of the box!")
+        XCTAssertEqual(L(.ja).notifEvolveBody(from: "デスマス", to: "デスカーン"), "デスマス が デスカーン にグレードアップしました！")
     }
 }

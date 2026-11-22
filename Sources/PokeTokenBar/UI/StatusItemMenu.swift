@@ -7,7 +7,7 @@ import AppKit
 @MainActor
 enum StatusItemMenu {
     enum Action: Equatable {
-        case refresh, openDex, openSettings, toggleFloatingPet, toggleBackView, quit
+        case refresh, openDex, openSettings, toggleFloatingPet, quit
     }
 
     struct Entry: Equatable {
@@ -20,8 +20,7 @@ enum StatusItemMenu {
     }
 
     /// `nil` elements are separators.
-    static func entries(l: L, todayTokens: Int, todayCost: UsageCost?, floatingPetEnabled: Bool,
-                        alwaysFacesBack: Bool = false) -> [Entry?] {
+    static func entries(l: L, todayTokens: Int, todayCost: UsageCost?, floatingPetEnabled: Bool) -> [Entry?] {
         [
             Entry(title: summary(l: l, todayTokens: todayTokens, todayCost: todayCost), keyEquivalent: "", action: nil),
             nil,
@@ -30,7 +29,6 @@ enum StatusItemMenu {
             Entry(title: l.settings + "…", keyEquivalent: ",", action: .openSettings),
             Entry(title: floatingPetEnabled ? l.floatingPetHideLabel : l.floatingPetEnableLabel,
                   keyEquivalent: "", action: .toggleFloatingPet),
-            Entry(title: l.backViewLabel, keyEquivalent: "", action: .toggleBackView, isChecked: alwaysFacesBack),
             nil,
             Entry(title: l.quit, keyEquivalent: "q", action: .quit),
         ]

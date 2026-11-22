@@ -102,15 +102,13 @@ final class LocalizationInterpolationTests: XCTestCase {
 
             // Pokédex / 도감
             expect(lang, "dexTotal", l.dexTotal(4242), "4242")
-            expect(lang, "dexSpeciesTotal", l.dexSpeciesTotal(4242), "4242")
+            expect(lang, "hangarMachineTotal", l.hangarMachineTotal(4242), "4242")
             expect(lang, "dexPageLabel", l.dexPageLabel(4242, 1717), "4242", "1717")
 
             // System notifications / 시스템 알림
             expect(lang, "notifHatchBody", l.notifHatchBody(a), a)
             expect(lang, "notifShinyHatchBody", l.notifShinyHatchBody(a, odds: 4242), a, "4242")
             expect(lang, "notifEvolveBody", l.notifEvolveBody(from: a, to: b), a, b)
-            expect(lang, "notifDittoRevealBody", l.notifDittoRevealBody(a), a)
-            expect(lang, "notifShinyDittoRevealBody", l.notifShinyDittoRevealBody(a), a)
             expect(lang, "notifGraduateBody", l.notifGraduateBody(a), a)
             expect(lang, "notifBody", l.notifBody(a, b), a, b)
             expect(lang, "notifCandyTitle", l.notifCandyTitle(item: a, count: 4242), a, "4242")

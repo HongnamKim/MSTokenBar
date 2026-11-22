@@ -6,7 +6,7 @@ import SwiftUI
 /// - 드래그: 커스텀 `mouseDragged` (클릭과 충돌하지 않음).
 /// - 클릭 → 알 기도 / 포켓몬 팝오버, 우클릭 → 메뉴, 호버 → 오늘 사용량 콜아웃.
 /// - Limit-alert speech bubbles grow the panel; persisted origin is the *pet*, not the panel.
-/// - Agent activity (`poketokenbar://agent`): bob while working, bubble while waiting,
+/// - Agent activity (`mstokenbar://agent`): bob while working, bubble while waiting,
 ///   run to the cursor when done. The run never moves the saved home.
 /// - 에너지: 숨김·슬립 시 호스팅 트리 해제.
 @MainActor
@@ -264,7 +264,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     /// Praying refreshes usage every 30 prayers (30, 60, 90...), the same step as the hover quip, so the egg's
     /// progress moves without a request per click.
     static let prayersPerRefresh = L.prayersPerQuip
-    /// How long the callout stays up on its own when a hatch / evolution / graduation / Ditto line arrives.
+    /// How long the callout stays up on its own when a hatch / evolution / graduation line arrives.
     static let eventPopDuration: Duration = .seconds(6)
 
     /// Pop the callout only for an event not shown yet, while the pet is on screen and no speech or
@@ -388,7 +388,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
 
     // MARK: Agent activity
 
-    /// Entry point for `poketokenbar://agent` URLs. Dropped while the pet or the setting is off.
+    /// Entry point for `mstokenbar://agent` URLs. Dropped while the pet or the setting is off.
     func handleAgentEvent(_ event: AgentActivityEvent) {
         guard agentEnabled else { return }
         tracker.apply(event, now: Date())
@@ -609,8 +609,6 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         hosting.onClick = { [weak self] in self?.petClicked() }
         hosting.onStroke = { [weak self] in self?.petWasStroked() }
         hosting.onHide = onHide
-        hosting.onToggleBackView = { [weak self] in self?.store.alwaysFacesBack.toggle() }
-        hosting.isBackViewOn = { [weak self] in self?.store.alwaysFacesBack ?? false }
         hosting.languageProvider = { [weak self] in self?.companion.language ?? .systemDefault }
         hosting.onHoverChange = { [weak self] hovering in
             self?.isHovering = hovering
@@ -900,8 +898,6 @@ final class PetHostingView: NSHostingView<AnyView> {
     var strokeDistance: CGFloat = 14
     private var petting = PettingDetector()
     var onHide: (() -> Void)?
-    var onToggleBackView: (() -> Void)?
-    var isBackViewOn: () -> Bool = { false }
     var onHoverChange: ((Bool) -> Void)?
     var languageProvider: () -> AppLanguage = { .systemDefault }
 
@@ -994,17 +990,11 @@ final class PetHostingView: NSHostingView<AnyView> {
                                 action: #selector(handleHide(_:)), keyEquivalent: "")
         hide.target = self
         hide.isEnabled = true
-        let backView = menu.addItem(withTitle: l.backViewLabel,
-                                    action: #selector(handleToggleBackView(_:)), keyEquivalent: "")
-        backView.target = self
-        backView.isEnabled = true
-        backView.state = isBackViewOn() ? .on : .off
         NSMenu.popUpContextMenu(menu, with: event, for: self)
     }
 
     @objc func handleOpen(_ sender: Any?) { onOpenPopover?() }
     @objc func handleHide(_ sender: Any?) { onHide?() }
-    @objc func handleToggleBackView(_ sender: Any?) { onToggleBackView?() }
 }
 
 /// Agent state the controller pushes into the SwiftUI pet; already gated by the settings.
@@ -1040,7 +1030,7 @@ struct FloatingPetView: View {
 
             SpriteView(speciesID: subject.speciesID, size: size, animated: animated,
                        shiny: subject.isShiny,
-                       minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore, form: subject.form,
+                       minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore,
                        back: companion.facesBack, reportsVisibleTop: true)
                 // One-shot wobble per prayer; keyframes run once per trigger change, never in a loop.
                 .keyframeAnimator(initialValue: 0.0, trigger: burst.wobbleCount) { sprite, angle in
