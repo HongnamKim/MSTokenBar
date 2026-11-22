@@ -14,8 +14,8 @@ final class HangarCellTests: XCTestCase {
     private func entry(_ machineID: Int, _ grades: [GunplaGrade]) -> DexEntry {
         let ids = grades.map { id(machineID, $0) }
         return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids,
-                        rarity: catalog.machine(machineID)?.rarity ?? .common, caughtAt: now,
-                        isShiny: catalog.machine(machineID)?.isVariant ?? false)
+                        rarity: catalog.machine(id: machineID)?.rarity ?? .common, caughtAt: now,
+                        isShiny: catalog.machine(id: machineID)?.isVariant ?? false)
     }
 
     private func store(dex: [DexEntry], active: MonState? = nil, language: AppLanguage = .en) throws -> CompanionStore {

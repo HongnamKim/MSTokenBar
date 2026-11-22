@@ -1490,7 +1490,7 @@ private struct DexGridView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(rarityDisplayOrder, id: \.self) { r in
-                        let count = all.lazy.filter { store.catalog.machine($0.machineID)?.rarity == r }.count
+                        let count = all.lazy.filter { store.catalog.machine(id: $0.machineID)?.rarity == r }.count
                         Button {
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 selectedRarity = (selectedRarity == r) ? nil : r
@@ -1602,7 +1602,7 @@ private struct DexGridView: View {
     private func footer(_ slice: [HangarCell], current: Int, pageCount: Int) -> some View {
         HStack(spacing: 8) {
             if let sel = slice.first(where: { $0.machineID == selectedID }),
-               let machine = store.catalog.machine(sel.machineID) {
+               let machine = store.catalog.machine(id: sel.machineID) {
                 // 칸은 형식번호·스프라이트·이름·등급만 보여주므로 희귀도가 선택으로 얻는 정보다.
                 Text("\(machine.modelNumber) \(store.machineName(sel.machineID)) · \(store.l.rarityLabel(machine.rarity))")
                     .font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
@@ -1866,7 +1866,7 @@ private struct HangarMachineCell: View {
 
     private static let thumb: CGFloat = 50
 
-    private var machine: MachineRecord? { store.catalog.machine(cell.machineID) }
+    private var machine: MachineRecord? { store.catalog.machine(id: cell.machineID) }
     private var name: String { store.machineName(cell.machineID) }
 
     var body: some View {

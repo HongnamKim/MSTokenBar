@@ -112,7 +112,7 @@ private struct ShopItemCard: View {
     @ViewBuilder
     private func buyControls(_ l: L) -> some View {
         if kind.isPassive && store.itemCount(kind) > 0 {
-            // 보유형(이로치 부적 등) — 1회 구매라 소유 후엔 "보유 중" 표시(재구매 버튼 없음).
+            // 보유형(도색 공구) — 1회 구매라 소유 후엔 "보유 중" 표시(재구매 버튼 없음).
             HStack(spacing: 5) {
                 Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.green)
                 Text(l.ownedAlready).font(.caption2.weight(.semibold)).foregroundStyle(.green)

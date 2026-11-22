@@ -404,11 +404,23 @@ struct MonState: Codable, Sendable {
     var displaysShiny: Bool { isShiny }
     // pathIDs 가 비면(손상된 상태 파일) baseID 로 폴백 — 렌더마다 읽히므로 out-of-bounds 크래시 방지.
     var currentID: Int { pathIDs.isEmpty ? baseID : pathIDs[min(stageIndex, pathIDs.count - 1)] }
-    var phaseThreshold: Int {
-        PokemonBalance.phaseThreshold(
+    /// Base (difficulty-free) cost of the current stage. A Gunpla machine is priced on its FULL
+    /// released-grade path — k = `machine.grades.count`, stage = the current grade's position there — so
+    /// resuming at grade G costs exactly the remaining stages of an original run. Ids the catalog does not
+    /// know keep the path-relative pricing.
+    func phaseThreshold(catalog: MachineCatalog) -> Int {
+        var k = totalForms, stage = stageIndex
+        // From the start grade, not `currentID`: callers price future stages by moving `stageIndex` alone.
+        if let decoded = GunplaID.decode(baseID),
+           let machine = catalog.machine(id: decoded.machineID),
+           let start = machine.grades.firstIndex(of: decoded.grade) {
+            k = machine.grades.count
+            stage = min(start + stageIndex, k - 1)
+        }
+        return PokemonBalance.phaseThreshold(
             rarity: rarity,
-            totalForms: totalForms,
-            stageIndex: stageIndex,
+            totalForms: k,
+            stageIndex: stage,
             growthMultiplier: hasGrowthBoost ? PokemonBalance.repeatGrowthMultiplier : 1)
     }
 
@@ -656,7 +668,7 @@ struct CompanionState: Codable, Sendable {
     /// Forget the prayers of the previous egg. Call on every path that starts a new egg (or consumes this one).
     mutating func resetEggPrayers() { eggPrayers = nil }
 
-    /// 대표 포켓몬은 사용자가 현재 보유한 종만 가리킨다. Fresh Egg·메타몽 리빌·손편집 세이브가
+    /// 대표 포켓몬은 사용자가 현재 보유한 종만 가리킨다. Fresh Egg·손편집 세이브가
     /// 유령 종을 메뉴바와 플로팅 펫에 영구히 남기지 않게 한다.
     mutating func reconcileRepresentativeSelection() {
         guard let selected = representativeSpeciesID else { return }

@@ -39,9 +39,13 @@ actor SpriteStore {
     /// Gunpla art is bundled: no network, no disk cache. There is no back view, so `back` reports "missing"
     /// and callers fall back to the front. Static requests get the GIF's first frame as PNG.
     private func gunplaData(speciesID: Int, animated: Bool, back: Bool) -> Data? {
-        if back { return nil }
+        back ? nil : Self.bundledGunplaData(speciesID: speciesID, animated: animated)
+    }
+
+    /// Bundled Gunpla front art: the GIF, or its first frame as PNG. Local and small, so sync callers may read it.
+    static func bundledGunplaData(speciesID: Int, animated: Bool) -> Data? {
         guard let gif = BundledSprites.gifData(speciesID: speciesID) else { return nil }
-        return animated ? gif : Self.firstFramePNG(of: gif)
+        return animated ? gif : firstFramePNG(of: gif)
     }
 
     private static func firstFramePNG(of gif: Data) -> Data? {
@@ -97,7 +101,10 @@ enum SpriteLoader {
         let f = directory.appendingPathComponent("\(key).\(ext)")
         let imageKey = f.path as NSString
         if let img = imageCache.object(forKey: imageKey) { return img }
-        if let d = try? Data(contentsOf: f), let img = NSImage(data: d) {
+        // Gunpla art never lands on disk; seed from the bundle so the first render has no placeholder.
+        let bundled = GunplaID.isGunpla(speciesID) && !back
+            ? SpriteStore.bundledGunplaData(speciesID: speciesID, animated: animated) : nil
+        if let d = (try? Data(contentsOf: f)) ?? bundled, let img = NSImage(data: d) {
             imageCache.setObject(img, forKey: imageKey)
             return img
         }
@@ -128,7 +135,9 @@ enum SpriteLoader {
         let key = SpriteStore.cacheKey(speciesID: speciesID, animated: true, shiny: shiny, back: back)
         let file = directory.appendingPathComponent("\(key).gif")
         if let cached = animationCache.object(forKey: file.path as NSString) { return cached.frames }
-        guard let data = try? Data(contentsOf: file) else { return [] }
+        let bundled = GunplaID.isGunpla(speciesID) && !back
+            ? SpriteStore.bundledGunplaData(speciesID: speciesID, animated: true) : nil
+        guard let data = (try? Data(contentsOf: file)) ?? bundled else { return [] }
         return rememberFrames(data, file: file)
     }
 

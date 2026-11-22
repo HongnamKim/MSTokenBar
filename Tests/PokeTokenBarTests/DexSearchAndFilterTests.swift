@@ -60,7 +60,7 @@ final class DexSearchAndFilterTests: XCTestCase {
     private func createHangarStore(language: AppLanguage = .en) -> CompanionStore {
         let owned: [(Int, [GunplaGrade])] = [(1, [.sd, .hg]), (2, [.hg]), (3, [.hg]), (7, [.hg]), (8, [.sd])]
         let dex = owned.map { machineID, grades in
-            let machine = MachineCatalog.shared.machine(machineID)!
+            let machine = MachineCatalog.shared.machine(id: machineID)!
             let ids = grades.map { GunplaID.encode(machineID: machineID, grade: $0) }
             return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids, rarity: machine.rarity,
                             caughtAt: now, isShiny: machine.isVariant)

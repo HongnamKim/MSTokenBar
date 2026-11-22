@@ -239,8 +239,6 @@ struct L {
     var tokenOutput: String { t("출력", "Output", "出力", "Salida", "Sortie", "Saída", "Ausgabe", "Вывод") }
     var tokenCacheWrite: String { t("캐시 쓰기", "Cache write", "キャッシュ書込", "Escritura caché", "Écriture cache", "Gravação cache", "Cache schreiben", "Запись в кэш") }
     var tokenCacheRead: String { t("캐시 읽기", "Cache read", "キャッシュ読込", "Lectura caché", "Lecture cache", "Leitura cache", "Cache lesen", "Чтение кэша") }
-    var website: String { t("웹사이트", "Website", "ウェブサイト", "Sitio web", "Site web", "Site", "Website", "Сайт") }
-    var sponsor: String { t("후원", "Sponsor", "支援", "Apoyar", "Soutenir", "Apoiar", "Unterstützen", "Поддержать") }
     var evolutionScrollPrevious: String { t("이전 등급 보기", "Show previous grades", "前のグレードを見る") }
     var evolutionScrollNext: String { t("다음 등급 보기", "Show next grades", "次のグレードを見る") }
 
@@ -1105,16 +1103,6 @@ struct L {
     func dexTotal(_ n: Int) -> String { t("총 \(n)기", "\(n) total", "全\(n)機") }
     /// 포획 로그 = 개체 단위 기록(같은 라인 중복이 정상). 도감 = 종 단위 집계.
     var catchLogTitle: String { t("제작 기록", "Build Log", "製作記録") }
-    /// 도감 총계는 개체가 아니라 종 수 — 로그의 dexTotal("총 N마리")과 단위가 다르다.
-    var chooseForm: String {
-        t("폼 선택", "Choose form", "フォルムを選択", "Elegir forma", "Choisir une forme", "Escolher forma", "Form auswählen", "Выбрать форму")
-    }
-    /// Usual look of a species whose official data names no form (Castform, Rotom, Kyurem, Genesect).
-    var defaultFormDataNote: String {
-        t("정보는 기본 폼 기준", "Data uses the default form", "データは基本フォルムに基づきます",
-          "Datos de la forma predeterminada", "Données de la forme par défaut", "Dados da forma padrão",
-          "Daten der Standardform", "Данные обычной формы")
-    }
     func dexPageLabel(_ page: Int, _ total: Int) -> String {
         t("\(total)페이지 중 \(page)페이지", "Page \(page) of \(total)", "\(total)ページ中 \(page)ページ", "Página \(page) de \(total)", "Page \(page) sur \(total)", "Página \(page) de \(total)", "Seite \(page) von \(total)", "Страница \(page) из \(total)")
     }
@@ -1134,8 +1122,9 @@ struct L {
     var dexShinyLabel: String { t("전용기", "Custom", "専用機") }
     var dexSearchPlaceholder: String { t("이름 또는 형식번호 검색…", "Search name or model number…", "名前または型式番号で検索…") }
     var sortTitle: String { t("정렬", "Sort", "並び替え", "Ordenar", "Trier", "Ordenar", "Sortieren", "Сортировка") }
-    var sortDexNumberAsc: String { t("형식번호 (낮은 순)", "Model number (Low to High)", "型式番号（昇順）") }
-    var sortDexNumberDesc: String { t("형식번호 (높은 순)", "Model number (High to Low)", "型式番号（降順）") }
+    /// Hangar order: series order, then machine id (not the model-number string).
+    var sortDexNumberAsc: String { t("작품 순", "Series order", "作品順") }
+    var sortDexNumberDesc: String { t("작품 역순", "Series order (reversed)", "作品順（逆順）") }
     var sortNameAsc: String { t("이름 (가나다·A-Z)", "Name (A–Z)", "名前（五十音・A-Z）", "Nombre (A–Z)", "Nom (A–Z)", "Nome (A–Z)", "Name (A–Z)", "Имя (A–Z)") }
     var sortNameDesc: String { t("이름 (역순)", "Name (Z–A)", "名前（逆順）", "Nombre (Z–A)", "Nom (Z–A)", "Nome (Z–A)", "Name (Z–A)", "Имя (Z–A)") }
     var sortRarity: String { t("희귀도 순", "Rarity (High to Low)", "希少度順", "Rareza (mayor a menor)", "Rareté (décroissante)", "Raridade (maior a menor)", "Seltenheit (absteigend)", "Редкость (по убыванию)") }
@@ -1185,9 +1174,7 @@ struct L {
     var statusFocus: String { t("지금은 집중 모드예요.", "In focus mode now.", "今は集中モードです。", "Ahora está en modo concentración.", "En mode concentration.", "Agora está em modo foco.", "Gerade voll konzentriert.", "Сейчас в режиме фокуса.") }
     var statusTired: String { t("한도에 가까워요. 잠깐 쉬어도 괜찮아요.", "Close to the limit. A short break is fine.", "上限が近いです。少し休んでも大丈夫。", "Está cerca del límite. Un pequeño descanso no vendría mal.", "Proche de la limite. Une petite pause ne fait pas de mal.", "Está perto do limite. Uma pausa cai bem.", "Fast am Limit. Eine kurze Pause tut gut.", "Лимит близко. Короткий перерыв не помешает.") }
     var statusSleep: String { t("지금은 자고 있어요.", "Sleeping now.", "今は眠っています。", "Ahora está durmiendo.", "En train de dormir.", "Agora está dormindo.", "Schläft gerade.", "Сейчас спит.") }
-    var backViewHint: String { t("메뉴바·플로팅 펫·팝오버에서 항상 뒷모습으로 보여요", "Always shows its back in the menu bar, floating pet and popover", "メニューバー・フローティングペット・ポップオーバーで常に後ろ姿になります") }
-    var backViewLabel: String { t("뒷모습 보기", "Show back view", "後ろ姿を見る", "Ver de espaldas", "Voir de dos", "Ver de costas", "Rückansicht zeigen", "Показывать спину") }
-    var statusSulk: String { t("삐져서 등을 돌리고 있어요.", "Sulking with its back turned.", "拗ねて背を向けています。", "Está de espaldas, enfurruñado.", "Boude, le dos tourné.", "Está de costas, emburrado.", "Schmollt mit dem Rücken zu dir.", "Обиделся и отвернулся.") }
+    var statusSulk: String { t("오래 기다려서 시무룩해요.", "Sulking after a long wait.", "待ちくたびれて拗ねています。") }
     func statusEvolved(_ name: String) -> String { t("\(KoreanParticle.direction.attach(to: name)) 등급 업했어요!", "Graded up to \(name)!", "\(name) にグレードアップしました！") }
     var statusGrew: String { t("성장했어요!", "It grew!", "成長しました！", "¡Ha crecido!", "Il a grandi !", "Cresceu!", "Ist gewachsen!", "Подрос!") }
 
@@ -1195,7 +1182,7 @@ struct L {
     var notifHatchTitle: String { t("📦 개봉!", "📦 Unboxed!", "📦 開封！") }
     func notifHatchBody(_ name: String) -> String { t("박스에서 \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(name) came out of the box!", "ボックスから \(name) が登場しました！") }
     var notifShinyHatchTitle: String { t("✨ 전용기!", "✨ Custom Mobile Suit!", "✨ 専用機！") }
-    /// 실제 판정에 쓴 분모를 받는다 — 부적이 있으면 64 가 아니다.
+    /// 실제 판정에 쓴 분모를 받는다 — 도색 공구를 보유하면 32 가 아니다.
     func notifShinyHatchBody(_ name: String, odds: UInt64) -> String { t("전용기 \(KoreanParticle.subject.attach(to: name)) 나왔어요! (1/\(odds))", "A Custom \(name) came out! (1 in \(odds))", "専用機の \(name) が登場しました！(1/\(odds))") }
     // MARK: 기도하기 (알 위약 버튼)
     func prayerBornWith(_ n: Int) -> String { t("기도 \(n)번 받고 태어남", "Born after \(n) prayers", "お祈り\(n)回を受けて誕生", "Nació tras \(n) oraciones", "Né après \(n) prières", "Nasceu após \(n) orações", "Geboren nach \(n) Gebeten", "Родился после \(n) молитв") }

@@ -46,7 +46,7 @@ final class MachineCatalogTests: XCTestCase {
         let c = try MachineCatalog.bundled()
         XCTAssertEqual(c.machines.count, 12)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
-        XCTAssertEqual(c.machine(3)?.isVariant, true)
+        XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
         XCTAssertEqual(c.series.count, 4)
@@ -66,7 +66,7 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_acceptsValidRecords() throws {
         let c = try MachineCatalog(machines: [m(1), m(2, variantOf: 1)], series: [s])
-        XCTAssertEqual(c.machine(2)?.variantOf, 1)
-        XCTAssertNil(c.machine(5))
+        XCTAssertEqual(c.machine(id: 2)?.variantOf, 1)
+        XCTAssertNil(c.machine(id: 5))
     }
 }

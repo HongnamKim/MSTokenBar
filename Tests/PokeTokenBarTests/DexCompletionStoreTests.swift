@@ -26,7 +26,7 @@ final class DexCompletionStoreTests: XCTestCase {
     /// One DexEntry per machine, owning the given grades (every released grade when nil).
     private func entries(_ owned: [Int: [GunplaGrade]?]) -> [DexEntry] {
         owned.keys.sorted().map { machineID in
-            let machine = catalog.machine(machineID)!
+            let machine = catalog.machine(id: machineID)!
             let ids = (owned[machineID]! ?? machine.grades).map { GunplaID.encode(machineID: machineID, grade: $0) }
             return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids,
                             rarity: machine.rarity, caughtAt: Date(), isShiny: machine.isVariant)

@@ -48,7 +48,7 @@ struct SettingsView: View {
         guard let species = companion.representativeDexSpecies else {
             return l.representativeFollowCurrent
         }
-        let model = companion.catalog.machine(species.id)?.modelNumber
+        let model = companion.catalog.machine(speciesID: species.id)?.modelNumber
         return "\(model.map { "\($0) " } ?? "")\(species.name)\(species.isShiny ? " ✨" : "")"
     }
 
@@ -353,17 +353,6 @@ struct SettingsView: View {
                 }
                 Spacer()
                 Toggle(l.floatingPetEnableLabel, isOn: $store.floatingPetEnabled)
-                    .labelsHidden().toggleStyle(.switch).controlSize(.small)
-            }
-            Divider()
-            groupRow {
-                // Also reachable from both right-click menus. Applies to every surface, not only the pet.
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(l.backViewLabel)
-                    Text(l.backViewHint).font(.caption2).foregroundStyle(.tertiary)
-                }
-                Spacer()
-                Toggle(l.backViewLabel, isOn: $store.alwaysFacesBack)
                     .labelsHidden().toggleStyle(.switch).controlSize(.small)
             }
             if store.floatingPetEnabled {

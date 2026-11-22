@@ -1204,7 +1204,7 @@ final class CompanionStoreTests: XCTestCase {
         let legacy = #"{"baseID":1,"pathIDs":[1],"stageIndex":0,"usedAtStage":0,"rarity":"common","totalForms":3}"#
         let decoded = try JSONDecoder().decode(MonState.self, from: Data(legacy.utf8))
         XCTAssertFalse(decoded.hasGrowthBoost)
-        XCTAssertEqual(decoded.phaseThreshold, 125_000_000)
+        XCTAssertEqual(decoded.phaseThreshold(catalog: .shared), 125_000_000)
     }
 
     func testReloadPreservesCompleteShortPlannedRouteLength() async {

@@ -11,11 +11,9 @@ final class CompanionStore {
     private(set) var displayState: CompanionStateKind = .egg
     /// Time since the last token usage while `displayState == .sulk`, else 0.
     private(set) var sulkIdle: TimeInterval = 0
-    /// Mirror of `UsageStore.alwaysFacesBack` (set by `AppDelegate.updateCompanion`): a display preference.
-    var alwaysFacesBack = false
-    /// The companion shows its back sprite on every surface: while sulking, or always when asked to.
-    /// An egg has no back to show.
-    var facesBack: Bool { state.active != nil && (alwaysFacesBack || displayState == .sulk) }
+    /// The companion asks for its back sprite while sulking; Gunpla has no back art, so every surface
+    /// falls back to the front sprite. An egg has no back to show.
+    var facesBack: Bool { state.active != nil && displayState == .sulk }
     private(set) var currentLine: EvoLine?
     private(set) var representativeSubject = RepresentativeSubject(speciesID: nil, isShiny: false)
     private(set) var isHatching = false
@@ -130,7 +128,7 @@ final class CompanionStore {
             return credits < oldThreshold ? min(newThreshold - 1, rounded) : rounded
         }
         if var active = state.active {
-            active.usedAtStage = rescaled(active.usedAtStage, base: active.phaseThreshold)
+            active.usedAtStage = rescaled(active.usedAtStage, base: active.phaseThreshold(catalog: catalog))
             state.active = active
         } else {
             state.eggUsage = rescaled(state.eggUsage, base: PokemonBalance.eggHatchThreshold)
@@ -153,7 +151,7 @@ final class CompanionStore {
     /// 난이도를 반영한 단계 임계. **`PokemonBalance.phaseThreshold` 를 직접 부르지 않는다** —
     /// 배율을 빠뜨린 호출부가 생기면 그 경로만 조용히 기본 난이도로 돌아간다.
     private func stageThreshold(for mon: MonState) -> Int {
-        PokemonBalance.scaled(mon.phaseThreshold, by: growthDifficulty)
+        PokemonBalance.scaled(mon.phaseThreshold(catalog: catalog), by: growthDifficulty)
     }
 
     /// 상점 표시·결제에 쓰는 실제 가격 — 기본가 × 상점 난이도. 미판매면 nil.
@@ -170,12 +168,10 @@ final class CompanionStore {
 
     var hasActive: Bool { state.active != nil }
     var rarity: Rarity? { state.active?.rarity }
-    var currentIsShiny: Bool { state.active?.displaysShiny ?? false }   // 위장 중엔 이로치 숨김(리빌 때 공개)
+    var currentIsShiny: Bool { state.active?.displaysShiny ?? false }   // 전용기(variant) 여부
     /// 새 알(리롤) 구매 시 실수로 놓아주지 않도록 2단계 확인이 필요한 고가치 개체인지 판정.
     /// 이로치(shiny)이거나 전설(legendary)인 경우에만 2단계 경고를 띄운다.
     /// 희귀(rare)는 고급/희귀 알의 반복 리롤 피로도(alert fatigue)를 방지하기 위해 일반 확인만 거친다.
-    /// 위장 중인 메타몽은 `currentIsShiny`(=false)와 `rarity`(=.common)의 불변식을 그대로 따라
-    /// 리빌 전 정체를 누설하지 않는다.
     var isHighValueCompanion: Bool {
         currentIsShiny || rarity == .legendary
     }
@@ -232,7 +228,7 @@ final class CompanionStore {
     private(set) var isHatchRetryDelayed = false
 
     var displayName: String {
-        guard let a = state.active, let line = currentLine else { return "Token Egg" }
+        guard let a = state.active, let line = currentLine else { return l.eggName(nil) }
         return line.localizedName(a.currentID, state.language)
     }
     var currentSpeciesID: Int? { state.active?.currentID }
@@ -319,7 +315,7 @@ final class CompanionStore {
     /// 같아야 놓아준 뒤에도 칸 구성이 그대로 유지된다 — `plannedPathIDs` 나 `pathIDs` 전체를 쓰면
     /// 도달한 적 없는 진화형까지 보유로 잡힌다(`dexSpecies` 가 같은 prefix 규칙을 쓴다).
     ///
-    /// 이로치는 `currentIsShiny` — 위장 중인 메타몽은 리빌 전까지 숨긴다(`activeDexEntry` 와 단일 판정).
+    /// 전용기 여부는 `currentIsShiny` — `activeDexEntry` 와 단일 판정.
     /// `caughtAt` 은 놓아준 시각이다: 포획 로그가 그 값으로 정렬하므로 기록이 남은 시점과 일치해야 한다.
     private func releasedDexEntry(from a: MonState) -> DexEntry {
         // stageIndex 가 음수·범위 밖이어도 최소 한 형태는 남긴다(손상 상태 파일 방어 — MonState.currentID 와 같은 태도).
@@ -1141,6 +1137,11 @@ final class CompanionStore {
         guard count >= 1, count <= maxBuyCount(kind), let price = price(of: kind) else { return false }
         state.spentTokens += price * count
         state.inventory[kind.rawValue, default: 0] += count
+        // A tool changes the variant odds; drop the box's pre-roll so the hatch (and its notification) uses them.
+        if kind.isPassive, state.active == nil, state.pendingHatchID != nil {
+            state.pendingHatchID = nil
+            prefetchedLineID = nil
+        }
         save()
         return true
     }
@@ -1365,11 +1366,14 @@ final class CompanionStore {
 
     // MARK: 부화
 
-    /// A `pendingHatchID` from an old PokeTokenBar save is a Pokémon species id; the catalog cannot serve
-    /// it, so the egg would retry it forever. Drop it (and its form) so a fresh choice is made.
+    /// A `pendingHatchID` the catalog cannot serve — a Pokémon species id from an old PokeTokenBar save, or a
+    /// grade that machine does not (or no longer) release — would be retried forever. Drop it so a fresh
+    /// choice is made.
     private func discardLegacyPendingHatch() {
-        guard let pending = state.pendingHatchID, catalog.machine(speciesID: pending) == nil else { return }
-        AppLog.write("hatch: dropping non-Gunpla pending id \(pending)")
+        guard let pending = state.pendingHatchID else { return }
+        if let decoded = GunplaID.decode(pending),
+           catalog.machine(id: decoded.machineID)?.grades.contains(decoded.grade) == true { return }
+        AppLog.write("hatch: dropping unservable pending id \(pending)")
         state.pendingHatchID = nil
         save()
     }
@@ -1403,7 +1407,7 @@ final class CompanionStore {
 
     /// 부화가 폐기된 뒤 남은 개체(대개 방금 불러온 개체)의 진화 라인을 다시 로드한다.
     /// `loadCurrentLine` 은 `!isHatching` 을 요구하므로 부화 중에 걸린 로드는 조용히 실패한다 —
-    /// 아무도 재시도하지 않으면 다음 update 틱(기본 120초)까지 이름이 "Token Egg" 로 남는다.
+    /// 아무도 재시도하지 않으면 다음 update 틱(기본 120초)까지 이름이 박스 이름(`eggName(nil)`)으로 남는다.
     /// Task 본문은 현재 동기 실행(= defer 로 isHatching 해제)이 끝난 뒤 돌므로 락이 이미 풀려 있다.
     private func kickLineLoadIfNeeded() {
         guard state.active != nil, currentLine == nil else { return }
@@ -1513,7 +1517,7 @@ final class CompanionStore {
         if let tier = state.eggTier, line.rarity.sortRank < tier.sortRank {
             AppLog.write("hatch: rolled \(line.rarity) below guaranteed \(tier) — discarded, re-roll next tick")
             state.pendingHatchID = nil
-                prefetchedLineID = nil
+            prefetchedLineID = nil
             markHatchRetryDelayedIfReady(generation: generation)
             save()
             return
@@ -1530,7 +1534,7 @@ final class CompanionStore {
         let prayers = state.eggPrayers   // 부화체에 옮기고 알 쪽은 비운다
         state.resetEggPrayers()
         // 이로치 = 전용기. 롤하지 않는다 — 전용기 여부는 선정(`chooseBase`)에서 이미 정해져 시작 종 id 에 담겨 있다.
-                // 알림 문구는 선정에 쓰인 것과 같은 분모를 보여준다.
+        // 알림 문구는 선정에 쓰인 것과 같은 분모를 보여준다.
         let shinyOdds = shinyDenominator
         let machine = catalog.machine(speciesID: line.baseID)
         let isShiny = machine?.variantOf != nil
@@ -1569,17 +1573,57 @@ final class CompanionStore {
         let generation = activeGeneration
         isHatching = true
         defer { isHatching = false }
-        if let line = try? await provider.line(baseSpeciesID: a.baseID) {
-            // await 중 사용량 등 활성 상태는 계속 바뀔 수 있다. 요청 당시 스냅샷을 다시 쓰지 말고
-            // 같은 개체가 아직 활성인 경우에만 최신 상태를 정규화한다.
+        let line: EvoLine
+        do {
+            line = try await provider.line(baseSpeciesID: a.baseID)
+        } catch let error as CatalogProviderError {
             guard activeGeneration == generation,
                   let latest = state.active, latest.baseID == a.baseID, currentLine == nil else { return }
-            state.active = normalizedEvolutionState(latest, from: line.tree)
-            state.reconcileRepresentativeSelection()   // 손상 경로 정규화로 사라진 단계가 대표로 남지 않게
-            currentLine = line
-            save()   // 마이그레이션 선택을 사용량 재평가 전에 영속화해 재시작마다 다시 롤리지 않는다.
-            applyUsage(0)   // 라인 미로딩 동안 적립된 사용량이 임계를 넘었으면 지금 진화 판정
+            retireUnservableActive(latest, error: error)
+            return
+        } catch {
+            return   // 일시적 실패 — 다음 update 틱에 재시도
         }
+        // await 중 사용량 등 활성 상태는 계속 바뀔 수 있다. 요청 당시 스냅샷을 다시 쓰지 말고
+        // 같은 개체가 아직 활성인 경우에만 최신 상태를 정규화한다.
+        guard activeGeneration == generation,
+              let latest = state.active, latest.baseID == a.baseID, currentLine == nil else { return }
+        state.active = normalizedEvolutionState(latest, from: line.tree)
+        state.reconcileRepresentativeSelection()   // 손상 경로 정규화로 사라진 단계가 대표로 남지 않게
+        currentLine = line
+        save()   // 마이그레이션 선택을 사용량 재평가 전에 영속화해 재시작마다 다시 롤리지 않는다.
+        applyUsage(0)   // 라인 미로딩 동안 적립된 사용량이 임계를 넘었으면 지금 진화 판정
+    }
+
+    /// The catalog will never serve this active individual (a Pokémon id from an old save, or a start grade
+    /// since removed), so retrying its line would loop forever. A known machine keeps its reached grades
+    /// that are still released as a released hangar record; anything else is dropped. Back to the box.
+    private func retireUnservableActive(_ a: MonState, error: CatalogProviderError) {
+        var reached: [Int] = []
+        if let machine = catalog.machine(speciesID: a.baseID) {
+            reached = a.pathIDs.prefix(max(1, a.stageIndex + 1)).filter { id in
+                guard let decoded = GunplaID.decode(id) else { return false }
+                return decoded.machineID == machine.id && machine.grades.contains(decoded.grade)
+            }
+        }
+        if let first = reached.first, let last = reached.last {
+            let now = clock()
+            state.dex.append(DexEntry(baseID: first, finalID: last, chainOrder: reached, rarity: a.rarity,
+                                      caughtAt: now, isShiny: a.isShiny, releasedAt: now, prayers: a.prayers))
+        }
+        AppLog.write("line: \(error) for active base \(a.baseID) — kept \(reached.count) released grade(s), back to the box")
+        state.active = nil
+        state.reconcileRepresentativeSelection()
+        activeGeneration += 1
+        currentLine = nil
+        state.eggUsage = 0
+        state.resetEggPrayers()
+        state.pendingHatchID = nil
+        prefetchedLineID = nil
+        isHatchRetryDelayed = false
+        displayState = .egg
+        save()
+        Task { await self.ensureEggPrefetch() }
     }
 
     /// 부화 기체 선정 — 전용기 여부 먼저 롤 → 졸업 안 한 후보에서 레어도 가중 1롤 → 지난번 도달 등급부터 시작.
@@ -1595,7 +1639,7 @@ final class CompanionStore {
     }
 
     /// Today's total at the previous refresh, and when a rise in it was last seen. The enrichment scan's
-    /// `lastUsage` lags a refresh behind, so without this the companion would keep its back turned for a
+    /// `lastUsage` lags a refresh behind, so without this the companion would keep sulking for a
     /// while after usage resumed. Not persisted: after a launch there is nothing to compare with.
     private var lastSeenToday: (date: String, total: Int)?
     private var lastObservedUsage: Date?

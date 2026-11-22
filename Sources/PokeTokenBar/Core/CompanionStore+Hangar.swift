@@ -8,13 +8,13 @@ extension CompanionStore {
         var owned: [Int: Set<GunplaGrade>] = [:]
         var raising: Set<Int> = []
         for species in dexSpecies {
-            guard let decoded = GunplaID.decode(species.id), catalog.machine(decoded.machineID) != nil else { continue }
+            guard let decoded = GunplaID.decode(species.id), catalog.machine(id: decoded.machineID) != nil else { continue }
             owned[decoded.machineID, default: []].insert(decoded.grade)
             if species.isRaising { raising.insert(decoded.machineID) }
         }
         let seriesOrder = Dictionary(catalog.series.map { ($0.id, $0.order) }, uniquingKeysWith: { first, _ in first })
         return owned.compactMap { machineID, grades -> (order: Int, cell: HangarCell)? in
-            guard let machine = catalog.machine(machineID) else { return nil }
+            guard let machine = catalog.machine(id: machineID) else { return nil }
             let cell = HangarCell(machineID: machineID, ownedGrades: grades, releasedGrades: machine.grades,
                                   isVariant: machine.isVariant, isRaising: raising.contains(machineID))
             return (seriesOrder[machine.series] ?? .max, cell)
@@ -54,7 +54,7 @@ extension CompanionStore {
 
     /// Machine name in the current language, or "#id" when the catalog does not know it.
     func machineName(_ machineID: Int) -> String {
-        catalog.machine(machineID).flatMap { state.language.resolveName($0.names) } ?? "#\(machineID)"
+        catalog.machine(id: machineID).flatMap { state.language.resolveName($0.names) } ?? "#\(machineID)"
     }
 
     /// Series title in the current language, or its id when unknown.
@@ -78,7 +78,7 @@ extension CompanionStore {
     ) -> [HangarCell] {
         let matcher = DexSearchMatcher(query)
         let cells = hangarCells.filter { cell in
-            guard let machine = catalog.machine(cell.machineID) else { return false }
+            guard let machine = catalog.machine(id: cell.machineID) else { return false }
             if let rarity, machine.rarity != rarity { return false }
             if variantOnly, !cell.isVariant { return false }
             if let series, machine.series != series { return false }
@@ -107,7 +107,7 @@ extension CompanionStore {
                 return cmp == .orderedSame ? hangarOrder($0, $1) : cmp == wanted
             }
         case .rarityDesc:
-            func rarityRank(_ cell: HangarCell) -> Int { catalog.machine(cell.machineID)?.rarity.sortRank ?? 0 }
+            func rarityRank(_ cell: HangarCell) -> Int { catalog.machine(id: cell.machineID)?.rarity.sortRank ?? 0 }
             return cells.sorted {
                 rarityRank($0) != rarityRank($1) ? rarityRank($0) > rarityRank($1) : hangarOrder($0, $1)
             }

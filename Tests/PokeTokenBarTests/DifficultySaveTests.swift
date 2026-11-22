@@ -18,7 +18,7 @@ final class DifficultySaveTests: XCTestCase {
             var mon = MonState(baseID: 1, pathIDs: [1], plannedPathIDs: [1, 2, 3],
                                stageIndex: 0, usedAtStage: 0, rarity: .common, totalForms: 3,
                                hasGrowthBoost: boost)
-            mon.usedAtStage = Int(Double(mon.phaseThreshold) * difficulty * fraction)
+            mon.usedAtStage = Int(Double(mon.phaseThreshold(catalog: .shared)) * difficulty * fraction)
             state.active = mon
         }
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("difficulty-save-\(UUID()).json")

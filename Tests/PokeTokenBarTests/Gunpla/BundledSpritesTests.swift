@@ -116,4 +116,19 @@ final class BundledSpritesTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(frames.count, 2)
         XCTAssertEqual(CountingURLProtocol.requestCount, 0)
     }
+
+    /// The first synchronous render must not flash the box glyph: bundled art seeds the caches without any
+    /// prior async load (the disk cache never holds Gunpla art).
+    @MainActor
+    func test_cachedSpritesForGunplaNeedNoPriorAsyncLoad() throws {
+        let empty = FileManager.default.temporaryDirectory.appendingPathComponent("bundled-sprites-\(UUID().uuidString)")
+        let id = GunplaID.encode(machineID: 1, grade: .rg)
+        XCTAssertNotNil(SpriteLoader.cachedImage(speciesID: id, directory: empty))
+        XCTAssertNotNil(SpriteLoader.cachedImage(speciesID: id, animated: true, shiny: true, directory: empty))
+        XCTAssertNotNil(SpriteLoader.cachedImage(speciesID: id, directory: empty, back: true), "back falls back to front")
+        XCTAssertGreaterThanOrEqual(SpriteLoader.cachedFrames(speciesID: id, shiny: false, directory: empty).count, 2)
+        XCTAssertTrue(SpriteLoader.cachedFrames(speciesID: id, shiny: false, directory: empty, back: true).isEmpty,
+                      "no back art — callers keep the front fallback")
+        XCTAssertNil(SpriteLoader.cachedImage(speciesID: 25, directory: empty), "non-Gunpla ids stay disk-only")
+    }
 }

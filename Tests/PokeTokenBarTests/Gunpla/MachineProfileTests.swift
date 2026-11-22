@@ -6,8 +6,8 @@ final class MachineProfileTests: XCTestCase {
         let profile = MachineCatalog.shared.profile(speciesID: GunplaID.encode(machineID: 2, grade: .hg))
         XCTAssertEqual(profile?.modelNumber, "MS-06F")
         XCTAssertEqual(profile?.releasedGrades, [.sd, .hg, .rg, .mg, .pg])
-        XCTAssertEqual(profile?.factionKey, MachineCatalog.shared.machine(2)?.faction)
-        XCTAssertEqual(profile?.seriesID, MachineCatalog.shared.machine(2)?.series)
+        XCTAssertEqual(profile?.factionKey, MachineCatalog.shared.machine(id: 2)?.faction)
+        XCTAssertEqual(profile?.seriesID, MachineCatalog.shared.machine(id: 2)?.series)
     }
 
     func test_unknownSpeciesHasNoProfile() {

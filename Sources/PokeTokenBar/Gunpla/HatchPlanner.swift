@@ -15,7 +15,7 @@ extension CompanionState {
         var highest: [Int: GunplaGrade] = [:]
         func reach(_ speciesIDs: [Int]) {
             for id in speciesIDs {
-                guard let decoded = GunplaID.decode(id), catalog.machine(decoded.machineID) != nil else { continue }
+                guard let decoded = GunplaID.decode(id), catalog.machine(id: decoded.machineID) != nil else { continue }
                 highest[decoded.machineID] = max(highest[decoded.machineID] ?? decoded.grade, decoded.grade)
             }
         }

@@ -7,7 +7,7 @@ enum BundledSprites {
     static func resourceName(speciesID: Int, catalog: MachineCatalog = .shared,
                              bundle: Bundle = GunplaResources.bundle) -> String? {
         guard let decoded = GunplaID.decode(speciesID) else { return nil }
-        let sprites = catalog.machine(decoded.machineID)?.sprites
+        let sprites = catalog.machine(id: decoded.machineID)?.sprites
         let bodyKey = decoded.grade.bodyType == .sd ? "sdBody" : "realBody"
         for key in [decoded.grade.rawValue, bodyKey] {
             if let name = sprites?[key], url(name, "gif", bundle) != nil { return name }

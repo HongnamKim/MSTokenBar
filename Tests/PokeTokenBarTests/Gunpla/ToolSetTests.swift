@@ -7,8 +7,9 @@ final class ToolSetTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
     private func store(used: Int, spent: Int = 0, inventory: [String: Int] = [:], dex: [DexEntry] = [],
-                       activeJSON: String? = nil) throws -> CompanionStore {
+                       activeJSON: String? = nil, pending: Int? = nil) throws -> CompanionStore {
         var seeded = CompanionState()
+        seeded.pendingHatchID = pending
         seeded.installBaselineSet = true
         seeded.usedSinceInstall = used
         seeded.spentTokens = spent
@@ -68,6 +69,22 @@ final class ToolSetTests: XCTestCase {
         XCTAssertTrue(s.canBuy(.panelLinePen))
         XCTAssertEqual(s.toolLevel, 1)
         XCTAssertEqual(s.shinyDenominator, 26)
+    }
+
+    /// The box pre-rolls its machine (variant or not) with the odds of the moment. A tool bought while waiting
+    /// must re-roll it, so the hatch uses — and its notification quotes — the new odds.
+    func test_buyingToolInBoxStateDropsThePreRoll() throws {
+        let s = try store(used: 10_000_000_000, pending: GunplaID.encode(machineID: 2, grade: .sd))
+        XCTAssertTrue(s.isEgg)
+        XCTAssertTrue(s.buy(.maskingTape))
+        XCTAssertNil(s.state.pendingHatchID)
+    }
+
+    func test_buyingSpongeInBoxStateKeepsThePreRoll() throws {
+        let pending = GunplaID.encode(machineID: 2, grade: .sd)
+        let s = try store(used: 10_000_000_000, pending: pending)
+        XCTAssertTrue(s.buy(.rareCandy))
+        XCTAssertEqual(s.state.pendingHatchID, pending)
     }
 
     func test_toolNeedsEnoughTokens() throws {

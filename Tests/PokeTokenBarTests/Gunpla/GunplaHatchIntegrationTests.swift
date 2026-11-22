@@ -38,14 +38,14 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         for _ in 0..<10 {
             guard let a = s.state.active else { return }
             if let stopAt, GunplaID.decode(a.currentID)?.grade == stopAt { return }
-            s.applyUsage(a.phaseThreshold)
+            s.applyUsage(s.threshold)
         }
     }
 
     private func gradeEntry(_ machineID: Int, _ grades: [GunplaGrade], released: Bool = false) -> DexEntry {
         let ids = grades.map { GunplaID.encode(machineID: machineID, grade: $0) }
         return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids,
-                        rarity: catalog.machine(machineID)!.rarity, caughtAt: now,
+                        rarity: catalog.machine(id: machineID)!.rarity, caughtAt: now,
                         releasedAt: released ? now : nil)
     }
 
@@ -54,7 +54,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         await openBox(s)
         let active = try XCTUnwrap(s.state.active)
         let decoded = try XCTUnwrap(GunplaID.decode(active.baseID))
-        let machine = try XCTUnwrap(catalog.machine(decoded.machineID))
+        let machine = try XCTUnwrap(catalog.machine(id: decoded.machineID))
         XCTAssertEqual(decoded.grade, machine.grades.first)
         XCTAssertEqual(active.stageIndex, 0)
         XCTAssertEqual(active.totalForms, machine.grades.count)
@@ -91,6 +91,60 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         }
         let pending = try XCTUnwrap(s.state.pendingHatchID)
         XCTAssertNotNil(GunplaID.decode(pending))
+    }
+
+    /// A pre-rolled id of a known machine whose grade is not (or no longer) released: the catalog refuses it.
+    func test_pendingHatchIDWithUnreleasedGradeIsDiscardedAndBoxOpens() async throws {
+        let unreleased = GunplaID.encode(machineID: 1, grade: .mgsd)   // RX-78-2 has no MGSD kit
+        XCTAssertFalse(catalog.machine(id: 1)!.grades.contains(.mgsd))
+        let url = tempURL()
+        try Data(#"{"pendingHatchID":\#(unreleased)}"#.utf8).write(to: url)
+        let s = store(fileURL: url)
+        XCTAssertEqual(s.state.pendingHatchID, unreleased)
+        use(s, 0)
+        use(s, s.eggHatchThreshold)
+        await s.hatchIfNeeded()
+        let active = try XCTUnwrap(s.state.active)
+        XCTAssertNotEqual(active.baseID, unreleased)
+        let decoded = try XCTUnwrap(GunplaID.decode(active.baseID))
+        XCTAssertTrue(try XCTUnwrap(catalog.machine(id: decoded.machineID)).grades.contains(decoded.grade))
+    }
+
+    /// Writes `active` into a save, loads it and runs update ticks until the store settles (or 2 s pass).
+    private func storeSettlingActive(_ activeJSON: String, dexJSON: String = "[]") async throws -> CompanionStore {
+        let url = tempURL()
+        try Data(#"{"installBaselineSet":true,"active":\#(activeJSON),"dex":\#(dexJSON)}"#.utf8).write(to: url)
+        let s = store(fileURL: url)
+        XCTAssertNotNil(s.state.active)
+        let deadline = Date().addingTimeInterval(2)
+        while s.state.active != nil, Date() < deadline {
+            use(s, 0)
+            try? await Task.sleep(nanoseconds: 5_000_000)
+        }
+        return s
+    }
+
+    func test_activePokemonIDBecomesBoxWithoutRetryingForever() async throws {
+        let s = try await storeSettlingActive(
+            #"{"baseID":25,"pathIDs":[25,26],"stageIndex":1,"usedAtStage":10,"rarity":"common","totalForms":2}"#)
+        XCTAssertNil(s.state.active)
+        XCTAssertTrue(s.isEgg)
+        XCTAssertTrue(s.state.dex.isEmpty, "a Pokémon id is not a machine — nothing to record")
+    }
+
+    func test_activeGunplaIDWithRemovedGradeBecomesReleasedEntryAndBox() async throws {
+        let removed = GunplaID.encode(machineID: 1, grade: .mgsd)
+        let hg = GunplaID.encode(machineID: 1, grade: .hg)
+        let rg = GunplaID.encode(machineID: 1, grade: .rg)
+        let s = try await storeSettlingActive(
+            #"{"baseID":\#(removed),"pathIDs":[\#(removed),\#(hg),\#(rg)],"stageIndex":1,"usedAtStage":10,"#
+            + #""rarity":"rare","totalForms":4}"#)
+        XCTAssertNil(s.state.active)
+        XCTAssertTrue(s.isEgg)
+        let entry = try XCTUnwrap(s.state.dex.last)
+        XCTAssertEqual(entry.chainOrder, [hg], "only reached grades that are still released")
+        XCTAssertNotNil(entry.releasedAt)
+        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).highestReachedGrade[1], .hg)
     }
 
     func test_variantHatchIsShiny() async throws {
@@ -182,6 +236,68 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         let active = try XCTUnwrap(s.state.active)
         XCTAssertEqual(active.baseID, GunplaID.encode(machineID: 1, grade: .sd))
         XCTAssertTrue(active.hasGrowthBoost)
+    }
+
+    // MARK: Resume pricing — stages are priced on the machine's full released-grade path.
+
+    /// Thresholds the store charges from the current stage to graduation, read stage by stage.
+    private func remainingStageCosts(_ s: CompanionStore) -> [Int] {
+        var costs: [Int] = []
+        for _ in 0..<10 {
+            guard s.state.active != nil else { break }
+            costs.append(s.threshold)
+            s.applyUsage(s.threshold)
+        }
+        return costs
+    }
+
+    private func fullPathStage(_ i: Int) -> Int {
+        // Machine 1 (rare): sd · hg · rg · mg · pg.
+        PokemonBalance.phaseThreshold(rarity: .rare, totalForms: 5, stageIndex: i)
+    }
+
+    func test_resumedAtFinalGradeCostsOnlyThatStage() async throws {
+        let s = store()
+        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .pg))
+        XCTAssertEqual(remainingStageCosts(s), [fullPathStage(4)])
+        XCTAssertEqual(fullPathStage(4), 1_000_000_000)
+    }
+
+    func test_resumedAtHGCostsTheRemainingStagesOfTheFullPath() async throws {
+        let s = store()
+        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .hg))
+        XCTAssertEqual(remainingStageCosts(s), (1...4).map(fullPathStage))
+        XCTAssertEqual(remainingStageCosts(s).reduce(0, +), 0)   // graduated
+    }
+
+    func test_freshRunPricingIsUnchanged() async throws {
+        let s = store()
+        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .sd))
+        let costs = remainingStageCosts(s)
+        XCTAssertEqual(costs, (0...4).map(fullPathStage))
+        XCTAssertEqual(costs.reduce(0, +), PokemonBalance.graduationTotal(.rare))
+    }
+
+    func test_resumedPricingComposesWithCandyBoostAndDifficulty() async throws {
+        var seeded = CompanionState()
+        seeded.installBaselineSet = true
+        seeded.inventory[ItemKind.rareCandy.rawValue] = 50
+        seeded.dex = [gradeEntry(1, [.sd, .hg, .rg, .mg, .pg])]   // graduated before → repeat-growth boost
+        let url = tempURL()
+        try JSONEncoder().encode(seeded).write(to: url)
+        let s = store(fileURL: url)
+        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .pg))
+        XCTAssertEqual(s.state.active?.hasGrowthBoost, true)
+        // PG stage 1.0B, halved by the boost → 500M at 100M per candy.
+        XCTAssertEqual(s.threshold, PokemonBalance.phaseThreshold(rarity: .rare, totalForms: 5, stageIndex: 4,
+                                                                  growthMultiplier: 2))
+        XCTAssertEqual(s.threshold, 500_000_000)
+        XCTAssertEqual(s.maxRareCandyUseCount, 5)
+        s.setGrowthDifficulty(0.5)
+        XCTAssertEqual(s.threshold, 250_000_000)
+        XCTAssertEqual(s.maxRareCandyUseCount, 3)
+        s.applyUsage(s.threshold / 2)
+        XCTAssertEqual(s.menuGrowthText, s.l.menuGrowthProgress(50, isEgg: false))
     }
 
     func test_loadsStateWithLegacyPokemonFields() throws {

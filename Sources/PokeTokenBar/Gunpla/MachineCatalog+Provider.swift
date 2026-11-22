@@ -9,7 +9,7 @@ enum CatalogProviderError: Error, Equatable {
 extension MachineCatalog: PokeProviding {
     func line(baseSpeciesID: Int) async throws -> EvoLine {
         guard let decoded = GunplaID.decode(baseSpeciesID),
-              let machine = machine(decoded.machineID) else {
+              let machine = machine(id: decoded.machineID) else {
             throw CatalogProviderError.unknownSpecies(baseSpeciesID)
         }
         guard machine.grades.contains(decoded.grade) else {

@@ -99,7 +99,7 @@ final class GunplaCopyTests: XCTestCase {
                 ("floatingPetSectionTitle", l.floatingPetSectionTitle), ("floatingPetEnableLabel", l.floatingPetEnableLabel),
                 ("floatingPetHint", l.floatingPetHint), ("floatingPetHideLabel", l.floatingPetHideLabel),
                 ("floatingPetMenuHide", l.floatingPetMenuHide), ("floatingPetHeartsLabel", l.floatingPetHeartsLabel),
-                ("allOffHint", l.allOffHint), ("backViewHint", l.backViewHint),
+                ("allOffHint", l.allOffHint), ("statusSulk", l.statusSulk),
                 ("importConfirmBody", l.importConfirmBody(incomingDex: 1, incomingTokens: "1M", exportedAt: "x",
                                                           sourceDevice: "y", currentDex: 2, currentTokens: "2M")),
                 ("importSaveDone", l.importSaveDone(dex: 1, tokens: "1M")),

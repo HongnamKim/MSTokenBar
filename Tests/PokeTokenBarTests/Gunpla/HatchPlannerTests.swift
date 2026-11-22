@@ -75,7 +75,7 @@ final class HatchPlannerTests: XCTestCase {
         for _ in 0..<500 {
             guard let choice = choose(snap, rng: &rng),
                   let decoded = GunplaID.decode(choice.startSpeciesID),
-                  let machine = catalog.machine(decoded.machineID) else {
+                  let machine = catalog.machine(id: decoded.machineID) else {
                 return XCTFail("expected a duplicate-phase choice")
             }
             XCTAssertTrue(choice.isDuplicatePhase)
@@ -105,7 +105,7 @@ final class HatchPlannerTests: XCTestCase {
         var rng: any RandomNumberGenerator = SeededRNG(seed: 3)
         for _ in 0..<500 {
             let id = machineID(choose(snapshot(), tier: .rare, rng: &rng))
-            let rarity = id.flatMap { catalog.machine($0)?.rarity }
+            let rarity = id.flatMap { catalog.machine(id: $0)?.rarity }
             XCTAssertTrue([Rarity.rare, .legendary].contains(rarity ?? .common), "id=\(String(describing: id))")
         }
     }

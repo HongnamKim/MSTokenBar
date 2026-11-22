@@ -65,7 +65,7 @@ struct MachineCatalog: Sendable {
         self.byID = byID
     }
 
-    func machine(_ id: Int) -> MachineRecord? { byID[id] }
+    func machine(id: Int) -> MachineRecord? { byID[id] }
 
     func machine(speciesID: Int) -> MachineRecord? {
         GunplaID.decode(speciesID).flatMap { byID[$0.machineID] }

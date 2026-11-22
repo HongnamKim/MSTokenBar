@@ -7,7 +7,7 @@ final class HangarProgressTests: XCTestCase {
 
     /// A hangar cell owning `grades` of machine `id` (every released grade when nil).
     private func cell(_ id: Int, _ grades: [GunplaGrade]? = nil) -> HangarCell {
-        let machine = catalog.machine(id)!
+        let machine = catalog.machine(id: id)!
         return HangarCell(machineID: id, ownedGrades: Set(grades ?? machine.grades),
                           releasedGrades: machine.grades, isVariant: machine.isVariant, isRaising: false)
     }

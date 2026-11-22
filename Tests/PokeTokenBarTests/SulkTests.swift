@@ -47,25 +47,19 @@ final class SulkStateTests: XCTestCase {
         XCTAssertEqual(threshold, 3 * 3600)
     }
 
-    func testFacesBackTruthTable() async {
+    func testFacesBackOnlyWhileSulking() async {
         let store = await makeStore()
-        for (always, idle, expected) in [(false, 0.0, false), (false, threshold, true),
-                                         (true, 0.0, true), (true, threshold, true)] {
-            store.alwaysFacesBack = always
+        for (idle, expected) in [(0.0, false), (threshold, true)] {
             update(store, idle: idle)
-            XCTAssertEqual(store.facesBack, expected, "always=\(always) idle=\(idle)")
-            XCTAssertEqual(store.displayState, idle >= threshold ? .sulk : .sleep,
-                           "the preference never changes the state kind")
-            XCTAssertEqual(store.sulkIdle, idle >= threshold ? idle : 0, "nor the sulk text input")
+            XCTAssertEqual(store.facesBack, expected, "idle=\(idle)")
         }
     }
 
-    func testAlwaysFacesBackDoesNotAffectAnEgg() {
+    func testAnEggNeverFacesBack() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-sulk-\(UUID().uuidString).json")
         let line = EvoLine(baseID: 1, tree: EvoNode(speciesID: 1, children: []), rarity: .common, names: [:])
         let store = CompanionStore(provider: StubProvider(value: line), clock: { sulkNow },
                                    fileURL: url, rng: SeededRNG(seed: 1))
-        store.alwaysFacesBack = true
         XCTAssertFalse(store.facesBack)
     }
 

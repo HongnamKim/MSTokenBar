@@ -609,8 +609,6 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         hosting.onClick = { [weak self] in self?.petClicked() }
         hosting.onStroke = { [weak self] in self?.petWasStroked() }
         hosting.onHide = onHide
-        hosting.onToggleBackView = { [weak self] in self?.store.alwaysFacesBack.toggle() }
-        hosting.isBackViewOn = { [weak self] in self?.store.alwaysFacesBack ?? false }
         hosting.languageProvider = { [weak self] in self?.companion.language ?? .systemDefault }
         hosting.onHoverChange = { [weak self] hovering in
             self?.isHovering = hovering
@@ -900,8 +898,6 @@ final class PetHostingView: NSHostingView<AnyView> {
     var strokeDistance: CGFloat = 14
     private var petting = PettingDetector()
     var onHide: (() -> Void)?
-    var onToggleBackView: (() -> Void)?
-    var isBackViewOn: () -> Bool = { false }
     var onHoverChange: ((Bool) -> Void)?
     var languageProvider: () -> AppLanguage = { .systemDefault }
 
@@ -994,17 +990,11 @@ final class PetHostingView: NSHostingView<AnyView> {
                                 action: #selector(handleHide(_:)), keyEquivalent: "")
         hide.target = self
         hide.isEnabled = true
-        let backView = menu.addItem(withTitle: l.backViewLabel,
-                                    action: #selector(handleToggleBackView(_:)), keyEquivalent: "")
-        backView.target = self
-        backView.isEnabled = true
-        backView.state = isBackViewOn() ? .on : .off
         NSMenu.popUpContextMenu(menu, with: event, for: self)
     }
 
     @objc func handleOpen(_ sender: Any?) { onOpenPopover?() }
     @objc func handleHide(_ sender: Any?) { onHide?() }
-    @objc func handleToggleBackView(_ sender: Any?) { onToggleBackView?() }
 }
 
 /// Agent state the controller pushes into the SwiftUI pet; already gated by the settings.
