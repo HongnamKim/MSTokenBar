@@ -47,7 +47,6 @@ final class EggPrayerRenderTests: XCTestCase {
         let file = directory.appendingPathComponent("state.json")
         try JSONEncoder().encode(state).write(to: file)
         let store = CompanionStore(provider: PrayerRenderProvider(), fileURL: file, defaults: defaults)
-        if !egg { await store.loadPokemonDetails(speciesID: 47) }
         return store
     }
 

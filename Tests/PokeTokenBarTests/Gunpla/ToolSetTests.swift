@@ -18,7 +18,7 @@ final class ToolSetTests: XCTestCase {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("toolset-\(UUID().uuidString).json")
         try JSONEncoder().encode(seeded).write(to: url)
         let fixedNow = now
-        return CompanionStore(provider: catalog, detailProvider: nil, clock: { fixedNow }, fileURL: url,
+        return CompanionStore(provider: catalog, clock: { fixedNow }, fileURL: url,
                               rng: SeededRNG(seed: 1), dittoDisguiseRollingEnabled: false,
                               defaults: UserDefaults(suiteName: "toolset-\(UUID().uuidString)")!)
     }

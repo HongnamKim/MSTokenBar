@@ -757,14 +757,6 @@ struct CompanionHeader: View {
                             Badge(store.l.rarityLabel(r).uppercased(), tint: .rarity(r))
                         }
                     }
-                    if store.hasActive, let id = store.currentSpeciesID, let details = store.pokemonDetailsByID[id] {
-                        TypeBadges(types: details.types, language: store.language)
-                        if !PokemonForm.isDefault(store.currentForm, speciesID: id) {
-                            Text(store.l.defaultFormDataNote)
-                                .font(.caption2).foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
                     if store.hasActive {
                         HStack(spacing: 5) {
                             Text(store.stageText).font(.caption2).foregroundStyle(.secondary)
@@ -827,11 +819,6 @@ struct CompanionHeader: View {
                 Text(store.l.graduated(g))
                     .font(.caption2).foregroundStyle(.orange)
             }
-        }
-        // Types come from PokéAPI details; cached after the first fetch. Same ID as the sprite,
-        // so a disguised Ditto shows its disguise's types.
-        .task(id: store.currentSpeciesID) {
-            if store.hasActive, let id = store.currentSpeciesID { await store.loadPokemonDetails(speciesID: id) }
         }
         .onAppear {
             playCelebrationIfNeeded()
@@ -1772,7 +1759,7 @@ struct PokemonDetailView: View {
                 }
                 .buttonStyle(.borderless)
                 Spacer()
-                Text("#\(species.id)").font(.callout).foregroundStyle(.secondary)
+                Text(profile?.modelNumber ?? "#\(species.id)").font(.callout).foregroundStyle(.secondary)
             }
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
@@ -1784,24 +1771,7 @@ struct PokemonDetailView: View {
                     if individuals.isEmpty {
                         Text(store.l.dexAppearancePreview).font(.callout).foregroundStyle(.secondary)
                     }
-                    if let details = store.pokemonDetailsByID[species.id] {
-                        if let individual, let profile = individual.profile {
-                            individualSection(entry: individual, profile: profile, details: details)
-                        } else {
-                            baseStatsSection(details)
-                        }
-                        speciesSection(details)
-                        movesSection(details)
-                    } else if store.failedPokemonDetailIDs.contains(species.id) {
-                        VStack(spacing: 8) {
-                            Text(store.l.pokemonDetailsUnavailable).foregroundStyle(.secondary)
-                            Button(store.l.retry) { Task { await store.loadPokemonDetails(speciesID: species.id) } }
-                        }
-                        .frame(maxWidth: .infinity).padding(.vertical, 24)
-                    } else {
-                        HStack { Spacer(); ProgressView(); Text(store.l.loadingPokemonDetails); Spacer() }
-                            .foregroundStyle(.secondary).padding(.vertical, 30)
-                    }
+                    if let profile { profileSection(profile, entry: individual) }
                 }
                 .padding(.bottom, 8)
                 .reservesScrollerLane()
@@ -1810,9 +1780,11 @@ struct PokemonDetailView: View {
         .task {
             if selectedForm == nil { selectedForm = displayedSpecies.form }
             if selectedInstanceID.isEmpty { selectedInstanceID = individuals.first?.id ?? "" }
-            await store.loadPokemonDetails(speciesID: species.id)
         }
     }
+
+    /// The machine behind this species; nil for anything else.
+    private var profile: MachineProfile? { store.catalog.profile(speciesID: species.id) }
 
     /// The hangar cell of the machine behind a Gunpla species; nil for anything else.
     private var hangarCell: HangarCell? {
@@ -1922,15 +1894,6 @@ struct PokemonDetailView: View {
                     Text(store.l.rarityLabel(species.rarity))
                         .font(.callout.weight(.semibold)).foregroundStyle(.secondary)
                 }
-                if let details = store.pokemonDetailsByID[species.id] {
-                    TypeBadges(types: details.types, language: store.language, size: 11,
-                               horizontalPadding: 7, verticalPadding: 2)
-                    if !PokemonForm.isDefault(species.form, speciesID: species.id) {
-                        Text(store.l.defaultFormDataNote)
-                            .font(.caption2).foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
                 if displayedShiny { Text("✨ \(store.l.dexShinyLabel)").font(.callout) }
                 if let individual, store.isActiveDexEntry(individual) { Text(store.l.dexRaising).font(.callout).foregroundStyle(Color.accentColor) }
                 let isRepresentative = store.isRepresentative(species)
@@ -1969,18 +1932,18 @@ struct PokemonDetailView: View {
             $0.formatted(Date.FormatStyle(date: .numeric, time: .omitted)
                 .locale(Locale(identifier: store.language.rawValue)))
         } ?? (store.isActiveDexEntry(entry) ? store.l.dexRaising : "—")
-        return "#\(index + 1) · \(appearance) · Lv. \(entry.profile?.level ?? 5) · \(date)"
+        return "#\(index + 1) · \(appearance) · \(date)"
     }
 
-    private func individualSection(entry: DexEntry, profile: PokemonProfile,
-                                   details: PokemonDetails) -> some View {
+    /// Model number, affiliation, series and the grades the kit was released in.
+    private func profileSection(_ profile: MachineProfile, entry: DexEntry?) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            detailTitle(store.l.pokemonIndividual)
-            HStack(spacing: 12) {
-                valuePair(store.l.level, "\(profile.level)")
-                valuePair(store.l.gender, store.l.genderLabel(profile.gender))
+            HStack(spacing: 14) {
+                valuePair(store.l.machineModelNumber, profile.modelNumber)
+                valuePair(store.l.machineAffiliation, store.l.factionName(profile.factionKey))
             }
-            if let prayers = entry.prayers, prayers.count > 0 {
+            valuePair(store.l.machineSeries, store.seriesName(profile.seriesID))
+            if let prayers = entry?.prayers, prayers.count > 0 {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(store.l.prayerBornWith(prayers.count)).font(.callout)
                     Text(store.l.prayerReachedHeaven)
@@ -1988,96 +1951,13 @@ struct PokemonDetailView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            VStack(alignment: .leading, spacing: 1) {
-                Text(store.l.ability).font(.system(size: 11)).foregroundStyle(.secondary)
-                if let name = profile.abilityName {
-                    PokemonNameLabel(.ability, name, language: store.language,
-                                     suffix: profile.abilityIsHidden ? " · " + store.l.hiddenAbility : "")
-                        .font(.callout.weight(.semibold))
-                } else {
-                    Text("—").font(.callout.weight(.semibold))
-                }
-            }
-            statsSection(PokemonStatCalculator.stats(details: details, profile: profile, nature: entry.nature))
-            detailTitle(store.l.activeMoves)
-            if profile.moves.isEmpty {
-                Text(store.l.noLevelMoves).font(.callout).foregroundStyle(.secondary)
-            } else {
-                ForEach(profile.moves) { move in
-                    HStack {
-                        PokemonNameLabel(.move, move.name, language: store.language)
-                        Spacer()
-                        Text("Lv. \(move.learnedAtLevel)").foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                detailTitle(store.l.machineReleasedGrades)
+                HStack(spacing: 5) {
+                    ForEach(profile.releasedGrades, id: \.self) { grade in
+                        Badge(grade.label, tint: .secondary, style: .tinted, size: 10)
                     }
-                    .font(.callout)
                 }
-            }
-        }
-        .detailCard()
-    }
-
-    private func baseStatsSection(_ details: PokemonDetails) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            detailTitle(store.l.baseStats)
-            ForEach(PokemonStatCalculator.order, id: \.self) { stat in
-                if let value = details.baseStats[stat] {
-                    statRow(name: stat, value: value, iv: nil, scaleMaximum: 300)
-                }
-            }
-        }
-        .detailCard()
-    }
-
-    private func statsSection(_ stats: [PokemonComputedStat]) -> some View {
-        let scaleMaximum = PokemonStatCalculator.displayScaleMaximum(for: stats.map(\.value))
-        return VStack(alignment: .leading, spacing: 5) {
-            detailTitle(store.l.actualStats)
-            ForEach(stats) { stat in
-                statRow(name: stat.name, value: stat.value, iv: stat.iv, scaleMaximum: scaleMaximum)
-            }
-        }
-    }
-
-    private func statRow(name: String, value: Int, iv: Int?, scaleMaximum: Int) -> some View {
-        HStack(spacing: 6) {
-            Text(store.l.statLabel(name)).frame(width: 74, alignment: .leading)
-            ProgressView(value: Double(value), total: Double(scaleMaximum)).tint(Color.accentColor)
-            Text("\(value)").monospacedDigit().frame(width: 30, alignment: .trailing)
-            if let iv { Text("IV \(iv)").foregroundStyle(.secondary).frame(width: 38, alignment: .trailing) }
-        }
-        .font(.system(size: 12))
-    }
-
-    private func speciesSection(_ details: PokemonDetails) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
-            detailTitle(store.l.speciesData)
-            HStack(spacing: 14) {
-                valuePair(store.l.height, String(format: "%.1f m", Double(details.height) / 10))
-                valuePair(store.l.weight, String(format: "%.1f kg", Double(details.weight) / 10))
-                valuePair(store.l.baseStatTotal, "\(details.baseStatTotal)")
-            }
-            detailTitle(store.l.possibleAbilities)
-            PokemonNameLabel(items: details.abilities.map { option in
-                PokemonNameItem(resource: .init(kind: .ability, name: option.name),
-                                suffix: option.isHidden ? " (\(store.l.hidden))" : "")
-            }, language: store.language)
-            .font(.callout).foregroundStyle(.secondary)
-        }
-        .detailCard()
-    }
-
-    private func movesSection(_ details: PokemonDetails) -> some View {
-        LazyVStack(alignment: .leading, spacing: 6) {
-            detailTitle(store.l.completeMoveList(details.moves.count))
-            ForEach(details.moves) { move in
-                HStack(alignment: .firstTextBaseline) {
-                    PokemonNameLabel(.move, move.name, language: store.language)
-                    Spacer()
-                    Text(move.learnMethods.map(store.l.moveMethod).uniqued().joined(separator: " · "))
-                        .foregroundStyle(.secondary).multilineTextAlignment(.trailing)
-                }
-                .font(.callout)
-                Divider()
             }
         }
         .detailCard()

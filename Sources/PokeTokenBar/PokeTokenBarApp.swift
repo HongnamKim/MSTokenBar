@@ -104,9 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             LoginItem.system.migrateFromLegacyAgentIfNeeded()
         }
         store = UsageStore()
-        companion = CompanionStore(provider: MachineCatalog.shared, detailProvider: nil,
-                                   dittoDisguiseRollingEnabled: false)
-        Task { await companion.preparePokemonProfiles() }
+        companion = CompanionStore(provider: MachineCatalog.shared, dittoDisguiseRollingEnabled: false)
         updater = UpdateChecker()
         store.localizationLanguage = companion.language   // 알림 현지화용 미러 시드
         store.onRefresh = { [weak self] in self?.onStoreRefreshed() }   // 한도 로드 후 companion·사탕 지급

@@ -12,7 +12,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
 
     private func store(rng: any RandomNumberGenerator = SeededRNG(seed: 7), fileURL: URL? = nil) -> CompanionStore {
         let fixedNow = now
-        return CompanionStore(provider: catalog, detailProvider: nil, clock: { fixedNow },
+        return CompanionStore(provider: catalog, clock: { fixedNow },
                               fileURL: fileURL ?? tempURL(), rng: rng,
                               dittoDisguiseRollingEnabled: false,
                               defaults: UserDefaults(suiteName: "gunpla-\(UUID().uuidString)")!)

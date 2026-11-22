@@ -1477,6 +1477,23 @@ struct L {
     }
     var hangarVariantLabel: String { t("전용기", "Custom", "専用機") }
     var hangarNotOwned: String { t("미보유", "Not owned", "未所持") }
+    var machineModelNumber: String { t("형식번호", "Model number", "型式番号") }
+    var machineAffiliation: String { t("소속", "Affiliation", "所属") }
+    var machineSeries: String { t("등장 작품", "Series", "登場作品") }
+    var machineReleasedGrades: String { t("출시 등급", "Released grades", "発売グレード") }
+    /// Faction display name; an unknown key reads as itself.
+    func factionName(_ key: String) -> String {
+        switch key {
+        case "efsf": return t("지구연방군", "Earth Federation", "地球連邦軍")
+        case "zeon": return t("지온공국군", "Principality of Zeon", "ジオン公国軍")
+        case "aeug": return t("에우고", "AEUG", "エゥーゴ")
+        case "titans": return t("티탄즈", "Titans", "ティターンズ")
+        case "axis": return t("액시즈", "Axis", "アクシズ")
+        case "neo_zeon": return t("네오지온", "Neo Zeon", "ネオ・ジオン")
+        case "londo_bell": return t("론도벨", "Londo Bell", "ロンド・ベル")
+        default: return key
+        }
+    }
     func hangarGradesOwned(_ owned: Int, of total: Int) -> String {
         t("보유 등급 \(owned)/\(total)", "Grades owned \(owned)/\(total)", "所持グレード \(owned)/\(total)")
     }

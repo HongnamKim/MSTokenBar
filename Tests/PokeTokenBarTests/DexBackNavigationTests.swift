@@ -52,7 +52,7 @@ final class DexBackNavigationTests: XCTestCase {
                      names: [hg(id): ["en": names[id]!]])
         }
         try JSONEncoder().encode(state).write(to: file)
-        return CompanionStore(provider: try catalog(names), detailProvider: OfflineProvider(), fileURL: file)
+        return CompanionStore(provider: try catalog(names), fileURL: file)
     }
 
     private func host(_ store: CompanionStore, _ navigation: PopoverNavigation) -> NSView {
@@ -256,7 +256,7 @@ final class DexBackNavigationTests: XCTestCase {
         }
         try JSONEncoder().encode(state).write(to: file)
         let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"]),
-                                   detailProvider: OfflineProvider(), fileURL: file)
+                                   fileURL: file)
         let navigation = PopoverNavigation()
         navigation.tab = .collection
         let root = host(store, navigation)
