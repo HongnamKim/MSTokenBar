@@ -6,7 +6,7 @@ import SwiftUI
 /// - 드래그: 커스텀 `mouseDragged` (클릭과 충돌하지 않음).
 /// - 클릭 → 알 기도 / 포켓몬 팝오버, 우클릭 → 메뉴, 호버 → 오늘 사용량 콜아웃.
 /// - Limit-alert speech bubbles grow the panel; persisted origin is the *pet*, not the panel.
-/// - Agent activity (`poketokenbar://agent`): bob while working, bubble while waiting,
+/// - Agent activity (`mstokenbar://agent`): bob while working, bubble while waiting,
 ///   run to the cursor when done. The run never moves the saved home.
 /// - 에너지: 숨김·슬립 시 호스팅 트리 해제.
 @MainActor
@@ -388,7 +388,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
 
     // MARK: Agent activity
 
-    /// Entry point for `poketokenbar://agent` URLs. Dropped while the pet or the setting is off.
+    /// Entry point for `mstokenbar://agent` URLs. Dropped while the pet or the setting is off.
     func handleAgentEvent(_ event: AgentActivityEvent) {
         guard agentEnabled else { return }
         tracker.apply(event, now: Date())

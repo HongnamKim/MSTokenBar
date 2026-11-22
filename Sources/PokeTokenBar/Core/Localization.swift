@@ -485,14 +485,14 @@ struct L {
           "Réagir à l’activité de l’agent", "Reagir à atividade do agente", "Auf Agent-Aktivität reagieren", "Реагировать на работу агента")
     }
     var floatingPetAgentActivityHint: String {
-        t("코딩 에이전트가 poketokenbar:// 링크로 펫을 움직여요 — README 참고",
-          "Coding agents trigger it with poketokenbar:// links — see the README",
-          "コーディングエージェントが poketokenbar:// リンクで動かします — README 参照",
-          "Los agentes de código lo activan con enlaces poketokenbar:// — consulta el README",
-          "Les agents de code le pilotent via des liens poketokenbar:// — voir le README",
-          "Agentes de código o acionam com links poketokenbar:// — veja o README",
-          "Coding-Agents steuern es über poketokenbar://-Links – siehe README",
-          "Агенты управляют питомцем через ссылки poketokenbar:// — см. README")
+        t("코딩 에이전트가 mstokenbar:// 링크로 펫을 움직여요 — README 참고",
+          "Coding agents trigger it with mstokenbar:// links — see the README",
+          "コーディングエージェントが mstokenbar:// リンクで動かします — README 参照",
+          "Los agentes de código lo activan con enlaces mstokenbar:// — consulta el README",
+          "Les agents de code le pilotent via des liens mstokenbar:// — voir le README",
+          "Agentes de código o acionam com links mstokenbar:// — veja o README",
+          "Coding-Agents steuern es über mstokenbar://-Links – siehe README",
+          "Агенты управляют питомцем через ссылки mstokenbar:// — см. README")
     }
     var agentWaitingTitle: String {
         t("에이전트가 기다려요", "Your agent needs you", "エージェントが呼んでいます", "Tu agente te necesita",
@@ -520,14 +520,14 @@ struct L {
     var onlyOnPress: String { t("누를 때만 Keychain 을 읽어요 — 자동 폴링은 안 읽어 팝업이 안 떠요. 토큰 만료 후 이 버튼으로 한도 갱신", "Reads Keychain only when pressed — auto-polling never does, so no pop-ups. Refresh limits here after the token expires", "押した時のみKeychainを読みます — 自動更新では読まずポップアップも出ません。トークン期限切れ後はこのボタンで上限を更新", "Solo lee Keychain al pulsar — el sondeo automático nunca lo hace, así que no aparecen avisos. Usa este botón para actualizar los límites tras la expiración del token", "Lit le Keychain uniquement sur appui — le polling automatique ne le fait jamais, donc pas de pop-up. Actualise les limites ici après l'expiration du token", "Só lê o Keychain quando você clica no botão — a atualização automática nunca lê, então não aparecem avisos. Use este botão para atualizar os limites depois que o token expirar", "Keychain wird nur auf Knopfdruck gelesen – die automatische Abfrage greift nicht darauf zu, daher gibt es keine Pop-ups. Aktualisiere die Limits hier, wenn das Token abgelaufen ist", "Связка ключей читается только по нажатию — автообновление её не трогает, поэтому запросов не будет. Обновите лимиты здесь, когда токен истечёт") }
     var launchAtLogin: String { t("로그인 시 자동 시작", "Launch at login", "ログイン時に自動起動", "Iniciar al arrancar sesión", "Lancer à l'ouverture de session", "Abrir ao iniciar sessão", "Bei der Anmeldung starten", "Запускать при входе в систему") }
     var launchAtLoginApprovalHint: String {
-        t("자동 시작을 켜려면 시스템 설정에서 PokeTokenBar를 허용하세요.",
-          "Allow PokeTokenBar in System Settings to launch at login.",
-          "ログイン時に起動するには、システム設定で PokeTokenBar を許可してください。",
-          "Permite PokeTokenBar en Ajustes del Sistema para abrirlo al iniciar sesión.",
-          "Autorisez PokeTokenBar dans Réglages Système pour l’ouvrir à la connexion.",
-          "Permita o PokeTokenBar nos Ajustes do Sistema para abri-lo ao iniciar sessão.",
-          "Erlaube PokeTokenBar in den Systemeinstellungen, damit es bei der Anmeldung startet.",
-          "Разрешите PokeTokenBar в Системных настройках, чтобы запускать его при входе.")
+        t("자동 시작을 켜려면 시스템 설정에서 MSTokenBar를 허용하세요.",
+          "Allow MSTokenBar in System Settings to launch at login.",
+          "ログイン時に起動するには、システム設定で MSTokenBar を許可してください。",
+          "Permite MSTokenBar en Ajustes del Sistema para abrirlo al iniciar sesión.",
+          "Autorisez MSTokenBar dans Réglages Système pour l’ouvrir à la connexion.",
+          "Permita o MSTokenBar nos Ajustes do Sistema para abri-lo ao iniciar sessão.",
+          "Erlaube MSTokenBar in den Systemeinstellungen, damit es bei der Anmeldung startet.",
+          "Разрешите MSTokenBar в Системных настройках, чтобы запускать его при входе.")
     }
     var bundledOnly: String { t(".app 번들로 설치된 경우에만 사용 가능 (scripts/build-app.sh)", "Available only when installed as an .app bundle (scripts/build-app.sh)", ".appバンドルでインストールした場合のみ利用可能 (scripts/build-app.sh)", "Disponible solo si se instaló como paquete .app (scripts/build-app.sh)", "Disponible uniquement si installé comme paquet .app (scripts/build-app.sh)", "Disponível apenas quando instalado como pacote .app (scripts/build-app.sh)", "Nur verfügbar, wenn die App als .app-Bundle installiert ist (scripts/build-app.sh)", "Доступно только при установке в виде .app (scripts/build-app.sh)") }
     var notificationsSection: String { t("알림", "Notifications", "通知", "Notificaciones", "Notifications", "Notificações", "Benachrichtigungen", "Уведомления") }
@@ -1008,14 +1008,14 @@ struct L {
           "Покедекс \(dex) · \(tokens) за всё время")
     }
     var importErrorNotSaveFile: String {
-        t("PokeTokenBar 세이브 파일이 아니에요.",
-          "That isn't a PokeTokenBar save file.",
-          "PokeTokenBar のセーブファイルではありません。",
-          "Ese no es un archivo de partida de PokeTokenBar.",
-          "Ce n'est pas un fichier de sauvegarde PokeTokenBar.",
-          "Esse não é um arquivo de save do PokeTokenBar.",
-          "Das ist keine PokeTokenBar-Spielstandsdatei.",
-          "Это не файл сохранения PokeTokenBar.")
+        t("MSTokenBar 세이브 파일이 아니에요.",
+          "That isn't a MSTokenBar save file.",
+          "MSTokenBar のセーブファイルではありません。",
+          "Ese no es un archivo de partida de MSTokenBar.",
+          "Ce n'est pas un fichier de sauvegarde MSTokenBar.",
+          "Esse não é um arquivo de save do MSTokenBar.",
+          "Das ist keine MSTokenBar-Spielstandsdatei.",
+          "Это не файл сохранения MSTokenBar.")
     }
     var importErrorNewerSchema: String {
         t("더 새로운 버전에서 만든 세이브예요 — 앱을 업데이트한 뒤 다시 시도해 주세요.",
@@ -1085,14 +1085,14 @@ struct L {
           "Не удалось открыть почтовое приложение. Напишите напрямую на \(address).")
     }
     func reportMailSubject(_ version: String) -> String {
-        t("[PokeTokenBar] 문제 리포트 (v\(version))",
-          "[PokeTokenBar] Problem report (v\(version))",
-          "[PokeTokenBar] 問題レポート (v\(version))",
-          "[PokeTokenBar] Reporte de problema (v\(version))",
-          "[PokeTokenBar] Rapport de problème (v\(version))",
-          "[PokeTokenBar] Relato de problema (v\(version))",
-          "[PokeTokenBar] Problembericht (v\(version))",
-          "[PokeTokenBar] Сообщение о проблеме (v\(version))")
+        t("[MSTokenBar] 문제 리포트 (v\(version))",
+          "[MSTokenBar] Problem report (v\(version))",
+          "[MSTokenBar] 問題レポート (v\(version))",
+          "[MSTokenBar] Reporte de problema (v\(version))",
+          "[MSTokenBar] Rapport de problème (v\(version))",
+          "[MSTokenBar] Relato de problema (v\(version))",
+          "[MSTokenBar] Problembericht (v\(version))",
+          "[MSTokenBar] Сообщение о проблеме (v\(version))")
     }
     func reportMailBody(version: String, os: String) -> String {
         t("""
@@ -1103,7 +1103,7 @@ struct L {
         ---
         앱 버전: v\(version)
         macOS: \(os)
-        로그 파일(첨부 권장): ~/Library/Logs/PokeTokenBar.log
+        로그 파일(첨부 권장): ~/Library/Logs/MSTokenBar.log
         """,
         """
         What happened:
@@ -1113,7 +1113,7 @@ struct L {
         ---
         App version: v\(version)
         macOS: \(os)
-        Log file (please attach): ~/Library/Logs/PokeTokenBar.log
+        Log file (please attach): ~/Library/Logs/MSTokenBar.log
         """,
         """
         問題の内容:
@@ -1123,7 +1123,7 @@ struct L {
         ---
         アプリのバージョン: v\(version)
         macOS: \(os)
-        ログファイル（添付推奨）: ~/Library/Logs/PokeTokenBar.log
+        ログファイル（添付推奨）: ~/Library/Logs/MSTokenBar.log
         """,
         """
         Descripción del problema:
@@ -1133,7 +1133,7 @@ struct L {
         ---
         Versión de la app: v\(version)
         macOS: \(os)
-        Archivo de registro (se recomienda adjuntar): ~/Library/Logs/PokeTokenBar.log
+        Archivo de registro (se recomienda adjuntar): ~/Library/Logs/MSTokenBar.log
         """,
         """
         Ce qui s'est passé :
@@ -1143,7 +1143,7 @@ struct L {
         ---
         Version de l'app : v\(version)
         macOS: \(os)
-        Fichier journal (à joindre de préférence) : ~/Library/Logs/PokeTokenBar.log
+        Fichier journal (à joindre de préférence) : ~/Library/Logs/MSTokenBar.log
         """,
         """
         Descrição do problema:
@@ -1153,7 +1153,7 @@ struct L {
         ---
         Versão do app: v\(version)
         macOS: \(os)
-        Arquivo de log (anexe, por favor): ~/Library/Logs/PokeTokenBar.log
+        Arquivo de log (anexe, por favor): ~/Library/Logs/MSTokenBar.log
         """,
         """
         Was ist passiert:
@@ -1163,7 +1163,7 @@ struct L {
         ---
         App-Version: v\(version)
         macOS: \(os)
-        Protokolldatei (bitte anhängen): ~/Library/Logs/PokeTokenBar.log
+        Protokolldatei (bitte anhängen): ~/Library/Logs/MSTokenBar.log
         """,
         """
         Что произошло:
@@ -1173,7 +1173,7 @@ struct L {
         ---
         Версия приложения: v\(version)
         macOS: \(os)
-        Файл журнала (приложите, пожалуйста): ~/Library/Logs/PokeTokenBar.log
+        Файл журнала (приложите, пожалуйста): ~/Library/Logs/MSTokenBar.log
         """)
     }
 

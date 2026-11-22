@@ -1,6 +1,6 @@
 import Foundation
 
-/// What an external coding agent last reported through `poketokenbar://agent?state=…`.
+/// What an external coding agent last reported through `mstokenbar://agent?state=…`.
 /// Agent-agnostic: any tool that can open a URL drives the same states.
 enum AgentActivity: Equatable, Sendable {
     case idle
@@ -9,9 +9,9 @@ enum AgentActivity: Equatable, Sendable {
     case done(message: String?)
 }
 
-/// One parsed `poketokenbar://agent?state=<working|waiting|done|idle>[&message=<text>][&label=<name>]` URL.
+/// One parsed `mstokenbar://agent?state=<working|waiting|done|idle>[&message=<text>][&label=<name>]` URL.
 struct AgentActivityEvent: Equatable, Sendable {
-    static let scheme = "poketokenbar"
+    static let scheme = "mstokenbar"
     static let host = "agent"
     /// Any app or web page can open the URL, so the message size is bounded here. These are size
     /// limits on untrusted input, not layout: `fittedBubbleBody` makes the text fit the bubble.

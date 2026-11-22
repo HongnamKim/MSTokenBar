@@ -145,7 +145,7 @@ final class LocalUsageCacheTests: XCTestCase {
         // Sample the mtime before the *first* scan: a second call returns early (dirty == false) before
         // the save throttle, so sampling after it would pass even with the write gate removed.
         let userFile = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("PokeTokenBar/usage-cache.json")
+            .appendingPathComponent("MSTokenBar/usage-cache.json")
         func userFileMtime() -> Date? {
             (try? FileManager.default.attributesOfItem(atPath: userFile.path))?[.modificationDate] as? Date
         }

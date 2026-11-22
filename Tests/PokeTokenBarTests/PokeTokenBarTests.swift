@@ -499,7 +499,7 @@ final class LimitsBackoffTests: XCTestCase {
 final class SupportMailTests: XCTestCase {
     func testMailtoURLEncodesSubjectAndBody() throws {
         let url = try XCTUnwrap(SupportMail.mailtoURL(
-            subject: "[PokeTokenBar] 문제 리포트 (v2.3.3)",
+            subject: "[MSTokenBar] 문제 리포트 (v2.3.3)",
             body: "문제 내용:\n(설명)\n---\n앱 버전: v2.3.3"))
         let s = url.absoluteString
         XCTAssertTrue(s.hasPrefix("mailto:parkdongmin123@gmail.com?"), s)
@@ -528,7 +528,7 @@ final class SupportMailTests: XCTestCase {
         let body = L(.ko).reportMailBody(version: "2.3.3", os: "Version 14.5 (Build 23F79)")
         XCTAssertTrue(body.contains("v2.3.3"))
         XCTAssertTrue(body.contains("Version 14.5"))
-        XCTAssertTrue(body.contains("PokeTokenBar.log"))
+        XCTAssertTrue(body.contains("MSTokenBar.log"))
     }
 }
 

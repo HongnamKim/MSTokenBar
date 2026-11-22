@@ -29,9 +29,9 @@ enum ProcessRunner {
         timeout: TimeInterval = 20
     ) async throws -> Data {
         let outURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("poketokenbar-\(UUID().uuidString).jsonl")
+            .appendingPathComponent("mstokenbar-\(UUID().uuidString).jsonl")
         let errURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("poketokenbar-\(UUID().uuidString).stderr")
+            .appendingPathComponent("mstokenbar-\(UUID().uuidString).stderr")
         FileManager.default.createFile(atPath: outURL.path, contents: nil)
         FileManager.default.createFile(atPath: errURL.path, contents: nil)
         defer {

@@ -191,7 +191,7 @@ final class UsageStore {
     var floatingPetBubbleAlerts: Bool {
         didSet { defaults.set(floatingPetBubbleAlerts, forKey: "floatingPetBubbleAlerts") }
     }
-    /// Let coding agents drive the floating pet through `poketokenbar://agent` URLs. Default on —
+    /// Let coding agents drive the floating pet through `mstokenbar://agent` URLs. Default on —
     /// nothing happens until the user wires an agent hook.
     var floatingPetAgentActivity: Bool {
         didSet { defaults.set(floatingPetAgentActivity, forKey: "floatingPetAgentActivity") }
@@ -1101,7 +1101,7 @@ final class UsageStore {
         clearStaleSuspension(reason: "refresh")
         // App Nap 방지 — 백그라운드 스로틀로 로그 파싱·codex 조회가 타임아웃되는 것을 막는다 (시스템 슬립은 허용)
         let activity = ProcessInfo.processInfo.beginActivity(
-            options: .userInitiatedAllowingIdleSystemSleep, reason: "PokeTokenBar usage refresh")
+            options: .userInitiatedAllowingIdleSystemSleep, reason: "MSTokenBar usage refresh")
         defer {
             ProcessInfo.processInfo.endActivity(activity)
             isRefreshing = false
@@ -2279,7 +2279,7 @@ final class UsageStore {
         // .app 번들에서만 기록 — 테스트가 실제 사용자 데이터 디렉토리의 스냅샷을 덮어쓰지 않도록.
         guard AppEnv.isBundledApp else { return }
         let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("PokeTokenBar")
+            .appendingPathComponent("MSTokenBar")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         var providerEntries: [[String: Any]] = []
         for snapshot in snapshots {

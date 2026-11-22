@@ -13,7 +13,7 @@ final class AppLogTests: XCTestCase {
     /// the line has not landed; after `flush` it has. Dropping `flush` from
     /// the test (or making `write` skip the queue) fails the second assert.
     func testFlushDrainsAQueuedWriteBeforeReturning() {
-        let queue = DispatchQueue(label: "poketokenbar.log.test")
+        let queue = DispatchQueue(label: "mstokenbar.log.test")
         let landed = LineSink()
         let log = AsyncLineLog(queue: queue) { line in
             Thread.sleep(forTimeInterval: 0.03)
@@ -30,7 +30,7 @@ final class AppLogTests: XCTestCase {
     /// `queue.sync {}` is a barrier behind every earlier `async`, not a
     /// drain of only the most recent line.
     func testFlushDrainsEveryWriteQueuedBeforeIt() {
-        let queue = DispatchQueue(label: "poketokenbar.log.test.multi")
+        let queue = DispatchQueue(label: "mstokenbar.log.test.multi")
         let landed = LineSink()
         let log = AsyncLineLog(queue: queue) { landed.append($0) }
 
@@ -44,7 +44,7 @@ final class AppLogTests: XCTestCase {
     /// yield path must use. A caller that reaches `exit()` after `write`
     /// alone is the defect.
     func testWriteAndFlushLandsTheLineBeforeReturning() {
-        let queue = DispatchQueue(label: "poketokenbar.log.test.pair")
+        let queue = DispatchQueue(label: "mstokenbar.log.test.pair")
         let landed = LineSink()
         let log = AsyncLineLog(queue: queue) { line in
             Thread.sleep(forTimeInterval: 0.03)
