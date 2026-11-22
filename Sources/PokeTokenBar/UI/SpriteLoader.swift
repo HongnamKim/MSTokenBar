@@ -1,4 +1,6 @@
 import AppKit
+import ImageIO
+import UniformTypeIdentifiers
 
 /// 포켓몬 스프라이트를 런타임에 받아 로컬(Application Support)에 캐시. 레포/번들에 미포함.
 actor SpriteStore {
@@ -46,6 +48,7 @@ actor SpriteStore {
 
     func data(speciesID: Int, animated: Bool, shiny: Bool = false, form: PokemonForm? = nil,
               back: Bool = false) async -> Data? {
+        if GunplaID.isGunpla(speciesID) { return gunplaData(speciesID: speciesID, animated: animated, back: back) }
         if animated, !PokemonAssets.hasAnimatedSprite(speciesID: speciesID) { return nil }
         let key = Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny, form: form, back: back)
         if let d = mem[key] { touch(key); return d }
@@ -61,6 +64,23 @@ actor SpriteStore {
         try? d.write(to: file, options: .atomic)   // torn write 방지 — 크래시/강제종료 시 손상 캐시가 남지 않게
         remember(key, d)
         return d
+    }
+
+    /// Gunpla art is bundled: no network, no disk cache. There is no back view, so `back` reports "missing"
+    /// and callers fall back to the front. Static requests get the GIF's first frame as PNG.
+    private func gunplaData(speciesID: Int, animated: Bool, back: Bool) -> Data? {
+        if back { return nil }
+        guard let gif = BundledSprites.gifData(speciesID: speciesID) else { return nil }
+        return animated ? gif : Self.firstFramePNG(of: gif)
+    }
+
+    private static func firstFramePNG(of gif: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(gif as CFData, nil),
+              let frame = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
+        let out = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(out, UTType.png.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(dest, frame, nil)
+        return CGImageDestinationFinalize(dest) ? out as Data : nil
     }
 
     /// True once the server answered 404 for this sprite in this session.
@@ -86,6 +106,7 @@ actor SpriteStore {
 
     /// 알 스프라이트(정적, pokemon/egg.png) — 애니메이션 알은 없음. 포켓몬/아이템과 같은 메모리·디스크 캐시(키 "egg").
     func eggData() async -> Data? {
+        if let box = BundledSprites.boxPNG() { return box }
         let key = "egg"
         if let d = mem[key] { touch(key); return d }
         let file = directory.appendingPathComponent("egg.png")

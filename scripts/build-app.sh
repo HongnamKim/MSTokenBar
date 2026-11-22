@@ -33,6 +33,11 @@ echo "   archs: $(lipo -archs "$APP/Contents/MacOS/$APP_NAME")"
 # 심볼 strip — 릴리스 바이너리 1.84MB → 0.80MB(-57%). codesign 전에 수행(서명 무효화 방지).
 strip -rSTx "$APP/Contents/MacOS/$APP_NAME" 2>/dev/null || strip -rSx "$APP/Contents/MacOS/$APP_NAME"
 cp assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+# SwiftPM 리소스 번들(건프라 스프라이트·카탈로그). GunplaResources.bundle 이 Contents/Resources 에서 찾는다.
+# 번들은 아키텍처와 무관하므로 마지막 슬라이스의 bin 경로에서 복사한다.
+RES_BUNDLE="$(dirname "${SLICES[${#SLICES[@]}-1]}")/${SWIFT_PRODUCT}_${SWIFT_PRODUCT}.bundle"
+[[ -d "$RES_BUNDLE" ]] || { echo "   ✗ 리소스 번들 없음: $RES_BUNDLE" >&2; exit 1; }
+cp -R "$RES_BUNDLE" "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

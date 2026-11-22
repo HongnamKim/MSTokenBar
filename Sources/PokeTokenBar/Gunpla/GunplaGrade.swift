@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 enum BodyType: String, Sendable { case sd, real }
@@ -22,6 +23,18 @@ enum GunplaGrade: String, Codable, CaseIterable, Comparable, Sendable {
         switch self {
         case .sd, .mgsd: return .sd
         case .hg, .rg, .mg, .pg: return .real
+        }
+    }
+
+    /// Same body type: the higher the grade, the bigger it is drawn.
+    var displayScale: CGFloat {
+        switch self {
+        case .sd: return 0.85
+        case .mgsd: return 1.0
+        case .hg: return 0.8
+        case .rg: return 0.88
+        case .mg: return 0.95
+        case .pg: return 1.05
         }
     }
 
