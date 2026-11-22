@@ -67,6 +67,37 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertNil(s.state.pendingHatchID)
     }
 
+    /// A store loaded from an old PokeTokenBar save whose pre-rolled species is a Pokémon id.
+    private func legacyPendingStore() -> CompanionStore {
+        let url = tempURL()
+        try? Data(#"{"pendingHatchID":25}"#.utf8).write(to: url)
+        let s = store(fileURL: url)
+        XCTAssertEqual(s.state.pendingHatchID, 25)
+        return s
+    }
+
+    func test_legacyNonGunplaPendingHatchIDIsDiscardedAndFreshChoiceMade() async throws {
+        let s = legacyPendingStore()
+        use(s, 0)
+        use(s, s.eggHatchThreshold)
+        await s.hatchIfNeeded()
+        let active = try XCTUnwrap(s.state.active)
+        XCTAssertNotNil(GunplaID.decode(active.baseID))
+        XCTAssertNil(s.state.pendingHatchID)
+    }
+
+    func test_legacyPendingHatchIDIsReplacedByEggPrefetch() async throws {
+        let s = legacyPendingStore()
+        use(s, 0)
+        use(s, 1)   // egg tick below the threshold triggers prefetch
+        let deadline = Date().addingTimeInterval(2)
+        while s.state.pendingHatchID == 25, Date() < deadline {
+            try? await Task.sleep(nanoseconds: 5_000_000)
+        }
+        let pending = try XCTUnwrap(s.state.pendingHatchID)
+        XCTAssertNotNil(GunplaID.decode(pending))
+    }
+
     func test_variantHatchIsShiny() async throws {
         let s = store(rng: SequenceRNG([0]))   // every variant roll hits
         await openBox(s)

@@ -1449,8 +1449,19 @@ final class CompanionStore {
 
     // MARK: 부화
 
+    /// A `pendingHatchID` from an old PokeTokenBar save is a Pokémon species id; the catalog cannot serve
+    /// it, so the egg would retry it forever. Drop it (and its form) so a fresh choice is made.
+    private func discardLegacyPendingHatch() {
+        guard let pending = state.pendingHatchID, catalog.machine(speciesID: pending) == nil else { return }
+        AppLog.write("hatch: dropping non-Gunpla pending id \(pending)")
+        state.pendingHatchID = nil
+        state.pendingForm = nil
+        save()
+    }
+
     func hatchIfNeeded() async {
         guard state.active == nil, !isHatching, state.eggUsage >= eggHatchThreshold else { return }
+        discardLegacyPendingHatch()
         // 프리패치가 "종 롤 중"(pending 미확정)일 때만 대기 — 이중 rng 소비 방지.
         // pending 확정 후의 예열(라인/스프라이트)과는 동시 진행해도 안전하다.
         guard state.pendingHatchID != nil || !prefetchInFlight else { return }
@@ -1518,6 +1529,7 @@ final class CompanionStore {
     /// 전부 성공하면 부화 순간 네트워크 0. 실패 지점부터 다음 update 틱에 이어서 재시도.
     private func ensureEggPrefetch() async {
         guard state.active == nil, !isHatching, !prefetchInFlight else { return }
+        discardLegacyPendingHatch()
         let generation = activeGeneration
         var shouldHatch = false
         prefetchInFlight = true
