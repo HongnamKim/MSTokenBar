@@ -325,7 +325,7 @@ enum PokemonAssets {
     static let animatedSpeciesIDs = 1...649
 
     static func hasAnimatedSprite(speciesID: Int) -> Bool {
-        animatedSpeciesIDs.contains(speciesID)
+        animatedSpeciesIDs.contains(speciesID) || GunplaID.isGunpla(speciesID)   // Gunpla ids bypass the GIF-asset filter
     }
 }
 
