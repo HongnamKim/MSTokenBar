@@ -4,7 +4,7 @@
 
 A macOS menu-bar app that turns the AI coding tokens you already spend (Claude Code, Codex, Gemini CLI, and more) into Gunpla (plastic model kit) progress. It is a Gunpla-themed fork of [chattymin/PokeTokenBar](https://github.com/chattymin/PokeTokenBar).
 
-> Work in progress: the Gunpla features are still under development. The usage tracking below is inherited from the original project.
+> Work in progress: the Gunpla features are still under development. Token usage tracking is inherited from the original project; see the [upstream README](https://github.com/chattymin/PokeTokenBar#readme) for the supported tools.
 
 ## Requirements
 
