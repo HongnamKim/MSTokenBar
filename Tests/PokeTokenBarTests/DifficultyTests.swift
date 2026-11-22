@@ -15,7 +15,8 @@ final class DifficultyTests: XCTestCase {
     }
 
     /// `used` 를 주면 지갑 잔액이 시드된 상태 파일로 시작한다(ShopTests 와 같은 JSON 시드 패턴).
-    private func store(growth: Double = 1.0, shop: Double = 1.0, used: Int = 0) -> CompanionStore {
+    private func store(growth: Double = 1.0, shop: Double = 1.0, used: Int = 0,
+                       provider: (any PokeProviding)? = nil) -> CompanionStore {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("ptb-diff-\(UUID().uuidString).json")
         let json = "{\"installBaselineSet\":true,\"usedSinceInstall\":\(used),\"spentTokens\":0,"
             + "\"lastDate\":\"d\",\"dex\":[],\"collectedFinals\":[]}"
@@ -23,7 +24,7 @@ final class DifficultyTests: XCTestCase {
         let suite = UserDefaults(suiteName: "ptb-diff-\(UUID().uuidString)")!
         suite.set(growth, forKey: "growthDifficulty")
         suite.set(shop, forKey: "shopDifficulty")
-        return CompanionStore(provider: StubDiffProvider(value: line()),
+        return CompanionStore(provider: provider ?? StubDiffProvider(value: line()),
                               clock: { Date(timeIntervalSince1970: 1_700_000_000) },
                               fileURL: url, rng: SeededDiffRNG(seed: 7),
                               dittoDisguiseRollingEnabled: false,
@@ -36,13 +37,16 @@ final class DifficultyTests: XCTestCase {
         return s
     }
 
+    /// 건프라: 기체 4(커먼, HG·MG)를 한 번 졸업하면 다음에 그 기체가 나올 때 반복 성장 부스트가 붙는다.
     func testRepeatBoostComposesWithDifficultyAndLiveChanges() async {
-        let s = await hatched(growth: 0.5)
+        let start = GunplaID.encode(machineID: 4, grade: .hg)
+        let s = store(growth: 0.5, provider: MachineCatalog.shared)
+        await s.hatch(baseID: start)
         s.applyUsage(PokemonBalance.graduationTotal(.common) / 2)
         XCTAssertNil(s.state.active)
-        await s.hatch(baseID: 1)
+        await s.hatch(baseID: start)
         XCTAssertEqual(s.state.active?.hasGrowthBoost, true)
-        let base = PokemonBalance.phaseThreshold(rarity: .common, totalForms: 3, stageIndex: 0)
+        let base = PokemonBalance.phaseThreshold(rarity: .common, totalForms: 2, stageIndex: 0)
         XCTAssertEqual(s.threshold, base / 4)
         s.applyUsage(base / 4 - 1)
         XCTAssertEqual(s.state.active?.stageIndex, 0)
@@ -56,10 +60,8 @@ final class DifficultyTests: XCTestCase {
         XCTAssertEqual(s.state.active?.stageIndex, 1)
         XCTAssertEqual(s.progress, 0.5, accuracy: 0.000001)
         s.applyUsage(s.tokensToNext)
-        XCTAssertEqual(s.state.active?.stageIndex, 2)
-        s.applyUsage(s.tokensToNext)
         XCTAssertNil(s.state.active)
-        XCTAssertEqual(s.state.dex.last?.finalID, 3)
+        XCTAssertEqual(s.state.dex.last?.finalID, GunplaID.encode(machineID: 4, grade: .mg))
     }
 
     // MARK: 1. 진화 — 같은 토큰, 다른 결과 (표시가 아니라 상태 전이)

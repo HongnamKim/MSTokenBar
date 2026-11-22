@@ -45,6 +45,8 @@ final class CompanionStore {
     func consumeMintFeedback() { mintFeedbackNature = nil }
 
     private let provider: any PokeProviding
+    /// 기체 카탈로그 — 주입된 provider 가 카탈로그면 그것, 아니면(포켓몬 스텁 provider 를 쓰는 기존 테스트) 번들 카탈로그.
+    private var catalog: MachineCatalog { provider as? MachineCatalog ?? .shared }
     private var dexNameRequests: [Int: Task<EvoLine, Error>] = [:]
     private let detailProvider: (any PokemonDetailProviding)?
     private let clock: () -> Date
@@ -1760,9 +1762,14 @@ final class CompanionStore {
         // 성격·폼·메타몽 위장·전투 프로필은 건프라에 없는 개념이라 만들지 않는다.
         // 알림 문구는 선정에 쓰인 것과 같은 분모를 보여준다.
         let shinyOdds = shinyDenominator
-        let isShiny = MachineCatalog.shared.machine(speciesID: line.baseID)?.variantOf != nil
+        let machine = catalog.machine(speciesID: line.baseID)
+        let isShiny = machine?.variantOf != nil
         let evolutionPlan = makeEvolutionPlan(from: line.tree, baseID: line.baseID)
-        let hasGrowthBoost = state.hasCollectedFinal(forBaseID: line.baseID)
+        // 반복 성장 부스트 = 이 **기체**를 졸업한 적이 있는가. 시작 등급(재개)과 무관해야 하므로
+        // collectedFinals 의 "base:final" 키가 아니라 졸업 기체 id 로 판정한다.
+        let hasGrowthBoost = machine.map {
+            state.collectionSnapshot(catalog: catalog).graduatedMachineIDs.contains($0.id)
+        } ?? false
         activeGeneration += 1
         state.active = MonState(baseID: line.baseID, pathIDs: [line.baseID], plannedPathIDs: evolutionPlan,
                                 stageIndex: 0, usedAtStage: 0, rarity: line.rarity, totalForms: evolutionPlan.count,
@@ -1873,7 +1880,6 @@ final class CompanionStore {
     /// 규칙 본체는 `HatchPlanner`(순수). 전용기 여부는 고른 시작 종 id 에서 다시 유도되므로
     /// `pendingHatchID` 하나만 영속해도 된다. 카탈로그가 비어 있을 때만 nil → 알 유지.
     private func chooseBase() -> Int? {
-        let catalog = MachineCatalog.shared
         guard let choice = HatchPlanner.choose(catalog: catalog, snapshot: state.collectionSnapshot(catalog: catalog),
                                                tier: state.eggTier, toolLevel: toolLevel, rng: &rng) else {
             AppLog.write("hatch: no candidate for tier \(state.eggTier?.rawValue ?? "none") — egg kept, retry next tick")

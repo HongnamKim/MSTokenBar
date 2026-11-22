@@ -138,6 +138,26 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertFalse(active.hasGrowthBoost)
     }
 
+    /// The repeat-growth boost belongs to the machine: one graduated from a resumed HG start still earns it
+    /// when the duplicate phase opens it again at SD.
+    func test_duplicateOfMachineGraduatedFromResumedGradeGetsGrowthBoost() async throws {
+        var seeded = CompanionState()
+        seeded.installBaselineSet = true
+        seeded.dex = catalog.machines.filter { $0.id != 1 }.map { gradeEntry($0.id, $0.grades) }
+        seeded.dex.append(gradeEntry(1, [.hg, .rg, .mg, .pg]))
+        let hg = GunplaID.encode(machineID: 1, grade: .hg), pg = GunplaID.encode(machineID: 1, grade: .pg)
+        seeded.collectedFinals = ["\(hg):\(pg)"]
+        let url = tempURL()
+        try JSONEncoder().encode(seeded).write(to: url)
+
+        // 1 % 32 != 0 → base machine; pick 0 → first base in catalog order, machine 1.
+        let s = store(rng: SequenceRNG([1, 0]), fileURL: url)
+        await openBox(s)
+        let active = try XCTUnwrap(s.state.active)
+        XCTAssertEqual(active.baseID, GunplaID.encode(machineID: 1, grade: .sd))
+        XCTAssertTrue(active.hasGrowthBoost)
+    }
+
     func test_loadsStateWithLegacyPokemonFields() throws {
         let base = GunplaID.encode(machineID: 2, grade: .sd)
         let json = """
