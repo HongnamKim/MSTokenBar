@@ -13,7 +13,7 @@ final class AgentActivityTests: XCTestCase {
         XCTAssertEqual(event("mstokenbar://agent?state=waiting"), .waiting(message: nil))
         XCTAssertEqual(event("mstokenbar://agent?state=done"), .done(message: nil))
         XCTAssertEqual(event("mstokenbar://agent?state=idle"), .idle)
-        XCTAssertEqual(event("POKETOKENBAR://Agent?state=DONE"), .done(message: nil))
+        XCTAssertEqual(event("MSTOKENBAR://Agent?state=DONE"), .done(message: nil))
     }
 
     func testIgnoresUnknownInput() {
