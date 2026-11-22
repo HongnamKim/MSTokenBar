@@ -1,0 +1,41 @@
+{
+  "_comment": "dev sample — grades unverified",
+  "series": [
+    {
+      "id": "first",
+      "names": {
+        "ko": "퍼스트",
+        "en": "Mobile Suit Gundam",
+        "ja": "機動戦士ガンダム"
+      },
+      "order": 0
+    },
+    {
+      "id": "zeta",
+      "names": {
+        "ko": "제타",
+        "en": "Zeta",
+        "ja": "ゼータ"
+      },
+      "order": 1
+    },
+    {
+      "id": "cca",
+      "names": {
+        "ko": "역습의 샤아",
+        "en": "Char's Counterattack",
+        "ja": "逆襲のシャア"
+      },
+      "order": 2
+    },
+    {
+      "id": "uc",
+      "names": {
+        "ko": "유니콘",
+        "en": "Unicorn",
+        "ja": "ユニコーン"
+      },
+      "order": 3
+    }
+  ]
+}

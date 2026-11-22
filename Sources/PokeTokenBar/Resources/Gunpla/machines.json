@@ -1,0 +1,218 @@
+{
+  "_comment": "dev sample — grades unverified",
+  "machines": [
+    {
+      "id": 1,
+      "modelNumber": "RX-78-2",
+      "names": {
+        "ko": "건담",
+        "en": "Gundam",
+        "ja": "ガンダム"
+      },
+      "series": "first",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "mgsd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ]
+    },
+    {
+      "id": 2,
+      "modelNumber": "MS-06F",
+      "names": {
+        "ko": "자쿠 II",
+        "en": "Zaku II",
+        "ja": "ザクII"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ]
+    },
+    {
+      "id": 3,
+      "modelNumber": "MS-06S",
+      "names": {
+        "ko": "샤아 전용 자쿠 II",
+        "en": "Char's Zaku II",
+        "ja": "シャア専用ザクII"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "variantOf": 2
+    },
+    {
+      "id": 4,
+      "modelNumber": "RGM-79",
+      "names": {
+        "ko": "짐",
+        "en": "GM",
+        "ja": "ジム"
+      },
+      "series": "first",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ]
+    },
+    {
+      "id": 5,
+      "modelNumber": "MS-07B",
+      "names": {
+        "ko": "구프",
+        "en": "Gouf",
+        "ja": "グフ"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ]
+    },
+    {
+      "id": 6,
+      "modelNumber": "RX-178",
+      "names": {
+        "ko": "건담 Mk-II",
+        "en": "Gundam Mk-II",
+        "ja": "ガンダムMk-II"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ]
+    },
+    {
+      "id": 7,
+      "modelNumber": "MSZ-006",
+      "names": {
+        "ko": "제타 건담",
+        "en": "Zeta Gundam",
+        "ja": "Ζガンダム"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ]
+    },
+    {
+      "id": 8,
+      "modelNumber": "RX-93",
+      "names": {
+        "ko": "ν 건담",
+        "en": "Nu Gundam",
+        "ja": "νガンダム"
+      },
+      "series": "cca",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ]
+    },
+    {
+      "id": 9,
+      "modelNumber": "MSN-04",
+      "names": {
+        "ko": "사자비",
+        "en": "Sazabi",
+        "ja": "サザビー"
+      },
+      "series": "cca",
+      "faction": "neo_zeon",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ]
+    },
+    {
+      "id": 10,
+      "modelNumber": "RGZ-91",
+      "names": {
+        "ko": "리 가지",
+        "en": "Re-GZ",
+        "ja": "リ・ガズィ"
+      },
+      "series": "cca",
+      "faction": "londo_bell",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ]
+    },
+    {
+      "id": 11,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "유니콘 건담",
+        "en": "Unicorn Gundam",
+        "ja": "ユニコーンガンダム"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ]
+    },
+    {
+      "id": 12,
+      "modelNumber": "MS-06R-2",
+      "names": {
+        "ko": "조니 라이덴 전용 자쿠 II",
+        "en": "Johnny Ridden's Zaku II",
+        "ja": "ジョニー・ライデン専用ザクII"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "mg"
+      ],
+      "variantOf": 2
+    }
+  ]
+}
