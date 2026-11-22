@@ -103,4 +103,17 @@ final class BundledSpritesTests: XCTestCase {
         XCTAssertEqual(pngData.prefix(4), Data([0x89, 0x50, 0x4E, 0x47]))
         XCTAssertEqual(CountingURLProtocol.requestCount, 0)
     }
+
+    @MainActor
+    func test_backAnimationFallsBackToFrontFramesForGunpla() async {
+        CountingURLProtocol.requestCount = 0
+        URLProtocol.registerClass(CountingURLProtocol.self)
+        defer { URLProtocol.unregisterClass(CountingURLProtocol.self) }
+        let store = SpriteStore(directory: FileManager.default.temporaryDirectory
+            .appendingPathComponent("bundled-sprites-\(UUID().uuidString)"))
+        let id = GunplaID.encode(machineID: 1, grade: .hg)
+        let frames = await SpriteLoader.animationFrames(speciesID: id, shiny: false, store: store, back: true)
+        XCTAssertGreaterThanOrEqual(frames.count, 2)
+        XCTAssertEqual(CountingURLProtocol.requestCount, 0)
+    }
 }

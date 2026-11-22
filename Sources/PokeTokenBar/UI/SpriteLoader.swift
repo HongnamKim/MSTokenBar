@@ -85,7 +85,8 @@ actor SpriteStore {
 
     /// True once the server answered 404 for this sprite in this session.
     func isConfirmedMissing(speciesID: Int, animated: Bool, shiny: Bool, form: PokemonForm?, back: Bool) -> Bool {
-        confirmedMissing.contains(Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny,
+        if back, GunplaID.isGunpla(speciesID) { return true }   // Gunpla has no back art, by design
+        return confirmedMissing.contains(Self.cacheKey(speciesID: speciesID, animated: animated, shiny: shiny,
                                                 form: form, back: back))
     }
 
