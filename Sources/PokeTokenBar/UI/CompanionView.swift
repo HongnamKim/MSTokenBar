@@ -940,40 +940,44 @@ struct RarityTally: View {
     }
 }
 
-/// 세대(지역)별 도감 진행 캡슐 — "관동 87/151". 완성 시 🏅, 이로치 완성 시 ✨ 를 덧붙인다.
+/// 작품별 격납고 진행 캡슐 — "제타 3/8"(일반 기체 셀). 일반 기체 완성 시 🏅, 전용기 완성 시 ✨.
 /// 희귀도 캡슐(RarityTally)과 같은 시각 언어를 쓰되 색 대신 완성 상태로 강조한다.
 @MainActor
-struct RegionTally: View {
+struct SeriesTally: View {
     let label: String
-    let completion: DexCompletion
+    /// nil = the "All" chip, which only clears the series filter.
+    let completion: SeriesCompletion?
     var isSelected: Bool = false
-    private var accent: Color { completion.isComplete ? .green : .secondary }
+    private var isComplete: Bool { completion?.isComplete == true }
+    private var accent: Color { isComplete ? .green : .secondary }
+    private var ownedAny: Bool {
+        completion.map { $0.ownedCells + $0.variantOwnedCells > 0 } ?? true
+    }
     var body: some View {
         HStack(spacing: 3) {
-            if completion.isShinyComplete {
-                Text("✨").font(.system(size: 10))
-            } else if completion.isComplete {
-                Text("🏅").font(.system(size: 10))
-            }
+            if isComplete { Text("🏅").font(.system(size: 10)) }
+            if completion?.isVariantComplete == true { Text("✨").font(.system(size: 10)) }
             Text(label).font(.system(size: 11, weight: isSelected ? .semibold : .medium))
-            Text("\(completion.owned)/\(completion.total)")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(completion.isComplete ? accent : .secondary)
+            if let completion {
+                Text("\(completion.ownedCells)/\(completion.totalCells)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(isComplete ? accent : .secondary)
+            }
             if isSelected {
                 Image(systemName: "checkmark").font(.system(size: 9, weight: .bold)).foregroundStyle(accent)
             }
         }
         .foregroundStyle(.primary)
         .padding(.horizontal, 6).padding(.vertical, 2)
-        .background(accent.opacity(isSelected ? 0.22 : (completion.isComplete ? 0.14 : 0.08)))
+        .background(accent.opacity(isSelected ? 0.22 : (isComplete ? 0.14 : 0.08)))
         .clipShape(Capsule())
         .overlay(Capsule().strokeBorder(isSelected ? accent : accent.opacity(0.35),
                                         lineWidth: isSelected ? 1.5 : 0.5))
-        .opacity(completion.owned == 0 ? 0.5 : 1)
+        .opacity(ownedAny ? 1 : 0.5)
     }
 }
 
-/// 헤더의 완성 메달 — 전국·안농 등 획득한 배지를 이모지 캡슐로 보여준다(순수 장식).
+/// 헤더의 완성 메달 — 격납고 전체·전용기 전체 등 획득한 배지를 이모지 캡슐로 보여준다(순수 장식).
 @MainActor
 struct DexBadgeMedal: View {
     let emoji: String
@@ -1027,7 +1031,7 @@ struct DexSummaryHeader: View {
 /// 컬렉션 탭 — 도감과 포획 로그를 하위 세그먼트로 전환한다.
 ///
 /// 두 화면은 같은 데이터를 다른 축으로 본다:
-///  - **도감**: 종 1개 = 1칸. 안농의 28개 글자는 상세 화면에서 모아 본다.
+///  - **격납고**: 기체 1개 = 1칸. 칸 안에 출시 등급을 늘어놓고, 등급별 모습은 상세 화면에서 본다.
 ///  - **로그**: 개체 1마리 = 1행. 같은 라인이 여러 행으로 나오는 게 정상 — 성격·획득 시각처럼
 ///    개체에 딸린 정보는 여기에만 있다.
 /// 상위 탭(PopoverTab)은 그대로 4개 — 세그먼트 폭(332/2)이 넉넉해 탭바를 늘릴 필요가 없다.
@@ -1036,7 +1040,7 @@ struct CollectionView: View {
     let store: CompanionStore
     let navigation: PopoverNavigation
     @State private var selectedRarity: Rarity?
-    @State private var selectedRegion: PokedexRegion?
+    @State private var selectedSeries: String?
     @State private var searchText = ""
     @State private var shinyOnly = false
     @State private var dexSort: CompanionStore.DexSortOption = .numberAsc
@@ -1070,7 +1074,7 @@ struct CollectionView: View {
         searchText = ""
         shinyOnly = false
         selectedRarity = nil
-        selectedRegion = nil
+        selectedSeries = nil
         dexSort = .numberAsc
         logSort = .recentFirst
     }
@@ -1108,9 +1112,9 @@ struct CollectionView: View {
                         shinyOnly: shinyOnly,
                         sortOption: dexSort,
                         selectedRarity: $selectedRarity,
-                        selectedRegion: $selectedRegion,
+                        selectedSeries: $selectedSeries,
                         returnAnchor: dexReturnAnchor,
-                        onSelectSpecies: { sp in nav.dexDetailCollectionID = sp.collectionID },
+                        onSelectCell: { cell in nav.dexDetailCollectionID = store.hangarDetailCollectionID(cell) },
                         onResetFilters: resetFilters
                     )
                     // The grid kept its own copy of the anchor; a later rebuild (segment switch) starts on page 1.
@@ -1444,7 +1448,7 @@ private struct ScrollWheelPager: NSViewRepresentable {
     }
 }
 
-/// 도감 — 보유 종만 도감 번호순으로, 한 페이지 16칸(4열×4행) 고정 격자.
+/// 격납고 — 보유 기체만 작품 순서·기체 번호순으로, 한 페이지 16칸(4열×4행) 고정 격자. 칸 하나 = 기체 하나.
 @MainActor
 private struct DexGridView: View {
     let store: CompanionStore
@@ -1452,53 +1456,60 @@ private struct DexGridView: View {
     let shinyOnly: Bool
     let sortOption: CompanionStore.DexSortOption
     @Binding var selectedRarity: Rarity?
-    @Binding var selectedRegion: PokedexRegion?
-    let onSelectSpecies: (CompanionStore.DexSpecies) -> Void
+    @Binding var selectedSeries: String?
+    let onSelectCell: (HangarCell) -> Void
     let onResetFilters: () -> Void
 
     /// nil = the page that shows `returnAnchor` (Back from a detail page). Paging or filtering sets it.
     @State private var page: Int?
-    /// The species whose detail page was just closed. Only picks the page; nothing is selected.
+    /// The detail page (`DexSpecies.collectionID`) that was just closed. Only picks the page of its
+    /// machine; nothing is selected.
     /// State, not a `let`: the parent clears its copy once the grid appears, which must not move the page.
     @State private var returnAnchor: String?
-    /// 선택한 칸 — 하단 줄에 희귀도를 띄우고, 이로치를 잡은 종이면 스프라이트를 그 색으로 바꾼다.
-    @State private var selectedID: String?
+    /// 선택한 칸(기체 번호) — 하단 줄에 형식번호·이름·희귀도를 띄운다.
+    @State private var selectedID: Int?
 
     private static let columns = 4
     private static let rows = 4
     private static let pageSize = columns * rows      // 16
     private static let spacing: CGFloat = 4
 
-    /// `returnAnchor` = the species whose detail page was just closed. The grid opens on its page,
+    /// `returnAnchor` = the detail page that was just closed. The grid opens on its machine's page,
     /// set here rather than in `onAppear`, which would flash page 1 for a frame first.
     init(store: CompanionStore, searchText: String, shinyOnly: Bool,
          sortOption: CompanionStore.DexSortOption, selectedRarity: Binding<Rarity?>,
-         selectedRegion: Binding<PokedexRegion?>,
+         selectedSeries: Binding<String?>,
          returnAnchor: String?,
-         onSelectSpecies: @escaping (CompanionStore.DexSpecies) -> Void,
+         onSelectCell: @escaping (HangarCell) -> Void,
          onResetFilters: @escaping () -> Void) {
         self.store = store
         self.searchText = searchText
         self.shinyOnly = shinyOnly
         self.sortOption = sortOption
         _selectedRarity = selectedRarity
-        _selectedRegion = selectedRegion
-        self.onSelectSpecies = onSelectSpecies
+        _selectedSeries = selectedSeries
+        self.onSelectCell = onSelectCell
         self.onResetFilters = onResetFilters
         _returnAnchor = State(initialValue: returnAnchor)
     }
 
+    /// The machine whose grade page `anchor` names, as the grid's page key.
+    static func anchorCellID(_ anchor: String?) -> String? {
+        anchor.flatMap(Int.init).flatMap(GunplaID.decode).map { String($0.machineID) }
+    }
+
     var body: some View {
-        let all = store.dexSpecies
-        let visible = store.filteredDexSpecies(
+        let all = store.hangarCells
+        let visible = store.filteredHangarCells(
             query: searchText,
             rarity: selectedRarity,
-            shinyOnly: shinyOnly,
-            region: selectedRegion,
+            variantOnly: shinyOnly,
+            series: selectedSeries,
             sort: sortOption
         )
         let pageCount = max(1, (visible.count + Self.pageSize - 1) / Self.pageSize)
-        let current = min(page ?? DexScrollPager.page(containing: returnAnchor, in: visible.map(\.collectionID),
+        let current = min(page ?? DexScrollPager.page(containing: Self.anchorCellID(returnAnchor),
+                                                      in: visible.map { String($0.machineID) },
                                                       pageSize: Self.pageSize),
                           pageCount - 1)
         let slice = Array(visible.dropFirst(current * Self.pageSize).prefix(Self.pageSize))
@@ -1520,7 +1531,7 @@ private struct DexGridView: View {
         .onChange(of: shinyOnly) { page = 0; selectedID = nil }
         .onChange(of: sortOption) { page = 0; selectedID = nil }
         .onChange(of: selectedRarity) { page = 0; selectedID = nil }
-        .onChange(of: selectedRegion) { page = 0; selectedID = nil }
+        .onChange(of: selectedSeries) { page = 0; selectedID = nil }
         .task { await store.backfillMissingDexNames() }
     }
 
@@ -1545,19 +1556,19 @@ private struct DexGridView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func header(_ all: [CompanionStore.DexSpecies]) -> some View {
+    private func header(_ all: [HangarCell]) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 6) {
-                Text(store.l.dexTitle).font(.callout.weight(.semibold))
-                Text(store.l.dexSpeciesTotal(all.count)).font(.caption).foregroundStyle(.secondary)
+                Text(store.l.hangarTitle).font(.callout.weight(.semibold))
+                Text(store.l.hangarMachineTotal(all.count)).font(.caption).foregroundStyle(.secondary)
                 Spacer(minLength: 4)
                 earnedMedals
             }
-            regionChips
+            seriesChips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(rarityDisplayOrder, id: \.self) { r in
-                        let count = all.lazy.filter { $0.rarity == r }.count
+                        let count = all.lazy.filter { store.catalog.machine($0.machineID)?.rarity == r }.count
                         Button {
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 selectedRarity = (selectedRarity == r) ? nil : r
@@ -1579,26 +1590,37 @@ private struct DexGridView: View {
         }
     }
 
-    /// 세대(지역)별 진행 캡슐 — 탭하면 그 세대만 필터. 아직 한 마리도 없는 세대는 비활성.
-    private var regionChips: some View {
+    /// 작품 칩 — "전체" + 카탈로그 작품 순서. 탭하면 그 작품만 필터. 아직 한 기체도 없는 작품은 비활성.
+    private var seriesChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        selectedSeries = nil
+                        page = 0
+                        selectedID = nil
+                    }
+                } label: {
+                    SeriesTally(label: store.l.hangarSeriesAll, completion: nil, isSelected: selectedSeries == nil)
+                }
+                .buttonStyle(.plain)
                 ForEach(store.dexCompletions) { completion in
+                    let name = store.seriesName(completion.seriesID)
                     Button {
                         withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedRegion = (selectedRegion == completion.region) ? nil : completion.region
+                            selectedSeries = (selectedSeries == completion.seriesID) ? nil : completion.seriesID
                             page = 0
                             selectedID = nil
                         }
                     } label: {
-                        RegionTally(label: store.l.regionName(completion.region),
-                                    completion: completion,
-                                    isSelected: selectedRegion == completion.region)
+                        SeriesTally(label: name, completion: completion,
+                                    isSelected: selectedSeries == completion.seriesID)
                     }
                     .buttonStyle(.plain)
-                    .disabled(completion.owned == 0)
-                    .help(store.l.dexRegionProgressLabel(completion.region,
-                                                         owned: completion.owned, total: completion.total))
+                    .disabled(completion.ownedCells + completion.variantOwnedCells == 0)
+                    .help(store.l.hangarSeriesProgressLabel(name, owned: completion.ownedCells,
+                                                            total: completion.totalCells)
+                          + " · " + store.l.hangarSeriesFilterHint)
                 }
             }
             .fixedSize(horizontal: true, vertical: false)
@@ -1606,16 +1628,16 @@ private struct DexGridView: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// 전국·안농 등 획득한 완성 메달 줄. 하나도 없으면 공간을 차지하지 않는다.
+    /// 격납고 전체·전용기 전체 완성 메달 줄. 하나도 없으면 공간을 차지하지 않는다.
     @ViewBuilder private var earnedMedals: some View {
         let badges = store.earnedDexBadges.filter {
-            // 지역 메달은 지역 캡슐에서 이미 드러나므로 전국·안농 티어만 헤더에 모은다.
-            switch $0 { case .region, .regionShiny: return false; default: return true }
+            // 작품 메달은 작품 캡슐에서 이미 드러나므로 전체 티어만 헤더에 모은다.
+            $0.seriesID == nil
         }
         if !badges.isEmpty {
             HStack(spacing: 3) {
                 ForEach(badges, id: \.notificationKey) { badge in
-                    DexBadgeMedal(emoji: medalEmoji(badge), help: store.l.dexBadgeLabel(badge))
+                    DexBadgeMedal(emoji: medalEmoji(badge), help: store.dexBadgeLabel(badge))
                 }
             }
         }
@@ -1623,31 +1645,25 @@ private struct DexGridView: View {
 
     private func medalEmoji(_ badge: DexBadge) -> String {
         switch badge {
-        case .region: return "🏅"
-        case .regionShiny: return "✨"
-        case .unown: return "🔤"
-        case .national: return "🌍"
-        case .nationalShiny: return "✨"
+        case .series: return "🏅"
+        case .seriesVariant, .allVariant: return "✨"
+        case .all: return "🏆"
         }
     }
 
-    private func grid(_ slice: [CompanionStore.DexSpecies]) -> some View {
-        let formCounts = Dictionary(uniqueKeysWithValues: slice.lazy
-            .filter { PokemonForm.hasForms(speciesID: $0.id) }
-            .map { ($0.id, store.state.collectedForms(speciesID: $0.id).count) })
-        return VStack(spacing: Self.spacing) {
+    private func grid(_ slice: [HangarCell]) -> some View {
+        VStack(spacing: Self.spacing) {
             ForEach(0..<Self.rows, id: \.self) { row in
                 HStack(spacing: Self.spacing) {
                     ForEach(0..<Self.columns, id: \.self) { col in
                         let i = row * Self.columns + col
                         if i < slice.count {
-                            let sp = slice[i]
-                            DexSpeciesCell(store: store, species: sp,
-                                           isSelected: selectedID == sp.collectionID,
-                                           isRepresentative: store.isRepresentative(sp),
-                                           formCount: formCounts[sp.id]) {
-                                selectedID = sp.collectionID
-                                onSelectSpecies(sp)
+                            let cell = slice[i]
+                            HangarMachineCell(store: store, cell: cell,
+                                              isSelected: selectedID == cell.machineID,
+                                              isRepresentative: store.isRepresentative(cell)) {
+                                selectedID = cell.machineID
+                                onSelectCell(cell)
                             }
                             .frame(maxWidth: .infinity)
                         } else {
@@ -1661,19 +1677,17 @@ private struct DexGridView: View {
         .frame(maxHeight: .infinity)
     }
 
-    private func footer(_ slice: [CompanionStore.DexSpecies],
-                        current: Int, pageCount: Int) -> some View {
+    private func footer(_ slice: [HangarCell], current: Int, pageCount: Int) -> some View {
         HStack(spacing: 8) {
-            if let sel = slice.first(where: { $0.collectionID == selectedID }) {
-                // 칸은 번호·스프라이트·이름만 보여주므로 희귀도가 선택으로 얻는 정보다.
-                Text("#\(sel.id) \(sel.name) · \(store.l.rarityLabel(sel.rarity))")
+            if let sel = slice.first(where: { $0.machineID == selectedID }),
+               let machine = store.catalog.machine(sel.machineID) {
+                // 칸은 형식번호·스프라이트·이름·등급만 보여주므로 희귀도가 선택으로 얻는 정보다.
+                Text("\(machine.modelNumber) \(store.machineName(sel.machineID)) · \(store.l.rarityLabel(machine.rarity))")
                     .font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
-                if !PokemonForm.hasForms(speciesID: sel.id) {
-                    let isRepresentative = store.isRepresentative(sel)
-                    RepresentativeFooterButton(localization: store.l,
-                                               isRepresentative: isRepresentative) {
-                        _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : sel.id)
-                    }
+                let isRepresentative = store.isRepresentative(sel)
+                RepresentativeFooterButton(localization: store.l,
+                                           isRepresentative: isRepresentative) {
+                    _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : store.hangarRepresentativeSpeciesID(sel))
                 }
             }
             Spacer(minLength: 4)
@@ -1762,6 +1776,7 @@ struct PokemonDetailView: View {
             }
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
+                    if let cell = hangarCell { gradeRow(cell) }
                     if PokemonForm.hasForms(speciesID: species.id) { formPicker }
                     if displayedSpecies.hasNormal && displayedSpecies.isShiny { appearancePicker }
                     identityHeader
@@ -1796,6 +1811,42 @@ struct PokemonDetailView: View {
             if selectedForm == nil { selectedForm = displayedSpecies.form }
             if selectedInstanceID.isEmpty { selectedInstanceID = individuals.first?.id ?? "" }
             await store.loadPokemonDetails(speciesID: species.id)
+        }
+    }
+
+    /// The hangar cell of the machine behind a Gunpla species; nil for anything else.
+    private var hangarCell: HangarCell? {
+        GunplaID.decode(species.id).flatMap { store.hangarCell(machineID: $0.machineID) }
+    }
+
+    /// 등급별 스프라이트 줄 — 보유 등급은 스프라이트, 미보유는 실루엣.
+    private func gradeRow(_ cell: HangarCell) -> some View {
+        let owned = cell.ownedGrades.intersection(cell.releasedGrades).count
+        return VStack(alignment: .leading, spacing: 6) {
+            Text(store.l.hangarGradesOwned(owned, of: cell.releasedGrades.count)).font(.callout.weight(.semibold))
+            HStack(spacing: 6) {
+                ForEach(cell.releasedGrades, id: \.self) { grade in
+                    let isOwned = cell.ownedGrades.contains(grade)
+                    VStack(spacing: 2) {
+                        let sprite = SpriteView(speciesID: GunplaID.encode(machineID: cell.machineID, grade: grade),
+                                                size: 44)
+                            .frame(width: 44, height: 44)
+                        if isOwned {
+                            sprite
+                        } else {
+                            // Silhouette: the sprite's shape only, in a flat tint.
+                            Color.primary.opacity(0.3).frame(width: 44, height: 44).mask { sprite }
+                        }
+                        Text(grade.label)
+                            .font(.system(size: 10, weight: isOwned ? .bold : .regular, design: .rounded))
+                            .foregroundStyle(isOwned ? .primary : .secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(grade.label)
+                    .accessibilityValue(isOwned ? "" : store.l.hangarNotOwned)
+                }
+            }
         }
     }
 
@@ -2059,57 +2110,52 @@ private extension Array where Element == String {
     }
 }
 
-/// 도감 한 칸 — 도감 번호 + 스프라이트 + 종 이름. 종 정보만 담는다(성격·획득 횟수는 로그의 몫).
+/// 격납고 한 칸 = 기체 하나 — 형식번호 + 최고 보유 등급 스프라이트 + 이름 + 출시 등급 라벨(보유는 강조, 미보유는 흐리게).
 /// 정적 스프라이트만 쓴다(animated 생략) — 한 페이지 16칸을 GIF 로 동시 재생하면 CPU 가 안 된다.
 @MainActor
-private struct DexSpeciesCell: View {
+private struct HangarMachineCell: View {
     let store: CompanionStore
-    let species: CompanionStore.DexSpecies
+    let cell: HangarCell
     let isSelected: Bool
     let isRepresentative: Bool
-    /// Collected forms, nil for species with a single appearance.
-    let formCount: Int?
     let onTap: () -> Void
     @State private var isHovered = false
 
-    private var formTotal: Int { PokemonForm.forms(speciesID: species.id).count }
+    private static let thumb: CGFloat = 50
 
-    /// Larger thumbnails remain static so a full page does not animate concurrently.
-    private static let thumb: CGFloat = 56
+    private var machine: MachineRecord? { store.catalog.machine(cell.machineID) }
+    private var name: String { store.machineName(cell.machineID) }
 
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 1) {
-                // 이로치를 잡은 종은 이로치 스프라이트로 표시한다(상세 화면에서 일반/이로치 모습 전환 가능).
-                // 폼이 있는 종의 아이콘은 기본 폼 일반색으로 유지하고, 폼별 색은 상세 화면에서 보여준다.
-                SpriteView(speciesID: species.id, size: Self.thumb,
-                           shiny: formCount == nil && species.isShiny)
+                SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb)
                     .frame(width: Self.thumb, height: Self.thumb)
                     // Keep the raising badge over the sprite to leave room for the name.
                     .overlay(alignment: .bottom) {
-                        if species.isRaising { raisingBadge.fixedSize() }
+                        if cell.isRaising { raisingBadge.fixedSize() }
                     }
-                Text(formCount.map { "\(species.name) \($0)/\(formTotal)" } ?? species.name)
-                    .font(.system(size: 12))
-                    .lineLimit(2, reservesSpace: true)
-                    .multilineTextAlignment(.center)
+                Text(name)
+                    .font(.system(size: 11))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                gradeLabels
             }
             .frame(maxWidth: .infinity)
-            // Attach number and shiny markers to the full cell width.
-            .overlay(alignment: .topLeading) { numberTag }
+            .padding(.top, 10)   // room for the model-number tag above the sprite
+            .overlay(alignment: .topLeading) { modelTag }
             .overlay(alignment: .topTrailing) {
-                // ✨ = 이 종의 이로치를 잡은 적이 있다는 표식.
-                if species.isShiny {
+                // ✨ = 전용기 칸.
+                if cell.isVariant {
                     Text("✨")
                         .font(.system(size: 10))
                         .padding(.horizontal, 2)
                         .background(.regularMaterial, in: Capsule())
-                        .accessibilityLabel(store.l.dexShinyLabel)
+                        .accessibilityLabel(store.l.hangarVariantLabel)
                 }
             }
             .padding(2)
-            // 대표 = 영속적인 accent 배경, 방금 클릭한 칸 = 기존 accent 테두리.
-            // 서로 다른 카드여도 같은 강조 두 개가 선택된 것처럼 보이지 않는다.
+            // 대표 = 영속적인 accent 배경, 방금 클릭한 칸 = accent 테두리.
             .background(isRepresentative ? Color.accentColor.opacity(0.16)
                                          : Color.secondary.opacity(isSelected ? 0.16 : 0.06))
             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -2119,8 +2165,7 @@ private struct DexSpeciesCell: View {
                         .strokeBorder(Color.accentColor, lineWidth: 1.5)
                 }
             }
-            // 호버 = 클릭 가능 피드백. 확대는 격자 간격 안에 머무는 폭으로만.
-            // 그림자는 카드 모양에만 — 칸 전체에 `.shadow` 를 걸면 번호·이름·스프라이트 글자마다 그림자가 진다.
+            // 호버 = 클릭 가능 피드백. 그림자는 카드 모양에만 건다.
             .background {
                 if isHovered {
                     RoundedRectangle(cornerRadius: 8)
@@ -2136,28 +2181,35 @@ private struct DexSpeciesCell: View {
         .help(tooltip)
         .accessibilityLabel(tooltip)
         .contextMenu {
-            if formCount != nil {
-                Button(store.l.chooseForm, action: onTap)
-            } else {
-                Button {
-                    _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : species.id)
-                } label: {
-                    Label(isRepresentative ? store.l.representativeFollowCurrent
-                                           : store.l.representativeSet,
-                          systemImage: isRepresentative ? "arrow.triangle.2.circlepath" : "star")
-                }
+            Button {
+                _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : store.hangarRepresentativeSpeciesID(cell))
+            } label: {
+                Label(isRepresentative ? store.l.representativeFollowCurrent : store.l.representativeSet,
+                      systemImage: isRepresentative ? "arrow.triangle.2.circlepath" : "star")
             }
         }
     }
 
-    /// material 판 — 어두운 스프라이트 위에서도 읽히게(라이트/다크 자동).
-    /// 스프라이트 위 라벨에 이미 쓰는 패턴과 동일.
-    private var numberTag: some View {
+    /// 출시 등급을 순서대로 — 보유 등급은 굵게, 미보유는 흐리게.
+    private var gradeLabels: some View {
         HStack(spacing: 2) {
-            Text("#\(species.id)")
-            // 기존 번호 캡슐에 결합해 이로치(우측 상단)·키우는 중(스프라이트 하단)·이름과
-            // 새 자리를 다투지 않는다. 아이콘은 언어에 따라 폭이 달라지지 않고, 의미는 셀의
-            // 현지화된 툴팁·접근성 라벨이 보완한다.
+            ForEach(cell.releasedGrades, id: \.self) { grade in
+                let owned = cell.ownedGrades.contains(grade)
+                Text(grade.label)
+                    .font(.system(size: 8, weight: owned ? .heavy : .regular, design: .rounded))
+                    .foregroundStyle(owned ? Color.primary : Color.secondary)
+                    .opacity(owned ? 1 : 0.45)
+            }
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+    }
+
+    /// material 판 — 어두운 스프라이트 위에서도 읽히게. 글자색 = 희귀도.
+    private var modelTag: some View {
+        HStack(spacing: 2) {
+            Text(machine?.modelNumber ?? "#\(cell.machineID)")
+                .lineLimit(1)
             if isRepresentative {
                 Image(systemName: "star.fill")
                     .font(.system(size: 8, weight: .bold))
@@ -2165,27 +2217,26 @@ private struct DexSpeciesCell: View {
                     .accessibilityHidden(true)
             }
         }
-            // 번호 색 = 희귀도 — "전체" 보기에서도 칸마다 희귀도가 보인다.
-            .font(.system(size: 10, weight: .semibold))
-            .foregroundStyle(rarityColor(species.rarity))
-            .padding(.horizontal, 2)
-            .background(.regularMaterial, in: Capsule())
+        .font(.system(size: 9, weight: .semibold))
+        .foregroundStyle(rarityColor(machine?.rarity))
+        .padding(.horizontal, 2)
+        .background(.regularMaterial, in: Capsule())
     }
 
-    /// "키우는 중"은 현재 개체의 현재 형태 한 칸에만 표시한다. accent 틴트는 반투명이라
-    /// 스프라이트가 비치므로 material 을 한 겹 깔아 대비를 확보한다(로그는 카드 배경 위라 불필요).
+    /// "키우는 중"은 현재 개체의 기체 칸에만 표시한다. material 을 한 겹 깔아 대비를 확보한다.
     private var raisingBadge: some View {
         Badge(store.l.dexRaising.uppercased(), tint: .accent, style: .tinted, size: 10)
             .background(.regularMaterial, in: Capsule())
     }
 
-    /// 툴팁과 접근성 라벨이 같은 문장을 쓴다 — 칸이 글자로 못 보여주는 희귀도를 담는다.
-    /// ✨ 는 이모지라 스크린리더가 일관되게 읽지 못하므로 명사로 함께 넣는다.
+    /// 툴팁과 접근성 라벨이 같은 문장을 쓴다 — 칸이 글자로 못 보여주는 희귀도·보유 등급 수를 담는다.
     private var tooltip: String {
-        var parts = ["#\(species.id) \(species.name)", store.l.rarityLabel(species.rarity)]
-        if let formCount { parts.append(store.l.formsCollected(formCount, of: formTotal)) }
-        if species.isShiny { parts.append(store.l.dexShinyLabel) }
-        if species.isRaising { parts.append(store.l.dexRaising) }
+        var parts = ["\(machine?.modelNumber ?? "#\(cell.machineID)") \(name)"]
+        if let machine { parts.append(store.l.rarityLabel(machine.rarity)) }
+        parts.append(store.l.hangarGradesOwned(cell.ownedGrades.intersection(cell.releasedGrades).count,
+                                               of: cell.releasedGrades.count))
+        if cell.isVariant { parts.append(store.l.hangarVariantLabel) }
+        if cell.isRaising { parts.append(store.l.dexRaising) }
         if isRepresentative { parts.append(store.l.representativeBadge) }
         return parts.joined(separator: " · ")
     }

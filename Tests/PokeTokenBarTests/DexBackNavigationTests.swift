@@ -22,20 +22,37 @@ final class DexBackNavigationTests: XCTestCase {
         window = nil
     }
 
-    /// 20 species = 2 grid pages: species 1…16, then 17…20.
+    /// A one-grade (HG) machine catalog: one cell per machine, `names[id]` as its name in every language.
+    private func catalog(_ names: [Int: String], series: [Int: String] = [:]) throws -> MachineCatalog {
+        let seriesNames = Set(series.values).union(series.count < names.count ? ["Meadow"] : [])
+        return try MachineCatalog(
+            machines: names.keys.sorted().map { id in
+                MachineRecord(id: id, modelNumber: "X\(id)", names: ["ko": names[id]!, "en": names[id]!, "ja": names[id]!],
+                              series: series[id] ?? "Meadow", faction: "efsf", rarity: .common, grades: [.hg],
+                              gradeSources: nil, variantOf: nil, sprites: nil)
+            },
+            series: seriesNames.sorted().enumerated().map { order, name in
+                SeriesRecord(id: name, names: ["ko": name, "en": name, "ja": name], order: order)
+            })
+    }
+
+    private func hg(_ machineID: Int) -> Int { GunplaID.encode(machineID: machineID, grade: .hg) }
+
+    /// 20 machines = 2 grid pages: machines 1…16, then 17…20.
     private func makeStore() throws -> CompanionStore {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-back-\(UUID()).json")
         addTeardownBlock { try? FileManager.default.removeItem(at: file) }
+        // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl.
+        let names = Dictionary(uniqueKeysWithValues: (1...20).map { ($0, $0 == 1 ? "Oldest" : "Mon\($0)") })
         var state = CompanionState()
         state.language = .en
         state.dex = (1...20).map { id in
-            DexEntry(id: "entry-\(id)", baseID: id, finalID: id, chainOrder: [id], rarity: .common,
+            DexEntry(id: "entry-\(id)", baseID: hg(id), finalID: hg(id), chainOrder: [hg(id)], rarity: .common,
                      caughtAt: Date(timeIntervalSince1970: 1_700_000_000 + Double(id)),
-                     // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl.
-                     names: [id: ["en": id == 1 ? "Oldest" : "Mon\(id)"]])
+                     names: [hg(id): ["en": names[id]!]])
         }
         try JSONEncoder().encode(state).write(to: file)
-        return CompanionStore(provider: OfflineProvider(), fileURL: file)
+        return CompanionStore(provider: try catalog(names), detailProvider: OfflineProvider(), fileURL: file)
     }
 
     private func host(_ store: CompanionStore, _ navigation: PopoverNavigation) -> NSView {
@@ -158,19 +175,19 @@ final class DexBackNavigationTests: XCTestCase {
         XCTFail("Pressing \(text) never changed the screen", file: file, line: line)
     }
 
-    /// Opens #18 (page 2) the way Home's sprite does, then presses the detail page's Back.
+    /// Opens machine 18 (page 2) the way Home's sprite does, then presses the detail page's Back.
     private func openPageTwoSpeciesAndGoBack(_ store: CompanionStore, _ navigation: PopoverNavigation,
                                              _ host: NSView) async throws {
-        let species = try XCTUnwrap(store.dexSpecies.first { $0.id == 18 })
+        let species = try XCTUnwrap(store.dexSpecies.first { $0.id == hg(18) })
         navigation.dexDetailCollectionID = species.collectionID
         try await press(store.l.back, in: host)
     }
 
-    // MARK: Pokédex grid
+    // MARK: Hangar grid
 
     /// Uses the same complete rendered state before and after each attempt. Checking the state
     /// before retrying avoids toggling a selection back off when the first click has just settled.
-    private func pressRegionChip(_ label: String, showing: [String], hiding: [String] = [],
+    private func pressSeriesChip(_ label: String, showing: [String], hiding: [String] = [],
                                  in root: NSView, file: StaticString = #filePath,
                                  line: UInt = #line) async throws -> Bool {
         func reached(_ seen: [Word]) -> Bool {
@@ -183,7 +200,7 @@ final class DexBackNavigationTests: XCTestCase {
             let chip = try XCTUnwrap(try seen.compactMap { try $0.focused(on: label) }
                 .max { $0.box.midY < $1.box.midY },
                 "No glyph bounds for \(label). Seen: \(seen.map(\.candidates))", file: file, line: line)
-            print("Region click \(attempt): candidates=\(chip.candidates) glyphBox=\(chip.box)")
+            print("Series click \(attempt): candidates=\(chip.candidates) glyphBox=\(chip.box)")
             try press(chip, in: root)
             let deadline = ContinuousClock.now + .seconds(1)
             repeat {
@@ -192,14 +209,14 @@ final class DexBackNavigationTests: XCTestCase {
                 if reached(seen) { return true }
             } while ContinuousClock.now < deadline
         }
-        try saveRegionRender(root, phase: "failed")
+        try saveSeriesRender(root, phase: "failed")
         XCTFail("Pressing \(label) did not show \(showing) / hide \(hiding). Seen: \(seen.map(\.candidates))",
                 file: file, line: line)
         return false
     }
 
     /// CI already uploads this directory. Keep exact pixels alongside the click/OCR diagnostics.
-    private func saveRegionRender(_ root: NSView, phase: String) throws {
+    private func saveSeriesRender(_ root: NSView, phase: String) throws {
         guard let directory = ProcessInfo.processInfo.environment["PTB_SNAPSHOT_SCREENSHOT_DIR"] else { return }
         let destination = URL(fileURLWithPath: directory)
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
@@ -207,7 +224,7 @@ final class DexBackNavigationTests: XCTestCase {
         let bitmap = try XCTUnwrap(root.bitmapImageRepForCachingDisplay(in: root.bounds))
         root.cacheDisplay(in: root.bounds, to: bitmap)
         let png = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
-        try png.write(to: destination.appendingPathComponent("dex-region-\(phase).png"))
+        try png.write(to: destination.appendingPathComponent("dex-series-\(phase).png"))
     }
 
     func testClickBoundsFocusOnTheRequestedTextInsideAMergedObservation() throws {
@@ -229,35 +246,33 @@ final class DexBackNavigationTests: XCTestCase {
         XCTAssertLessThan(middle.box.maxX, merged.box.maxX)
     }
 
-    func testRegionChipFiltersMountedCollectionAndTogglesBack() async throws {
-        let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-region-\(UUID()).json")
+    func testSeriesChipFiltersMountedCollectionAndTogglesBack() async throws {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-series-\(UUID()).json")
         defer { try? FileManager.default.removeItem(at: file) }
         var state = CompanionState()
         state.language = .en
-        state.dex = [
-            DexEntry(baseID: 1, finalID: 1, chainOrder: [1], rarity: .common,
-                     caughtAt: Date(), names: [1: ["en": "Maple"]]),
-            DexEntry(baseID: 152, finalID: 152, chainOrder: [152], rarity: .common,
-                     caughtAt: Date(), names: [152: ["en": "Willow"]]),
-        ]
+        state.dex = [1, 2].map { id in
+            DexEntry(baseID: hg(id), finalID: hg(id), chainOrder: [hg(id)], rarity: .common, caughtAt: Date())
+        }
         try JSONEncoder().encode(state).write(to: file)
-        let store = CompanionStore(provider: OfflineProvider(), fileURL: file)
+        let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"]),
+                                   detailProvider: OfflineProvider(), fileURL: file)
         let navigation = PopoverNavigation()
         navigation.tab = .collection
         let root = host(store, navigation)
         try await waitForText("Maple", exactly: true, in: root)
         try await waitForText("Willow", exactly: true, in: root)
-        try saveRegionRender(root, phase: "before")
+        try saveSeriesRender(root, phase: "before")
 
-        guard try await pressRegionChip("Johto", showing: ["Willow"], hiding: ["Maple"], in: root) else { return }
+        guard try await pressSeriesChip("Harbor", showing: ["Willow"], hiding: ["Maple"], in: root) else { return }
         XCTAssertFalse(try isRendered("Maple", exactly: true, in: root))
         try await waitForText("Willow", exactly: true, in: root)
-        try saveRegionRender(root, phase: "johto")
+        try saveSeriesRender(root, phase: "harbor")
 
-        guard try await pressRegionChip("Johto", showing: ["Maple", "Willow"], in: root) else { return }
+        guard try await pressSeriesChip("Harbor", showing: ["Maple", "Willow"], in: root) else { return }
         try await waitForText("Maple", exactly: true, in: root)
         try await waitForText("Willow", exactly: true, in: root)
-        try saveRegionRender(root, phase: "restored")
+        try saveSeriesRender(root, phase: "restored")
     }
 
     func testBackFromDetailReturnsToThePageOfThatSpecies() async throws {

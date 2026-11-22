@@ -43,7 +43,7 @@ final class CompanionStore {
 
     private let provider: any PokeProviding
     /// 기체 카탈로그 — 주입된 provider 가 카탈로그면 그것, 아니면(포켓몬 스텁 provider 를 쓰는 기존 테스트) 번들 카탈로그.
-    private var catalog: MachineCatalog { provider as? MachineCatalog ?? .shared }
+    var catalog: MachineCatalog { provider as? MachineCatalog ?? .shared }
     private var dexNameRequests: [Int: Task<EvoLine, Error>] = [:]
     private let detailProvider: (any PokemonDetailProviding)?
     private let clock: () -> Date
@@ -486,28 +486,7 @@ final class CompanionStore {
         return collectedDexSpecies(groupForms: true).filter { $0.id == speciesID }
     }
 
-    // MARK: 세대(지역) 도감 완성 추적
-
-    /// Owned species reduced to the (dex number, shiny) pairs the generation math needs.
-    private var ownedDexForProgress: [(id: Int, isShiny: Bool)] {
-        dexSpecies.map { (id: $0.id, isShiny: $0.isShiny) }
-    }
-
-    /// Per-region owned/total progress, in National Dex order. Drives the Pokédex generation chips.
-    var dexCompletions: [DexCompletion] {
-        DexProgress.regionCompletions(owned: ownedDexForProgress)
-    }
-
-    /// National (Gen 1–5) progress for the Pokédex header.
-    var nationalDexProgress: (owned: Int, shinyOwned: Int, total: Int) {
-        DexProgress.nationalProgress(owned: ownedDexForProgress)
-    }
-
-    /// Every completion badge currently earned — derived, never persisted (ownership only grows).
-    var earnedDexBadges: [DexBadge] {
-        DexProgress.earnedBadges(owned: ownedDexForProgress,
-                                 unownFormsCollected: state.collectedForms(speciesID: PokemonForm.unownSpeciesID).count)
-    }
+    // MARK: 격납고 작품 완성 추적 (진행·배지는 CompanionStore+Hangar)
 
     /// Fire a one-time completion notification for every badge earned since the last check.
     /// Idempotent: a badge already in `notifiedDexCompletions` never re-fires. Does not persist on its
@@ -515,8 +494,8 @@ final class CompanionStore {
     /// Guarded on seeding so pre-feature completions are announced by `seedDexCompletionsIfNeeded`, not here.
     func checkDexCompletions() {
         guard state.dexCompletionsSeeded else { return }
-        let newly = DexProgress.newlyEarnedBadges(earned: earnedDexBadges,
-                                                  alreadyNotified: state.notifiedDexCompletions)
+        let newly = HangarProgress.newlyEarnedBadges(earned: earnedDexBadges,
+                                                     alreadyNotified: state.notifiedDexCompletions)
         for badge in newly {
             let (title, body) = dexCompletionNotification(badge)
             notifyCompanionEvent(title, body)
@@ -539,18 +518,8 @@ final class CompanionStore {
     }
 
     private func dexCompletionNotification(_ badge: DexBadge) -> (title: String, body: String) {
-        switch badge {
-        case .region(let r):
-            return (l.notifDexRegionCompleteTitle(l.regionName(r)), l.notifDexRegionCompleteBody(l.regionName(r)))
-        case .regionShiny(let r):
-            return (l.notifDexRegionShinyCompleteTitle(l.regionName(r)), l.notifDexRegionShinyCompleteBody(l.regionName(r)))
-        case .unown:
-            return (l.notifDexUnownCompleteTitle, l.notifDexUnownCompleteBody)
-        case .national:
-            return (l.notifDexNationalCompleteTitle, l.notifDexNationalCompleteBody)
-        case .nationalShiny:
-            return (l.notifDexNationalShinyCompleteTitle, l.notifDexNationalShinyCompleteBody)
-        }
+        let series = badge.seriesID.map(seriesName) ?? ""
+        return (l.notifHangarCompleteTitle(badge, seriesName: series), l.notifHangarCompleteBody(badge, seriesName: series))
     }
 
     private func collectedDexSpecies(groupForms: Bool) -> [DexSpecies] {
@@ -607,9 +576,10 @@ final class CompanionStore {
         return "#\(targetID)"
     }
 
-    /// The one search rule shared by the Pokédex grid and the Catch Log, so the two screens cannot
-    /// drift apart. A query matches a Pokédex number (`25` or `#25`) or part of any stored name
-    /// in any language, ignoring case and diacritics ("flabebe" finds Flabébé).
+    /// The one search rule shared by the hangar grid and the Catch Log, so the two screens cannot
+    /// drift apart. In the Catch Log a query matches a species number (`25` or `#25`) or part of any
+    /// stored name in any language; in the hangar, the machine name or model number. Both ignore case
+    /// and diacritics ("flabebe" finds Flabébé).
     struct DexSearchMatcher: Sendable {
         private let query: String
         private let number: Int?
@@ -622,8 +592,9 @@ final class CompanionStore {
             number = Int(trimmed.hasPrefix("#") ? String(trimmed.dropFirst()) : trimmed)
         }
 
-        func matches(_ species: DexSpecies) -> Bool {
-            matches(ids: [species.id], names: [species.name] + (species.names.map { Array($0.values) } ?? []))
+        /// A hangar cell matches its machine name (current language) or model number ("ms-06" finds MS-06F).
+        func matches(name: String, modelNumber: String) -> Bool {
+            [name, modelNumber].contains { $0.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
         }
 
         /// An individual matches through any species of its chain, like its evolution line in the log row.
@@ -637,57 +608,6 @@ final class CompanionStore {
             // Partial numbers keep working: "25" also finds #125, "#25" finds #25 and #250.
             if ids.contains(where: { "#\($0)".contains(query) }) { return true }
             return names.contains { $0.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
-        }
-    }
-
-    /// Filters and sorts DexSpecies for the Pokédex grid.
-    func filteredDexSpecies(
-        query: String = "",
-        rarity: Rarity? = nil,
-        shinyOnly: Bool = false,
-        region: PokedexRegion? = nil,
-        sort: DexSortOption = .numberAsc
-    ) -> [DexSpecies] {
-        var result = dexSpecies
-        if let rarity {
-            result = result.filter { $0.rarity == rarity }
-        }
-        if let region {
-            result = result.filter { region.dexRange.contains($0.id) }
-        }
-        if shinyOnly {
-            result = result.filter { $0.isShiny }
-        }
-        if let matcher = DexSearchMatcher(query) {
-            result = result.filter { matcher.matches($0) }
-        }
-        return sortDexSpecies(result, by: sort)
-    }
-
-    /// Sorts DexSpecies by the given option.
-    func sortDexSpecies(_ species: [DexSpecies], by sort: DexSortOption) -> [DexSpecies] {
-        switch sort {
-        case .numberAsc:
-            return species.sorted { $0.id < $1.id }
-        case .numberDesc:
-            return species.sorted { $0.id > $1.id }
-        case .nameAsc:
-            return species.sorted {
-                let cmp = $0.name.localizedCompare($1.name)
-                return cmp == .orderedAscending ? true : (cmp == .orderedSame ? $0.id < $1.id : false)
-            }
-        case .nameDesc:
-            return species.sorted {
-                let cmp = $0.name.localizedCompare($1.name)
-                return cmp == .orderedDescending ? true : (cmp == .orderedSame ? $0.id < $1.id : false)
-            }
-        case .rarityDesc:
-            return species.sorted {
-                if $0.rarity.sortRank != $1.rarity.sortRank {
-                    return $0.rarity.sortRank > $1.rarity.sortRank
-                }
-                return $0.id < $1.id
-            }
         }
     }
 

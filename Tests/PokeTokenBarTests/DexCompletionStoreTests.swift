@@ -21,15 +21,29 @@ final class DexCompletionStoreTests: XCTestCase {
             .appendingPathComponent("ptb-dex-\(UUID().uuidString).json")
     }
 
-    /// One DexEntry whose chainOrder spans a dex range registers every species in it.
-    private func store(withOwnedRange range: ClosedRange<Int>, shiny: Bool = false) throws -> CompanionStore {
+    private let catalog = MachineCatalog.shared
+
+    /// One DexEntry per machine, owning the given grades (every released grade when nil).
+    private func entries(_ owned: [Int: [GunplaGrade]?]) -> [DexEntry] {
+        owned.keys.sorted().map { machineID in
+            let machine = catalog.machine(machineID)!
+            let ids = (owned[machineID]! ?? machine.grades).map { GunplaID.encode(machineID: machineID, grade: $0) }
+            return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids,
+                            rarity: machine.rarity, caughtAt: Date(), isShiny: machine.isVariant)
+        }
+    }
+
+    private func store(owning owned: [Int: [GunplaGrade]?], active: MonState? = nil) throws -> CompanionStore {
         var state = CompanionState()
-        state.dex = [DexEntry(baseID: range.lowerBound, finalID: range.upperBound,
-                              chainOrder: Array(range), rarity: .common, caughtAt: Date(), isShiny: shiny)]
+        state.dex = entries(owned)
+        state.active = active
         let url = tempURL()
         try JSONEncoder().encode(state).write(to: url)
-        return CompanionStore(provider: OfflineProvider(), fileURL: url)
+        return CompanionStore(provider: catalog, fileURL: url)
     }
+
+    /// Zeta = machines 6 and 7, four grades each, no variants.
+    private let zeta: [Int: [GunplaGrade]?] = [6: nil, 7: nil]
 
     func testEmptyStoreHasNoCompletionsAndIsSeeded() throws {
         let url = tempURL()
@@ -41,81 +55,65 @@ final class DexCompletionStoreTests: XCTestCase {
         XCTAssertTrue(s.state.notifiedDexCompletions.isEmpty)
     }
 
-    func testCompleteRegionIsReportedComplete() throws {
-        let s = try store(withOwnedRange: PokedexRegion.kanto.dexRange)
-        let kanto = s.dexCompletions.first { $0.region == .kanto }
-        XCTAssertEqual(kanto?.owned, 151)
-        XCTAssertTrue(kanto?.isComplete ?? false)
-        XCTAssertTrue(s.earnedDexBadges.contains(.region(.kanto)))
+    func testCompleteSeriesIsReportedComplete() throws {
+        let s = try store(owning: zeta)
+        let completion = s.dexCompletions.first { $0.seriesID == "zeta" }
+        XCTAssertEqual(completion?.ownedCells, 8)
+        XCTAssertTrue(completion?.isComplete ?? false)
+        XCTAssertTrue(s.earnedDexBadges.contains(.series("zeta")))
     }
 
     /// A save that was already complete before the feature shipped must not fire a notification burst:
     /// seeding records the earned badges as already-notified on first load.
     func testExistingCompletionsAreSeededAsNotifiedWithoutFiring() throws {
-        let s = try store(withOwnedRange: PokedexRegion.kanto.dexRange)
+        let s = try store(owning: zeta)
         XCTAssertTrue(s.state.dexCompletionsSeeded)
-        XCTAssertTrue(s.state.notifiedDexCompletions.contains(DexBadge.region(.kanto).notificationKey))
+        XCTAssertTrue(s.state.notifiedDexCompletions.contains(DexBadge.series("zeta").notificationKey))
         // Nothing is "newly earned" after seeding, so a re-check adds no keys and fires nothing.
         let before = s.state.notifiedDexCompletions
         s.checkDexCompletions()
         XCTAssertEqual(s.state.notifiedDexCompletions, before)
     }
 
-    func testRegionFilterReturnsOnlySpeciesInThatGeneration() throws {
-        let s = try store(withOwnedRange: 1...200)   // all of Kanto + Johto 152–200
-        let johto = s.filteredDexSpecies(region: .johto)
-        XCTAssertEqual(johto.count, 49)
-        XCTAssertTrue(johto.allSatisfy { PokedexRegion.region(forDexNumber: $0.id) == .johto })
-        XCTAssertEqual(s.filteredDexSpecies(region: .kanto).count, 151)
-        XCTAssertEqual(s.filteredDexSpecies(region: nil).count, 200)
+    func testSeriesFilterReturnsOnlyMachinesInThatSeries() throws {
+        let s = try store(owning: [1: [.sd], 2: [.hg], 6: [.hg], 8: [.sd]])
+        XCTAssertEqual(s.filteredHangarCells(series: "first").map(\.machineID), [1, 2])
+        XCTAssertEqual(s.filteredHangarCells(series: "zeta").map(\.machineID), [6])
+        XCTAssertTrue(s.filteredHangarCells(series: "uc").isEmpty)
+        XCTAssertEqual(s.filteredHangarCells(series: nil).map(\.machineID), [1, 2, 6, 8])
     }
 
-    func testNationalProgressCountsAcrossAllRegions() throws {
-        let s = try store(withOwnedRange: PokedexRegion.nationalRange)
-        XCTAssertEqual(s.nationalDexProgress.owned, PokedexRegion.nationalTotal)
-        XCTAssertTrue(s.earnedDexBadges.contains(.national))
-        XCTAssertTrue(PokedexRegion.allCases.allSatisfy { s.earnedDexBadges.contains(.region($0)) })
+    func testOwningEveryMachineEarnsEveryBadge() throws {
+        let everything = Dictionary(uniqueKeysWithValues: catalog.machines.map { ($0.id, nil as [GunplaGrade]?) })
+        let s = try store(owning: everything)
+        XCTAssertTrue(s.earnedDexBadges.contains(.all))
+        XCTAssertTrue(s.earnedDexBadges.contains(.allVariant))
+        XCTAssertTrue(catalog.series.allSatisfy { s.earnedDexBadges.contains(.series($0.id)) })
+        XCTAssertEqual(s.state.notifiedDexCompletions, Set(s.earnedDexBadges.map(\.notificationKey)))
     }
 
-    func testCurrentFormsCountUnownLettersWithoutInflatingRegionalSpecies() throws {
-        var state = CompanionState()
-        let letters = PokemonForm.forms(speciesID: PokemonForm.unownSpeciesID)
-        state.dex = letters.dropLast().map { form in
-            DexEntry(baseID: 201, finalID: 201, chainOrder: [201], rarity: .rare,
-                     caughtAt: Date(), form: form)
-        }
-        state.dex += PokemonForm.forms(speciesID: 351).map { form in
-            DexEntry(baseID: 351, finalID: 351, chainOrder: [351], rarity: .common,
-                     caughtAt: Date(), form: form)
-        }
-        let url = tempURL()
-        defer { try? FileManager.default.removeItem(at: url) }
-        try JSONEncoder().encode(state).write(to: url)
-        let partial = CompanionStore(provider: OfflineProvider(), fileURL: url)
-        XCTAssertFalse(partial.earnedDexBadges.contains(.unown))
+    /// The raising machine's reached grade is owned before it graduates, so it can finish a series.
+    func testActiveReachedGradeCompletesTheSeries() throws {
+        let partial = try store(owning: [6: nil, 7: [.hg, .rg, .mg]])
+        XCTAssertFalse(partial.earnedDexBadges.contains(.series("zeta")))
 
-        // The last letter belongs to the active individual, which is owned before graduation.
-        state.active = MonState(baseID: 201, pathIDs: [201], stageIndex: 0, usedAtStage: 0,
-                                rarity: .rare, totalForms: 1, form: letters.last)
-        try JSONEncoder().encode(state).write(to: url)
-        let complete = CompanionStore(provider: OfflineProvider(), fileURL: url)
-        XCTAssertTrue(complete.earnedDexBadges.contains(.unown))
-        XCTAssertEqual(complete.dexCompletions.first { $0.region == .johto }?.owned, 1)
-        XCTAssertEqual(complete.dexCompletions.first { $0.region == .hoenn }?.owned, 1)
-        XCTAssertEqual(complete.nationalDexProgress.owned, 2)
-        XCTAssertEqual(complete.formSpecies(speciesID: 201).filter { $0.hasNormal || $0.isShiny }.count, 28)
-        XCTAssertTrue(complete.state.notifiedDexCompletions.contains("unown"))
+        let pg = GunplaID.encode(machineID: 7, grade: .pg)
+        let active = MonState(baseID: pg, pathIDs: [pg], stageIndex: 0, usedAtStage: 0,
+                              rarity: .rare, totalForms: 1)
+        let complete = try store(owning: [6: nil, 7: [.hg, .rg, .mg]], active: active)
+        XCTAssertTrue(complete.earnedDexBadges.contains(.series("zeta")))
+        XCTAssertTrue(complete.state.notifiedDexCompletions.contains("series.zeta"))
     }
 
     func testLegacyImportSeedsExistingCompletionsBeforeANewHatch() async throws {
-        try await assertLegacyImportTracksTheNextCompletion(existingKanto: true)
+        try await assertLegacyImportTracksTheNextCompletion(existingFirst: true)
     }
 
     func testLegacyImportWithoutEarnedBadgesStillEnablesFutureCompletions() async throws {
-        try await assertLegacyImportTracksTheNextCompletion(existingKanto: false)
+        try await assertLegacyImportTracksTheNextCompletion(existingFirst: false)
     }
 
-    private func assertLegacyImportTracksTheNextCompletion(existingKanto: Bool) async throws {
+    private func assertLegacyImportTracksTheNextCompletion(existingFirst: Bool) async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("ptb-dex-import-\(UUID())")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -126,11 +124,12 @@ final class DexCompletionStoreTests: XCTestCase {
         defaults.set(1.0, forKey: "growthDifficulty")
 
         var legacy = CompanionState()
-        let lower = existingKanto ? 1 : 152
-        legacy.dex = [DexEntry(baseID: lower, finalID: 250, chainOrder: Array(lower...250),
-                               rarity: .common, caughtAt: Date())]
+        var owned: [Int: [GunplaGrade]?] = [6: nil, 7: [.hg, .rg, .mg]]
+        if existingFirst { for id in [1, 2, 4, 5] { owned[id] = .some(nil) } }
+        legacy.dex = entries(owned)
         legacy.eggUsage = PokemonBalance.eggHatchThreshold
-        legacy.pendingHatchID = 251 // The final missing Johto species, ready to hatch after import.
+        // The final missing Zeta cell (Zeta Gundam PG), ready to hatch after import.
+        legacy.pendingHatchID = GunplaID.encode(machineID: 7, grade: .pg)
         let data = try SaveTransfer.encode(state: legacy, appVersion: "2.5.0", deviceName: "Old Mac", now: Date())
         var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         var oldState = try XCTUnwrap(json["state"] as? [String: Any])
@@ -140,9 +139,9 @@ final class DexCompletionStoreTests: XCTestCase {
         let envelope = try SaveTransfer.decode(JSONSerialization.data(withJSONObject: json))
         XCTAssertFalse(envelope.state.dexCompletionsSeeded, "the exported save predates completion tracking")
 
-        let store = CompanionStore(provider: OfflineProvider(), fileURL: url, defaults: defaults)
+        let store = CompanionStore(provider: catalog, fileURL: url, defaults: defaults)
         try store.applySave(envelope, todayTokensByProvider: ["test": 0], todayDate: "2026-11-05", hasUsageData: true)
-        let preexisting: Set<String> = existingKanto ? ["region.kanto"] : []
+        let preexisting: Set<String> = existingFirst ? ["series.first"] : []
         XCTAssertTrue(store.state.dexCompletionsSeeded)
         XCTAssertEqual(store.state.notifiedDexCompletions, preexisting,
                        "imported completions are seeded rather than announced again")
@@ -150,10 +149,10 @@ final class DexCompletionStoreTests: XCTestCase {
         XCTAssertTrue(persisted.dexCompletionsSeeded, "even an empty seed must persist during import")
 
         await store.hatchIfNeeded()
-        XCTAssertEqual(store.state.active?.baseID, 251)
-        XCTAssertTrue(store.earnedDexBadges.contains(.region(.johto)))
-        XCTAssertEqual(store.state.notifiedDexCompletions, preexisting.union(["region.johto"]),
-                       "a newly completed region is announced in the same session without restarting")
+        XCTAssertEqual(store.state.active?.baseID, GunplaID.encode(machineID: 7, grade: .pg))
+        XCTAssertTrue(store.earnedDexBadges.contains(.series("zeta")))
+        XCTAssertEqual(store.state.notifiedDexCompletions, preexisting.union(["series.zeta"]),
+                       "a newly completed series is announced in the same session without restarting")
         let after = store.state.notifiedDexCompletions
         store.checkDexCompletions()
         XCTAssertEqual(store.state.notifiedDexCompletions, after, "completion is announced once")

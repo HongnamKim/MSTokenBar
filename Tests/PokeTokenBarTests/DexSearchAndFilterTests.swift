@@ -55,12 +55,25 @@ final class DexSearchAndFilterTests: XCTestCase {
         return makeStore(dex: [entryBulbasaur, entryPikachu, entryMewtwo])
     }
 
-    private func makeStore(dex: [DexEntry], active: MonState? = nil) -> CompanionStore {
+    /// Gunpla save: Gundam (1) SD+HG, Zaku II (2) HG, Char's Zaku II (3, variant) HG,
+    /// Zeta Gundam (7) HG, Nu Gundam (8) SD.
+    private func createHangarStore(language: AppLanguage = .en) -> CompanionStore {
+        let owned: [(Int, [GunplaGrade])] = [(1, [.sd, .hg]), (2, [.hg]), (3, [.hg]), (7, [.hg]), (8, [.sd])]
+        let dex = owned.map { machineID, grades in
+            let machine = MachineCatalog.shared.machine(machineID)!
+            let ids = grades.map { GunplaID.encode(machineID: machineID, grade: $0) }
+            return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids, rarity: machine.rarity,
+                            caughtAt: now, isShiny: machine.isVariant)
+        }
+        return makeStore(dex: dex, language: language)
+    }
+
+    private func makeStore(dex: [DexEntry], active: MonState? = nil, language: AppLanguage = .en) -> CompanionStore {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("dex-search-\(UUID().uuidString).json")
         var state = CompanionState()
         state.dex = dex
         state.active = active
-        state.language = .en
+        state.language = language
         try? JSONEncoder().encode(state).write(to: url)
 
         return CompanionStore(provider: MockPokeProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 42))
@@ -98,52 +111,29 @@ final class DexSearchAndFilterTests: XCTestCase {
         XCTAssertNil(store.currentSpeciesID.flatMap { store.dexLinkTargets[$0] })
     }
 
-    func testDexSpeciesSearchByIDAndName() {
-        let store = createTestStore()
+    /// Hangar search: the machine name in the current language or its model number, ignoring case.
+    func testHangarSearchByNameAndModelNumber() {
+        let store = createHangarStore()
+        func ids(_ query: String) -> [Int] { store.filteredHangarCells(query: query).map(\.machineID) }
 
-        // Search by number (exact and with # prefix)
-        let byID = store.filteredDexSpecies(query: "25")
-        XCTAssertTrue(byID.contains(where: { $0.id == 25 }))
-        XCTAssertFalse(byID.contains(where: { $0.id == 1 }))
+        XCTAssertEqual(ids("Zaku"), [2, 3])
+        XCTAssertEqual(ids("zeta"), [7], "case-insensitive")
+        XCTAssertEqual(ids("nu gundam"), [8])
+        XCTAssertEqual(ids("RX-93"), [8], "model number")
+        XCTAssertEqual(ids("rx-7"), [1], "partial model number, any case")
+        XCTAssertEqual(ids("MS-06"), [2, 3])
+        XCTAssertEqual(ids("자쿠"), [], "other languages' names are not searched")
+        XCTAssertEqual(ids("MissingNo"), [])
+        XCTAssertEqual(ids("").count, store.hangarCells.count, "a blank query filters nothing")
 
-        let byHashID = store.filteredDexSpecies(query: "#150")
-        XCTAssertEqual(byHashID.count, 1)
-        XCTAssertEqual(byHashID.first?.id, 150)
-
-        // Partial number, with or without the # prefix
-        XCTAssertEqual(store.filteredDexSpecies(query: "15").map(\.id), [150])
-        XCTAssertEqual(store.filteredDexEntries(query: "#15").map(\.id), ["entry-3"])
-
-        // Search by English name
-        let byName = store.filteredDexSpecies(query: "Venusaur")
-        XCTAssertEqual(byName.count, 1)
-        XCTAssertEqual(byName.first?.id, 3)
-
-        // Case-insensitive
-        let byCaseInsensitive = store.filteredDexSpecies(query: "pika")
-        XCTAssertTrue(byCaseInsensitive.contains(where: { $0.id == 25 }))
-
-        // Multilingual search (French name for Bulbasaur)
-        let byFrenchName = store.filteredDexSpecies(query: "Bulbizarre")
-        XCTAssertTrue(byFrenchName.contains(where: { $0.id == 1 }))
-
-        // Korean name
-        let byKoreanName = store.filteredDexSpecies(query: "뮤츠")
-        XCTAssertEqual(byKoreanName.count, 1)
-        XCTAssertEqual(byKoreanName.first?.id, 150)
-
-        // No match
-        let noMatch = store.filteredDexSpecies(query: "MissingNo")
-        XCTAssertTrue(noMatch.isEmpty)
-
-        // Empty query matches all
-        let all = store.filteredDexSpecies(query: "")
-        XCTAssertEqual(all.count, store.dexSpecies.count)
+        let korean = createHangarStore(language: .ko)
+        XCTAssertEqual(korean.filteredHangarCells(query: "자쿠").map(\.machineID), [2, 3])
+        XCTAssertEqual(korean.filteredHangarCells(query: "Zaku").map(\.machineID), [])
     }
 
-    /// Regression: both screens used `localizedCaseInsensitiveContains`, which keeps accents, so
+    /// Regression: the Catch Log used `localizedCaseInsensitiveContains`, which keeps accents, so
     /// "flabebe" missed Flabébé although the PR promised diacritic-insensitive name search.
-    func testNameSearchIgnoresCaseAndDiacriticsInPokedexAndCatchLog() {
+    func testNameSearchIgnoresCaseAndDiacriticsInCatchLog() {
         let flabebe = DexEntry(
             id: "entry-flabebe",
             baseID: 669,
@@ -165,70 +155,36 @@ final class DexSearchAndFilterTests: XCTestCase {
         let store = makeStore(dex: [flabebe, pikachu])
 
         for query in ["flabebe", "FLABEBE", "Flabébé", "flabébe"] {
-            XCTAssertEqual(store.filteredDexSpecies(query: query).map(\.id), [669], "Pokédex: \(query)")
             XCTAssertEqual(store.filteredDexEntries(query: query).map(\.id), ["entry-flabebe"], "Catch Log: \(query)")
         }
     }
 
-    func testDexSpeciesFilterByShinyAndRarity() {
-        let store = createTestStore()
+    func testHangarFilterByVariantRarityAndSeries() {
+        let store = createHangarStore()
+        func ids(rarity: Rarity? = nil, variantOnly: Bool = false, series: String? = nil) -> [Int] {
+            store.filteredHangarCells(rarity: rarity, variantOnly: variantOnly, series: series).map(\.machineID)
+        }
 
-        // Shiny only
-        let shinyOnly = store.filteredDexSpecies(shinyOnly: true)
-        XCTAssertTrue(shinyOnly.allSatisfy { $0.isShiny })
-        XCTAssertTrue(shinyOnly.contains(where: { $0.id == 25 }))
-        XCTAssertFalse(shinyOnly.contains(where: { $0.id == 150 }))
-
-        // Rarity only
-        let legendaries = store.filteredDexSpecies(rarity: .legendary)
-        XCTAssertEqual(legendaries.count, 1)
-        XCTAssertEqual(legendaries.first?.id, 150)
-
-        let commons = store.filteredDexSpecies(rarity: .common)
-        XCTAssertEqual(commons.count, 3) // 1, 2, 3
-
-        // Combined shiny + rarity
-        let shinyRare = store.filteredDexSpecies(rarity: .rare, shinyOnly: true)
-        XCTAssertEqual(shinyRare.count, 2) // 25, 26
-
-        let shinyLegendary = store.filteredDexSpecies(rarity: .legendary, shinyOnly: true)
-        XCTAssertTrue(shinyLegendary.isEmpty)
+        XCTAssertEqual(ids(variantOnly: true), [3])
+        XCTAssertEqual(ids(rarity: .legendary), [8])
+        XCTAssertEqual(ids(rarity: .rare), [1, 3, 7])
+        XCTAssertEqual(ids(rarity: .common), [2])
+        XCTAssertEqual(ids(rarity: .rare, variantOnly: true), [3])
+        XCTAssertEqual(ids(rarity: .legendary, variantOnly: true), [])
+        XCTAssertEqual(ids(series: "first"), [1, 2, 3])
+        XCTAssertEqual(ids(rarity: .rare, series: "zeta"), [7])
     }
 
-    func testDexSpeciesSorting() {
-        let store = createTestStore()
+    func testHangarSorting() {
+        let store = createHangarStore()
+        func ids(_ sort: CompanionStore.DexSortOption) -> [Int] { store.filteredHangarCells(sort: sort).map(\.machineID) }
 
-        // Number Asc
-        let numAsc = store.filteredDexSpecies(sort: .numberAsc)
-        let numAscIDs = numAsc.map(\.id)
-        XCTAssertEqual(numAscIDs, numAscIDs.sorted())
-
-        // Number Desc
-        let numDesc = store.filteredDexSpecies(sort: .numberDesc)
-        let numDescIDs = numDesc.map(\.id)
-        XCTAssertEqual(numDescIDs, numDescIDs.sorted(by: >))
-
-        // Name Asc
-        let nameAsc = store.filteredDexSpecies(sort: .nameAsc)
-        let names = nameAsc.map(\.name)
-        for i in 0..<(names.count - 1) {
-            let result = names[i].localizedCompare(names[i + 1])
-            XCTAssertTrue(result == .orderedAscending || result == .orderedSame)
-        }
-
-        // Name Desc
-        let nameDesc = store.filteredDexSpecies(sort: .nameDesc)
-        let descNames = nameDesc.map(\.name)
-        for i in 0..<(descNames.count - 1) {
-            let result = descNames[i].localizedCompare(descNames[i + 1])
-            XCTAssertTrue(result == .orderedDescending || result == .orderedSame)
-        }
-
-        // Rarity Desc
-        let rarityDesc = store.filteredDexSpecies(sort: .rarityDesc)
-        for i in 0..<(rarityDesc.count - 1) {
-            XCTAssertGreaterThanOrEqual(rarityDesc[i].rarity.sortRank, rarityDesc[i + 1].rarity.sortRank)
-        }
+        XCTAssertEqual(ids(.numberAsc), [1, 2, 3, 7, 8], "series order, then machine id")
+        XCTAssertEqual(ids(.numberDesc), [8, 7, 3, 2, 1])
+        // Char's Zaku II, Gundam, Nu Gundam, Zaku II, Zeta Gundam
+        XCTAssertEqual(ids(.nameAsc), [3, 1, 8, 2, 7])
+        XCTAssertEqual(ids(.nameDesc), [7, 2, 8, 1, 3])
+        XCTAssertEqual(ids(.rarityDesc), [8, 1, 3, 7, 2], "rarity, then hangar order")
     }
 
     func testCatchLogSearchAndFilters() {
@@ -238,6 +194,8 @@ final class DexSearchAndFilterTests: XCTestCase {
         let matchChain = store.filteredDexEntries(query: "25")
         XCTAssertEqual(matchChain.count, 1)
         XCTAssertEqual(matchChain.first?.baseID, 25)
+        // Partial number with the # prefix
+        XCTAssertEqual(store.filteredDexEntries(query: "#15").map(\.id), ["entry-3"])
 
         // Search by name
         let matchName = store.filteredDexEntries(query: "Raichu")
