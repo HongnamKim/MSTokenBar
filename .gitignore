@@ -26,6 +26,7 @@ build/
 docs/*
 !docs/reference/
 !docs/superpowers/
+!docs/gunpla/
 
 # Agent worktrees / local state
 .claude/*

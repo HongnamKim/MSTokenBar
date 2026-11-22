@@ -8,7 +8,7 @@
 
 **Tech Stack:** Swift 6, SwiftPM, SwiftUI/AppKit, XCTest, macOS 14+. 외부 의존성 추가 없음.
 
-**Spec:** `docs/superpowers/specs/2026-11-22-gunpla-tokenbar-design.md` (이 계획은 스펙의 §10 작업 덩어리 1 "앱"만 다룬다. 데이터 50기·도트는 별도 계획.)
+**Spec:** `docs/superpowers/specs/2026-11-22-gunpla-tokenbar-design.md` (이 계획은 스펙의 §10 작업 덩어리 1 "앱"만 다룬다. 첫 공개판의 기체 데이터·도트는 별도 계획.) [첫 공개판 기체 명단](../../gunpla/initial-roster.md)
 
 ## Global Constraints
 
