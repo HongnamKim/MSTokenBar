@@ -101,37 +101,34 @@ private struct ItemCard: View {
         }
     }
 
-    /// 이 아이템을 지금 쓸 수 있나 (kind 별 — 사탕은 라인 로딩 필요, 민트는 활성 포켓몬만).
+    /// 이 아이템을 지금 쓸 수 있나 (kind 별 — 스펀지는 라인 로딩 필요).
     private var canUse: Bool {
         switch kind {
         case .rareCandy: return store.canUseRareCandy
-        case .mint:      return store.canUseMint
-        case .shinyCharm: return false   // 보유형 — 사용 개념 없음(상시 효과)
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush: return false   // 보유형 — 사용 개념 없음(상시 효과)
         }
     }
-    /// 사용 컨트롤 효과 힌트 ("+XP" / "성격 랜덤 변경").
+    /// 사용 컨트롤 효과 힌트 ("+XP").
     private func effectHint(_ l: L) -> String {
         switch kind {
         case .rareCandy: return "+\(TokenFormatter.compact(selectedCandyCount * RareCandy.xp)) XP"
-        case .mint:      return l.mintEffectHint
-        case .shinyCharm: return l.shinyCharmEffectHint
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush: return l.toolEffectHint
         }
     }
     private func performUse() {
         switch kind {
         case .rareCandy: _ = store.useRareCandy(count: selectedCandyCount)
-        case .mint:      _ = store.useMint()
-        case .shinyCharm: break   // 보유형 — 사용 동작 없음
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush: break   // 보유형 — 사용 동작 없음
         }
     }
 
     @ViewBuilder
     private func useControls(_ l: L) -> some View {
         if kind.isPassive {
-            // 보유형(이로치 부적) — 사용 버튼 대신 상시 효과 표시.
+            // 보유형(도색 공구) — 사용 버튼 대신 상시 효과 표시.
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.green)
-                Text(l.shinyCharmEffectHint).font(.caption2.weight(.semibold)).foregroundStyle(.green)
+                Text(l.toolEffectHint).font(.caption2.weight(.semibold)).foregroundStyle(.green)
                 Spacer()
             }
         } else if canUse {

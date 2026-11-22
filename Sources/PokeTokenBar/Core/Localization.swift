@@ -7,6 +7,15 @@ struct L {
     let lang: AppLanguage
     init(_ lang: AppLanguage) { self.lang = lang }
 
+    /// Three-language form for the Gunpla build: anything that is not Korean or Japanese reads English.
+    func t(_ ko: String, _ en: String, _ ja: String) -> String {
+        switch lang {
+        case .ko: return ko
+        case .ja: return ja
+        default: return en
+        }
+    }
+
     func t(_ ko: String, _ en: String, _ ja: String, _ es: String, _ fr: String, _ pt: String, _ de: String, _ ru: String) -> String {
         switch lang {
         case .ko: return ko
@@ -1834,45 +1843,32 @@ struct L {
     /// 아이템 표시명 — species 처럼 공식 현지명.
     func itemName(_ kind: ItemKind) -> String {
         switch kind {
-        case .rareCandy: return t("이상한 사탕", "Rare Candy", "ふしぎなアメ", "Caramelo Raro", "Super Bonbon", "Doce Raro", "Sonderbonbon", "Редкая конфета")
-        case .mint:      return t("민트", "Mint", "ミント", "Menta", "Menthe", "Menta", "Minze", "Мята")
-        case .shinyCharm: return t("이로치 부적", "Shiny Charm", "ひかるおまもり", "Amuleto Iris", "Charme Chroma", "Amuleto Shiny", "Schillerpin", "Шайни-талисман")
+        case .rareCandy: return t("스펀지 사포", "Sanding Sponge", "スポンジヤスリ")
+        case .maskingTape: return t("마스킹 테이프", "Masking Tape", "マスキングテープ")
+        case .panelLinePen: return t("먹선펜", "Panel Line Pen", "スミ入れペン")
+        case .paintSet: return t("도료 세트", "Paint Set", "塗料セット")
+        case .airbrush: return t("에어브러시", "Airbrush", "エアブラシ")
         }
     }
     func itemDescription(_ kind: ItemKind) -> String {
         switch kind {
         case .rareCandy:
             let xp = TokenFormatter.compact(RareCandy.xp)   // 상수에서 파생(하드코딩 드리프트 방지)
-            return t("현재 포켓몬의 경험치를 \(xp) 올려줘요.",
-                     "Raises your Pokémon's EXP by \(xp).",
-                     "ポケモンの経験値を\(xp)上げます。",
-                     "Aumenta la experiencia de tu Pokémon en \(xp).",
-                     "Augmente l'EXP de ton Pokémon de \(xp).",
-                     "Aumenta a experiência do seu Pokémon em \(xp).",
-                     "Gibt deinem aktuellen Pokémon \(xp) EP.",
-                     "Увеличивает опыт покемона на \(xp).")
-        case .mint:
-            return t("현재 포켓몬의 성격을 랜덤으로 바꿔줘요.",
-                     "Randomly changes your Pokémon's nature.",
-                     "ポケモンのせいかくをランダムに変えます。",
-                     "Cambia aleatoriamente la naturaleza de tu Pokémon.",
-                     "Change aléatoirement la nature de ton Pokémon.",
-                     "Muda a natureza do seu Pokémon aleatoriamente.",
-                     "Ändert das Wesen deines aktuellen Pokémon zufällig.",
-                     "Случайно меняет характер покемона.")
-        case .shinyCharm:
-            return t("보유하면 이로치 포켓몬이 태어날 확률이 올라가요.",
-                     "While owned, raises the chance of hatching a shiny.",
-                     "持っていると色違いが生まれる確率が上がります。",
-                     "Mientras lo tengas, aumenta la probabilidad de que nazca un Pokémon variocolor.",
-                     "Tant que tu le possèdes, augmente les chances qu'un Pokémon chromatique éclose.",
-                     "Enquanto estiver na sua bolsa, aumenta a chance de nascer um Pokémon shiny.",
-                     "Erhöht im Beutel die Chance, dass ein schillerndes Pokémon schlüpft.",
-                     "Пока он у вас, повышает шанс, что вылупится шайни.")
+            return t("현재 키트의 성장을 \(xp) 올려줘요.",
+                     "Advances your current kit's growth by \(xp).",
+                     "今のキットの成長を\(xp)進めます。")
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush:
+            return t("전용기 확률이 영구히 올라가요",
+                     "Permanently raises the custom-unit chance",
+                     "カスタム機の出現率が永続的に上がります")
         }
     }
-    /// 가방 사용 컨트롤의 효과 힌트 — 민트("성격 랜덤 변경", 사탕의 "+XP" 자리).
-    var mintEffectHint: String { t("성격 랜덤 변경", "Random nature", "せいかくランダム変更", "Naturaleza aleatoria", "Nature aléatoire", "Natureza aleatória", "Zufälliges Wesen", "Случайный характер") }
+    /// 가방/상점의 보유 공구 효과 표시.
+    var toolEffectHint: String { t("전용기 확률 ↑ · 적용 중", "Custom-unit odds ↑ · active", "カスタム機率↑ · 適用中") }
+    /// 아직 살 수 없는 공구(앞 단계 미보유)의 안내.
+    var toolLockedHint: String { t("앞의 공구를 먼저 사야 해요", "Buy the previous tool first", "前の工具を先に購入してください") }
+    /// 이 등급 이상 키트를 모두 졸업해 박스를 살 수 없을 때의 안내.
+    var hangarTierComplete: String { t("이 등급 이상은 모두 모았어요", "You've completed every kit at this tier or above", "このランク以上はすべて集めました") }
 
     // MARK: 상점 (재화 = 사용한 토큰)
     var shop: String { t("상점", "Shop", "ショップ", "Tienda", "Boutique", "Loja", "Laden", "Магазин") }
@@ -1884,7 +1880,6 @@ struct L {
     func ownedCount(_ n: Int) -> String { t("보유 ×\(n)", "Owned ×\(n)", "所持 ×\(n)", "En posesión ×\(n)", "Possédés ×\(n)", "Você tem ×\(n)", "Im Beutel ×\(n)", "Есть ×\(n)") }
     var shopPriceLabel: String { t("가격", "Price", "価格", "Precio", "Prix", "Preço", "Preis", "Цена") }
     var ownedAlready: String { t("보유 중", "Owned", "所持済み", "En posesión", "Possédé", "Já tem", "Im Beutel", "Уже есть") }
-    var shinyCharmEffectHint: String { t("이로치 확률 ↑ · 적용 중", "Shiny rate ↑ · active", "色違い率↑ · 適用中", "Prob. variocolor ↑ · activo", "Taux chromatique ↑ · actif", "Chance shiny ↑ · ativo", "Schillerchance ↑ · aktiv", "Шанс шайни ↑ · активен") }
     // 알 (리롤) — tier = 보증 등급 하한(nil = 보증 없는 기본 알).
     // 이름은 `rarityLabel(r) + " 알"` 식 조합으로 만들지 않는다: 한국어·영어는 맞아떨어져도 일본어에서
     // 조사가 어긋난다(レアのタマゴ vs 자연스러운 レアなタマゴ). 세 언어를 명시 트리플로 적는다.

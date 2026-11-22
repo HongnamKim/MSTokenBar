@@ -178,41 +178,39 @@ enum PokemonBalance {
     }
 }
 
-/// 인벤토리 아이템 종류 — 확장 대비 enum(현재 이상한 사탕 1종). rawValue 로 CompanionState.inventory 에 저장.
+/// 인벤토리 아이템 종류 — rawValue 로 CompanionState.inventory 에 저장. `rareCandy` 는 저장 호환을 위해 이름을
+/// 유지한 채 스펀지 사포로 표시된다. 공구 4종은 보유형(패시브)이며 `ToolSet.order` 순서로만 산다.
 enum ItemKind: String, Codable, Sendable, CaseIterable {
     case rareCandy
-    case mint
-    case shinyCharm
+    case maskingTape
+    case panelLinePen
+    case paintSet
+    case airbrush
 
-    /// PokéAPI 아이템 스프라이트 파일명(.../sprites/items/{name}.png). nil = 스프라이트 없음(이모지 폴백만).
-    var spriteName: String? {
-        switch self {
-        case .rareCandy: return "rare-candy"
-        case .mint: return nil   // PokéAPI 에 민트 스프라이트 없음(8세대 아이템) → 이모지 폴백
-        case .shinyCharm: return "shiny-charm"
-        }
-    }
+    /// 스프라이트 파일명. 전부 nil = 스프라이트 없음(이모지 폴백만).
+    var spriteName: String? { nil }
     /// 스프라이트 로딩 전/미제공/실패 시 폴백 이모지.
     var fallbackEmoji: String {
         switch self {
-        case .rareCandy: return "🍬"
-        case .mint: return "🌿"
-        case .shinyCharm: return "✨"
+        case .rareCandy: return "🧽"
+        case .maskingTape: return "🩹"
+        case .panelLinePen: return "🖊️"
+        case .paintSet: return "🎨"
+        case .airbrush: return "💨"
         }
     }
     /// 상점 판매가(재화 = 사용한 토큰). nil = 상점 미판매.
     var shopPrice: Int? {
         switch self {
         case .rareCandy: return RareCandy.price
-        case .mint: return Mint.price
-        case .shinyCharm: return ShinyCharm.price
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush: return ToolSet.prices[self]
         }
     }
     /// 보유형(패시브) 아이템 — 소비하지 않고 보유하는 동안 상시 효과. 1회 구매(재구매 불가), 가방엔 "적용 중" 표시.
     var isPassive: Bool {
         switch self {
-        case .rareCandy, .mint: return false
-        case .shinyCharm: return true
+        case .rareCandy: return false
+        case .maskingTape, .panelLinePen, .paintSet, .airbrush: return true
         }
     }
 }
@@ -230,23 +228,6 @@ enum RareCandy {
     /// 공짜 추가성장(150M 써서 250M 성장)이 된다. 500M 로 두면 그 값 모으는 500M 패시브 성장 + 사탕
     /// 100M = 실질 보너스 +20% 로 억제된다. 무료 획득(한도 100% 보상)이 항상 이득이도록 값어치보다 비싸게.
     static let price = 500_000_000
-}
-
-/// 민트 밸런스 상수.
-enum Mint {
-    /// 상점 구매가. 성격 변경은 순수 코스메틱(성장·능력치 무관)이라 밸런스 근거가 없어 "느낌" 값 —
-    /// 사탕(500M)의 1/5로 싸게 둬서 성격을 마음에 들 때까지 굴려보는 가벼운 재미. 성장을 안 줘서
-    /// 이중계산 이슈도 없음(가격 = 순수 소비).
-    static let price = 100_000_000
-}
-
-/// 이로치 부적 밸런스 상수 — 보유형(1회 구매·영구, 소비 안 됨).
-enum ShinyCharm {
-    /// 상점 구매가. 앞으로의 모든 부화에 적용되는 영구 럭 업그레이드라 프리미엄(레어 1마리 졸업분=3B).
-    static let price = 3_000_000_000
-    /// 보유 시 이로치 부화 확률 분모 — 1/64 → 1/48 (+33%). 본가 '반짝이 부적'(이로치 확률↑) 오마주.
-    /// ×2(1/32)는 과해 절제. 이미 부화한 개체엔 소급 없음(이로치는 부화 순간 확정).
-    static let shinyDenominator: UInt64 = 48
 }
 
 /// 새 알(리롤) 밸런스 상수 — 상점 구매 시 현재 포켓몬을 폐기하고 새 알로 되돌린다.

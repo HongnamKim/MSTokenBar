@@ -678,9 +678,6 @@ struct CompanionHeader: View {
     @State private var seenCandySeq = -1
     @State private var candyXPShown = false
     @State private var candyXPAmount = 0     // 표시 순간 캡처(consume 후에도 텍스트 유지)
-    // 민트 사용 시 "반짝" 스파클 (성격 변경 피드백 — 텍스트 없이 짧은 이펙트)
-    @State private var seenMintSeq = -1
-    @State private var mintSparkle = false
 
     /// Hover tooltip for the growth bars: "X / Y · Z%". Used is clamped to total (egg usage can
     /// overshoot while a hatch retry is pending) and the percent floors, so 100% means done.
@@ -731,16 +728,6 @@ struct CompanionHeader: View {
                                 .offset(y: -16)
                         }
                     }
-                    .overlay {
-                        if mintSparkle {
-                            ZStack {
-                                Text("✨").font(.system(size: 22)).offset(x: -11, y: -9)
-                                Text("✨").font(.system(size: 15)).offset(x: 13, y: 5)
-                                Text("✨").font(.system(size: 12)).offset(x: 1, y: 13)
-                            }
-                            .transition(.scale.combined(with: .opacity))
-                        }
-                    }
                     // Outermost, so the celebration overlays and animations above stay intact.
                     // An egg has no species (nil) and therefore no link.
                     .modifier(DexEntryLink(
@@ -764,10 +751,8 @@ struct CompanionHeader: View {
                         }
                     }
                     if store.hasActive {
-                        // 단계 + 성격(부화 시 확정된 개체 아이덴티티)
-                        let nature = store.currentNature.map { " · \($0.name(store.language))" } ?? ""
                         HStack(spacing: 5) {
-                            Text(store.stageText + nature).font(.caption2).foregroundStyle(.secondary)
+                            Text(store.stageText).font(.caption2).foregroundStyle(.secondary)
                             if let multiplier = store.growthMultiplier {
                                 Badge(store.l.growthBoost(multiplier), tint: .orange, style: .tinted)
                                     .fixedSize()
@@ -836,12 +821,10 @@ struct CompanionHeader: View {
         .onAppear {
             playCelebrationIfNeeded()
             showCandyXPIfNeeded()
-            showMintIfNeeded()
             syncEggWiggle()
         }
         .onChange(of: store.celebrationSeq) { playCelebrationIfNeeded() }
         .onChange(of: store.candyFeedbackSeq) { showCandyXPIfNeeded() }
-        .onChange(of: store.mintFeedbackSeq) { showMintIfNeeded() }
         .onChange(of: eggImminent) { syncEggWiggle() }
         .task(id: store.currentForm) { await store.loadActiveFormNames() }   // The title names the form.
     }
@@ -886,18 +869,6 @@ struct CompanionHeader: View {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_300_000_000)
             withAnimation(.easeOut(duration: 0.4)) { candyXPShown = false }
-        }
-    }
-
-    /// 민트 사용 "반짝" 스파클 1회 재생 — 사탕과 동일 1회성 계약(consume 로 재마운트 재생 방지). 텍스트 없음.
-    private func showMintIfNeeded() {
-        guard store.mintFeedbackNature != nil, store.mintFeedbackSeq != seenMintSeq else { return }
-        seenMintSeq = store.mintFeedbackSeq
-        store.consumeMintFeedback()
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.5)) { mintSparkle = true }
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 900_000_000)
-            withAnimation(.easeOut(duration: 0.4)) { mintSparkle = false }
         }
     }
 
@@ -1942,7 +1913,6 @@ struct PokemonDetailView: View {
             HStack(spacing: 12) {
                 valuePair(store.l.level, "\(profile.level)")
                 valuePair(store.l.gender, store.l.genderLabel(profile.gender))
-                valuePair(store.l.nature, entry.nature?.name(store.language) ?? "—")
             }
             if let prayers = entry.prayers, prayers.count > 0 {
                 VStack(alignment: .leading, spacing: 2) {
@@ -2238,10 +2208,6 @@ private struct DexEntryRow: View {
                         .accessibilityLabel(store.l.dexShinyLabel)
                 }
                 Spacer()
-                if let nature = entry.nature {
-                    Text(nature.name(store.language))
-                        .font(.system(size: 11)).foregroundStyle(.secondary)
-                }
             }
             EvoLineView(nodes: entry.chainOrder.map { EvoLineItem(.species($0), .done) },
                         mysteryLabel: store.l.unknownNextEvolution, language: store.language, thumb: 68,

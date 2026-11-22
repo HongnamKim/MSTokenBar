@@ -40,9 +40,6 @@ final class CompanionStore {
     func consumeCandyFeedback() { candyFeedbackAmount = 0 }
 
     /// 민트 사용 시 "성격이 X로" 순간 표시 — 사탕 피드백과 동일 1회성 패턴(seq + consume).
-    private(set) var mintFeedbackSeq = 0
-    private(set) var mintFeedbackNature: PokemonNature?
-    func consumeMintFeedback() { mintFeedbackNature = nil }
 
     private let provider: any PokeProviding
     /// 기체 카탈로그 — 주입된 provider 가 카탈로그면 그것, 아니면(포켓몬 스텁 provider 를 쓰는 기존 테스트) 번들 카탈로그.
@@ -195,7 +192,6 @@ final class CompanionStore {
     var isHighValueCompanion: Bool {
         currentIsShiny || rarity == .legendary
     }
-    var currentNature: PokemonNature? { state.active?.nature }
     var growthMultiplier: Int? {
         state.active?.hasGrowthBoost == true ? PokemonBalance.repeatGrowthMultiplier : nil
     }
@@ -1159,8 +1155,6 @@ final class CompanionStore {
 
     var rareCandyCount: Int { itemCount(.rareCandy) }
     func itemCount(_ kind: ItemKind) -> Int { state.inventory[kind.rawValue] ?? 0 }
-    /// 이로치 부적 보유 여부 — 보유형이라 개수>0 = 소유(부화 shiny 분모를 낮춘다).
-    var ownsShinyCharm: Bool { itemCount(.shinyCharm) > 0 }
 
     /// 소유 아이템(개수>0) — 가방 목록. 정렬은 ItemKind.allCases 순서.
     var ownedItems: [(kind: ItemKind, count: Int)] {
@@ -1250,28 +1244,6 @@ final class CompanionStore {
         return .progressed
     }
 
-    // MARK: 민트 (성격 랜덤 재설정)
-
-    /// 민트 사용 가능 — 활성 포켓몬 + 재고>0. 성격은 MonState 에만 있어 진화 라인 로딩과 무관하다
-    /// (사탕과 달리 currentLine 조건 없음 — 재시작 직후·오프라인에도 사용 가능).
-    var canUseMint: Bool { hasActive && itemCount(.mint) > 0 }
-
-    /// 민트 1개 사용 — 현재 포켓몬 성격을 '현재와 다른' 무작위 성격으로 교체(반드시 바뀐다). 성장·shiny·
-    /// 종·usedAtStage·통계 전부 무관(순수 코스메틱). 사용 불가면 nil(무소모). 바뀐 성격을 반환(피드백용).
-    @discardableResult
-    func useMint() -> PokemonNature? {
-        guard canUseMint, state.active != nil else { return nil }
-        let cur = state.active!.nature
-        let pool = PokemonNature.allCases.filter { $0 != cur }   // cur=nil(구버전 개체)이면 25종 전체
-        let new = pool[Int(rng.next() % UInt64(pool.count))]
-        state.active!.nature = new
-        state.inventory[ItemKind.mint.rawValue] = itemCount(.mint) - 1
-        mintFeedbackNature = new
-        mintFeedbackSeq += 1
-        save()
-        return new
-    }
-
     // MARK: 상점 (재화 = 사용한 토큰)
 
     /// 상점에서 쓸 수 있는 토큰(재화) = 실사용 누적 − 상점 지출 누적. 성장 미터(usedSinceInstall)는
@@ -1324,7 +1296,13 @@ final class CompanionStore {
     func canBuy(_ kind: ItemKind) -> Bool {
         guard let price = price(of: kind) else { return false }
         if kind.isPassive && itemCount(kind) > 0 { return false }   // 보유형은 1회만(재구매 불가)
+        if ToolSet.order.contains(kind) && kind != ToolSet.nextPurchasable(inventory: state.inventory) { return false }   // 공구는 순서대로만
         return availableTokens >= price
+    }
+
+    /// 공구인데 앞 단계를 아직 안 사서 잠긴 상태 — 보유한 공구는 잠김이 아니다(상점 안내 표시용).
+    func isToolLocked(_ kind: ItemKind) -> Bool {
+        ToolSet.order.contains(kind) && itemCount(kind) == 0 && kind != ToolSet.nextPurchasable(inventory: state.inventory)
     }
 
     /// 한 번에 살 수 있는 최대 개수 — 잔액 ÷ 가격. 보유형은 1회 구매라 최대 1, 이미 보유했거나
@@ -1355,6 +1333,12 @@ final class CompanionStore {
     /// 현재 알이 보증하는 등급 하한(UI 표시용). 활성 포켓몬이 있으면 알이 없으므로 nil.
     var eggGuarantee: Rarity? { state.active == nil ? state.eggTier : nil }
 
+    /// 이 등급 이상 기체를 전부 졸업했는지 — 그런 박스는 영영 안 깨지므로 살 수 없다(보증 없는 알은 해당 없음).
+    func isEggTierExhausted(_ tier: Rarity?) -> Bool {
+        guard let tier else { return false }
+        return !HatchPlanner.hasCandidates(catalog: catalog, snapshot: state.collectionSnapshot(catalog: catalog), tier: tier)
+    }
+
     /// 알 구매 가능 — 폐기할 활성 포켓몬이 있고 지갑이 그 티어 가격 이상일 때만.
     /// 알 상태에서도 살 수 있게 하는 안은 채택하지 않았다(기존 새 알과 게이트 통일) — 알끼리 교체하는
     /// 동작을 새로 만들지 않고, 상점의 알은 언제나 "지금 개체를 놓아주고 다시 뽑는다"는 한 가지 의미만 갖는다.
@@ -1365,6 +1349,7 @@ final class CompanionStore {
         // 새 알 구매는 `hasActive` 에 막혀 되돌릴 수단이 없다. 가격만 계산되면 값이 빠져나가므로
         // 판매 목록을 여기서 강제한다(호출부 하나가 실수하면 토큰이 통째로 사라진다).
         guard FreshEgg.shopTiers.contains(tier) else { return false }
+        if isEggTierExhausted(tier) { return false }
         return hasActive && availableTokens >= price(of: .egg(tier))
     }
 
@@ -1710,8 +1695,8 @@ final class CompanionStore {
 
     // MARK: 메타몽 위장/리빌
 
-    /// 보유한 도색 공구 단계 — Task 4 가 실제 계산으로 교체할 임시값(공구 없음).
-    var toolLevel: Int { 0 }
+    /// 보유한 도색 공구 단계 — 순서대로 연속 보유한 개수.
+    var toolLevel: Int { ToolSet.level(inventory: state.inventory) }
 
     /// 지금 박스를 열면 적용될 전용기(이로치) 분모. 선정(`HatchPlanner`)과 알림 문구가 같은 값을 쓴다.
     var shinyDenominator: UInt64 { ToolSet.shinyDenominator(toolLevel: toolLevel) }
@@ -1964,7 +1949,6 @@ final class CompanionStore {
         // 이전 개체 기준의 1회성 피드백(사탕 +XP·민트 성격)도 비운다 — 안 비우면 불러온 직후 남의
         // 개체에 대한 "+XP" 가 새 개체 위에 떠오른다.
         candyFeedbackAmount = 0
-        mintFeedbackNature = nil
         displayState = state.active != nil ? .idle : .egg
         migratePokemonProfilesIfNeeded()
         seedDexCompletionsIfNeeded()

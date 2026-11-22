@@ -1376,19 +1376,15 @@ final class CompanionStoreTests: XCTestCase {
         XCTAssertTrue(isSuspended, "line fetch should be suspended")
 
         s.applyUsage(42)
-        let changedNature = try XCTUnwrap(s.useMint())
         XCTAssertEqual(s.state.active?.usedAtStage, 42)
-        XCTAssertEqual(s.state.active?.nature, changedNature)
 
         await provider.resume()
         let loaded = await waitUntil { s.currentLine != nil }
         XCTAssertTrue(loaded)
 
         XCTAssertEqual(s.state.active?.usedAtStage, 42)
-        XCTAssertEqual(s.state.active?.nature, changedNature)
         let persisted = try JSONDecoder().decode(CompanionState.self, from: Data(contentsOf: url))
         XCTAssertEqual(persisted.active?.usedAtStage, 42)
-        XCTAssertEqual(persisted.active?.nature, changedNature)
     }
 
     func testLocalizedName() async {
@@ -1796,12 +1792,6 @@ final class CompanionIdentityTests: XCTestCase {
         ]
 
         XCTAssertEqual(PokemonNature.allCases.map { $0.name(.ru) }, expected)
-    }
-
-    func testGermanItemNamesUseOfficialMainlineTerms() {
-        let l = L(.de)
-        XCTAssertEqual(l.itemName(.rareCandy), "Sonderbonbon")
-        XCTAssertEqual(l.itemName(.shinyCharm), "Schillerpin")
     }
 
     /// 성격 25종 — 모든 지원 언어 명칭이 전부 비어있지 않고 중복 없는지.
