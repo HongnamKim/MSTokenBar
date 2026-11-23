@@ -1,5 +1,5 @@
 {
-  "_comment": "The first-series HG entries cite released kits. Other grades from the development sample remain unverified.",
+  "_comment": "Mobile Suit Gundam (first) entries list only released kits, each with an official Bandai source. The other series are a development sample and remain unverified.",
   "machines": [
     {
       "id": 1,
@@ -27,7 +27,11 @@
         "pg": "rx-78-2-pg"
       },
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/1004"
+        "sd": "https://bandai-hobby.net/item/01_1458/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1004",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/656",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/611",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/985"
       }
     },
     {
@@ -49,7 +53,11 @@
         "pg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/504"
+        "sd": "https://bandai-hobby.net/item/01_1127/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/504",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/659",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/838",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/988"
       },
       "sprites": {
         "hg": "zaku-ii-hg"
@@ -70,11 +78,16 @@
         "sd",
         "hg",
         "rg",
-        "mg"
+        "mg",
+        "pg"
       ],
       "variantOf": 2,
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/501"
+        "sd": "https://bandai-hobby.net/item/01_2566/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/501",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/657",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/834",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/987"
       },
       "sprites": {
         "hg": "chars-zaku-ii-hg"
@@ -96,7 +109,8 @@
         "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/220"
+        "hg": "https://manual.bandai-hobby.net/menus/detail/220",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/839"
       },
       "sprites": {
         "hg": "gm-hg"
@@ -114,11 +128,14 @@
       "faction": "zeon",
       "rarity": "uncommon",
       "grades": [
+        "sd",
         "hg",
         "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/464"
+        "sd": "https://bandai-hobby.net/item/01_825/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/464",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/840"
       },
       "sprites": {
         "hg": "gouf-hg"
@@ -232,22 +249,6 @@
       ]
     },
     {
-      "id": 12,
-      "modelNumber": "MS-06R-2",
-      "names": {
-        "ko": "조니 라이덴 전용 자쿠 II",
-        "en": "Johnny Ridden's Zaku II",
-        "ja": "ジョニー・ライデン専用ザクII"
-      },
-      "series": "first",
-      "faction": "zeon",
-      "rarity": "rare",
-      "grades": [
-        "mg"
-      ],
-      "variantOf": 2
-    },
-    {
       "id": 13,
       "modelNumber": "RX-77-2",
       "names": {
@@ -259,10 +260,14 @@
       "faction": "efsf",
       "rarity": "rare",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/1003"
+        "sd": "https://bandai-hobby.net/item/01_1407/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1003",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/512"
       },
       "sprites": {
         "hg": "guncannon-hg"
@@ -280,10 +285,14 @@
       "faction": "efsf",
       "rarity": "rare",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/208"
+        "sd": "https://bandai-hobby.net/item/01_1210/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/208",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/565"
       },
       "sprites": {
         "hg": "guntank-hg"
@@ -301,10 +310,12 @@
       "faction": "zeon",
       "rarity": "common",
       "grades": [
-        "hg"
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/253"
+        "hg": "https://manual.bandai-hobby.net/menus/detail/253",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/864"
       },
       "sprites": {
         "hg": "zaku-i-hg"
@@ -322,10 +333,14 @@
       "faction": "zeon",
       "rarity": "common",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/251"
+        "sd": "https://bandai-hobby.net/item/01_375/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/251",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/640"
       },
       "sprites": {
         "hg": "dom-hg"
@@ -343,10 +358,12 @@
       "faction": "zeon",
       "rarity": "common",
       "grades": [
-        "hg"
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/904"
+        "hg": "https://manual.bandai-hobby.net/menus/detail/904",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/831"
       },
       "sprites": {
         "hg": "gelgoog-hg"
@@ -364,11 +381,15 @@
       "faction": "zeon",
       "rarity": "rare",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "mg"
       ],
       "variantOf": 17,
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/828"
+        "sd": "https://bandai-hobby.net/item/01_657/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/828",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/833"
       },
       "sprites": {
         "hg": "chars-gelgoog-hg"
@@ -386,10 +407,16 @@
       "faction": "zeon",
       "rarity": "common",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "rg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/203"
+        "sd": "https://bandai-hobby.net/item/01_429/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/203",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2198",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/818"
       },
       "sprites": {
         "hg": "zgok-hg"
@@ -407,11 +434,17 @@
       "faction": "zeon",
       "rarity": "rare",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "rg",
+        "mg"
       ],
       "variantOf": 19,
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/219"
+        "sd": "https://bandai-hobby.net/item/01_4469/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/219",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/952",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/524"
       },
       "sprites": {
         "hg": "chars-zgok-hg"
@@ -429,10 +462,14 @@
       "faction": "zeon",
       "rarity": "common",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/901"
+        "sd": "https://bandai-hobby.net/item/01_1916/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/901",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/535"
       },
       "sprites": {
         "hg": "acguy-hg"
@@ -450,10 +487,12 @@
       "faction": "zeon",
       "rarity": "uncommon",
       "grades": [
-        "hg"
+        "hg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/465"
+        "hg": "https://manual.bandai-hobby.net/menus/detail/465",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/540"
       },
       "sprites": {
         "hg": "gyan-hg"
@@ -471,10 +510,16 @@
       "faction": "zeon",
       "rarity": "legendary",
       "grades": [
-        "hg"
+        "sd",
+        "hg",
+        "rg",
+        "mg"
       ],
       "gradeSources": {
-        "hg": "https://manual.bandai-hobby.net/menus/detail/222"
+        "sd": "https://bandai-hobby.net/item/01_4461/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/222",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/682",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/517"
       },
       "sprites": {
         "hg": "zeong-hg"
