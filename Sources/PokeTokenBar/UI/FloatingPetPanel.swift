@@ -458,7 +458,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     /// Leaves home for a spot next to the cursor and returns the panel frame to animate to.
     func beginRun(cursor: NSPoint, visibleFrame: NSRect) -> NSRect {
         let petSize = CGFloat(store.floatingPetSize)
-        let size = Self.panelSize(petSize: petSize, showingBubble: true, grade: petGrade)
+        let size = Self.panelSize(petSize: petSize, showingBubble: true)
         let origin = Self.runPanelOrigin(cursor: cursor, panelSize: size, visibleFrame: visibleFrame)
         runPhase = .away
         awayPetOrigin = Self.petOrigin(panelOrigin: origin, petSize: petSize, panelSize: size)
@@ -512,14 +512,9 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         onOpenPopover?()
     }
 
-    private var petGrade: GunplaGrade? {
-        companion.representativeSubject.speciesID.flatMap(GunplaID.decode)?.grade
-    }
-
-    static func panelSize(petSize: CGFloat, showingBubble: Bool, grade: GunplaGrade? = nil) -> NSSize {
-        let footer = GunplaGradeBadge.footerHeight(for: petSize, grade: grade)
+    static func panelSize(petSize: CGFloat, showingBubble: Bool) -> NSSize {
         return NSSize(width: showingBubble ? max(petSize, bubbleMinWidth) : petSize,
-                      height: petSize + footer + (showingBubble ? bubbleHeadroom : 0))
+                      height: petSize + (showingBubble ? bubbleHeadroom : 0))
     }
 
     static func panelOrigin(petOrigin: NSPoint, petSize: CGFloat, panelSize: NSSize) -> NSPoint {
@@ -770,7 +765,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     }
 
     private func targetFrame(petSize: CGFloat, showingBubble: Bool) -> NSRect {
-        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble, grade: petGrade)
+        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble)
         let petOrigin: NSPoint
         if runPhase == .away, let awayPetOrigin {
             petOrigin = awayPetOrigin
@@ -835,7 +830,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         }
         guard move.persist else { return }
         let petSize = CGFloat(store.floatingPetSize)
-        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble, grade: petGrade)
+        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble)
         let pet = Self.petOrigin(panelOrigin: panelOrigin, petSize: petSize, panelSize: size)
         defaults.set(Double(pet.x), forKey: Self.originXKey)
         defaults.set(Double(pet.y), forKey: Self.originYKey)
@@ -1065,10 +1060,9 @@ struct FloatingPetView: View {
                 }
                 // Keep the attached heart and prayer particles aligned with the bobbing sprite.
                 .modifier(AgentBob(active: agent.bobs))
-                .padding(.bottom, GunplaGradeBadge.footerHeight(for: size, grade: grade))
-                .overlay(alignment: .bottom) {
+                .overlay(alignment: .bottomTrailing) {
                     if let grade {
-                        GunplaGradeBadge(grade: grade, spriteSize: size)
+                        GunplaGradeBadge(grade: grade, spriteSize: size, isFloatingMark: true)
                     }
                 }
                 .zIndex(0)

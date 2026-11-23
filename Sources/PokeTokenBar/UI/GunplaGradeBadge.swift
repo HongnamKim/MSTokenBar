@@ -5,6 +5,7 @@ import SwiftUI
 struct GunplaGradeBadge: View {
     let grade: GunplaGrade
     let spriteSize: CGFloat
+    var isFloatingMark = false
 
     static let images: [GunplaGrade: NSImage] = {
         var images: [GunplaGrade: NSImage] = [:]
@@ -17,21 +18,20 @@ struct GunplaGradeBadge: View {
         return images
     }()
 
-    private static func pixelScale(for size: CGFloat) -> CGFloat {
-        min(3, max(1.5, (size / 48).rounded(.down)))
-    }
+    private var markHeight: CGFloat { min(12, max(4, (spriteSize / 16).rounded())) }
 
-    /// Keep the badge below the floating pet, with a two-point gap even in the smallest window.
-    static func footerHeight(for size: CGFloat, grade: GunplaGrade?) -> CGFloat {
-        guard let grade else { return 0 }
-        let nativeHeight = images[grade]?.size.height ?? 13
-        return ceil(nativeHeight * pixelScale(for: size)) + 2
+    private func pixelScale(for image: NSImage) -> CGFloat {
+        if isFloatingMark {
+            // The four-letter MGSD mark also fits in the corner of a 48-point pet.
+            return min(markHeight / image.size.height, (spriteSize / 6) / image.size.width)
+        }
+        return min(3, max(1.5, (spriteSize / 48).rounded(.down)))
     }
 
     var body: some View {
         Group {
             if spriteSize >= 48, let image = Self.images[grade] {
-                let scale = Self.pixelScale(for: spriteSize)
+                let scale = pixelScale(for: image)
                 Image(nsImage: image)
                     .renderingMode(.original)
                     .resizable()
@@ -39,9 +39,10 @@ struct GunplaGradeBadge: View {
                     .frame(width: image.size.width * scale, height: image.size.height * scale)
             } else {
                 Text(verbatim: grade.label)
-                    .font(.system(size: min(18, max(7, spriteSize * 0.14)), weight: .bold, design: .rounded))
+                    .font(.system(size: isFloatingMark ? markHeight * 0.65 : min(18, max(7, spriteSize * 0.14)),
+                                  weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 3)
+                    .padding(.horizontal, isFloatingMark ? 1 : 3)
                     .background(Capsule().fill(Color.black.opacity(0.65)))
             }
         }
