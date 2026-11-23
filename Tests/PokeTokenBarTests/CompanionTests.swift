@@ -494,13 +494,15 @@ final class CompanionStoreTests: XCTestCase {
                                fileURL: url, rng: SeededRNG(seed: 7))
         XCTAssertTrue(s.setRepresentativeSpeciesID(2))
         XCTAssertEqual(s.currentSpeciesID, 20, "육성 대상은 그대로")
-        XCTAssertEqual(s.representativeSubject,
+        XCTAssertEqual(s.representativeSubject.speciesID, 20, "the menu bar and main pet keep the raised one")
+        XCTAssertTrue(s.showsDisplayPet, "choosing a suit switches the second pet on")
+        XCTAssertEqual(s.displayPetSubject,
                        CompanionStore.RepresentativeSubject(speciesID: 2, isShiny: true))
 
         let reloaded = CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
                                       fileURL: url, rng: SeededRNG(seed: 7))
         XCTAssertEqual(reloaded.representativeSpeciesID, 2)
-        XCTAssertEqual(reloaded.representativeSubject,
+        XCTAssertEqual(reloaded.displayPetSubject,
                        CompanionStore.RepresentativeSubject(speciesID: 2, isShiny: true))
     }
 
@@ -512,14 +514,15 @@ final class CompanionStoreTests: XCTestCase {
 
         for stage in 0..<3 {
             s.applyUsage(PokemonBalance.phaseThreshold(rarity: .common, totalForms: 3, stageIndex: stage))
-            XCTAssertEqual(s.representativeSubject.speciesID, 1,
-                           "진화·졸업·새 알 전환이 고정한 대표 포켓몬을 덮어쓰면 안 된다")
+            XCTAssertEqual(s.displayPetSubject?.speciesID, 1,
+                           "진화·졸업·새 알 전환이 함께 띄운 기체를 덮어쓰면 안 된다")
         }
 
         XCTAssertNil(s.state.active, "졸업 후 새 알")
         XCTAssertEqual(s.state.dex.first?.chainOrder, [1, 2, 3])
         XCTAssertEqual(s.representativeSpeciesID, 1, "도감에 영구 보존됐으므로 고정 유지")
-        XCTAssertEqual(s.representativeSubject.speciesID, 1)
+        XCTAssertEqual(s.displayPetSubject?.speciesID, 1)
+        XCTAssertNil(s.representativeSubject.speciesID, "the main pet shows the new box")
     }
 
     /// 메뉴바 관찰자는 이 캐시 하나만 구독한다. 대표 선택을 해제하는 즉시 캐시가 바뀌고
@@ -537,15 +540,17 @@ final class CompanionStoreTests: XCTestCase {
         let s = CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
                                fileURL: url, rng: SeededRNG(seed: 7))
 
+        XCTAssertEqual(s.displayPetSubject?.speciesID, 1, "a legacy pin keeps floating as the second pet")
         nonisolated(unsafe) var didChange = false   // onChange는 동기 발화; 테스트 스레드 밖 접근 없음
         withObservationTracking {
-            _ = s.representativeSubject
+            _ = s.displayPetSubject
         } onChange: {
             didChange = true
         }
 
         XCTAssertTrue(s.setRepresentativeSpeciesID(nil))
         XCTAssertTrue(didChange)
+        XCTAssertNil(s.displayPetSubject)
         XCTAssertEqual(s.representativeSubject.speciesID, 20)
     }
 
@@ -566,7 +571,37 @@ final class CompanionStoreTests: XCTestCase {
         XCTAssertEqual(s.representativeSpeciesID, 1)
         XCTAssertTrue(s.buyFreshEgg())
         XCTAssertEqual(s.representativeSpeciesID, 1, "놓아준 종도 보유분이라 선택이 유지된다")
-        XCTAssertEqual(s.representativeSubject.speciesID, 1, "메뉴바도 그 종을 계속 그린다")
+        XCTAssertEqual(s.displayPetSubject?.speciesID, 1, "두 번째 펫도 그 종을 계속 그린다")
+    }
+
+    /// The menu bar and main pet always show the raised suit; the chosen one floats only while switched on,
+    /// and switching it off keeps the choice for later.
+    func testDisplayPetToggleKeepsTheChoiceAndNeverReplacesTheRaisedSuit() throws {
+        let dex = [DexEntry(baseID: 1, finalID: 1, chainOrder: [1], rarity: .common, caughtAt: fixedNow)]
+        let active = MonState(baseID: 20, pathIDs: [20], stageIndex: 0, usedAtStage: 0,
+                              rarity: .common, totalForms: 1)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("poke-\(UUID().uuidString).json")
+        let dexJSON = String(decoding: try JSONEncoder().encode(dex), as: UTF8.self)
+        let activeJSON = String(decoding: try JSONEncoder().encode(active), as: UTF8.self)
+        try Data(#"{"dex":\#(dexJSON),"active":\#(activeJSON)}"#.utf8).write(to: url)
+        let s = CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
+                               fileURL: url, rng: SeededRNG(seed: 7))
+        XCTAssertFalse(s.showsDisplayPet, "a save without a choice starts with the second pet off")
+        XCTAssertNil(s.displayPetSubject)
+
+        XCTAssertTrue(s.setRepresentativeSpeciesID(1))
+        XCTAssertEqual(s.displayPetSubject?.speciesID, 1)
+        s.setDisplayPetEnabled(false)
+        XCTAssertNil(s.displayPetSubject)
+        XCTAssertEqual(s.representativeSpeciesID, 1, "switching off keeps the choice")
+        XCTAssertEqual(s.representativeSubject.speciesID, 20)
+
+        let reloaded = CompanionStore(provider: StubProvider(value: linear3), clock: { fixedNow },
+                                      fileURL: url, rng: SeededRNG(seed: 7))
+        XCTAssertFalse(reloaded.showsDisplayPet, "off is saved")
+        reloaded.setDisplayPetEnabled(true)
+        XCTAssertEqual(reloaded.displayPetSubject?.speciesID, 1)
+        XCTAssertEqual(reloaded.representativeSubject.speciesID, 20)
     }
 
     /// 외부에서 손편집했거나 다른 상태와 잘못 합쳐진 선택은 로드 경계에서 제거한다.

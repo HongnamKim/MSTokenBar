@@ -24,6 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var companion: CompanionStore!
     private var updater: UpdateChecker!
     private var floatingPet: FloatingPetController!
+    /// The chosen hangar machine, floating beside the raised one when switched on.
+    private var displayPet: DisplayPetController!
     private let navigation = PopoverNavigation()
 
     // 메뉴바 캐릭터 애니메이션 — 단일 타이머로 프레임 순환.
@@ -112,6 +114,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             onOpenPopover: { [weak self] in self?.openPopover() },
             onHide: { [weak self] in self?.store.floatingPetEnabled = false }
         )   // 데스크톱 플로팅 펫(옵트인)
+        displayPet = DisplayPetController(
+            store: store, companion: companion,
+            onOpenPopover: { [weak self] in self?.openPopover() })
         Task { await updater.check() }                    // 기동 시 1회 업데이트 확인
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -683,6 +688,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         }
         syncMenuAnimation()
         floatingPet.setDisplayAwake(awake)   // 슬립 중엔 펫 호스팅 트리 해제(GIF 루프 정지)
+        displayPet.setDisplayAwake(awake)
     }
 
     /// menuShouldAnimate 상태에 맞춰 애니메이션을 재개/정지한다(멱등 — 중복 호출 안전).

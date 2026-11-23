@@ -16,6 +16,8 @@ final class CompanionStore {
     var facesBack: Bool { state.active != nil && displayState == .sulk }
     private(set) var currentLine: EvoLine?
     private(set) var representativeSubject = RepresentativeSubject(speciesID: nil, isShiny: false)
+    /// The chosen machine for the second floating pet; nil while it is off or nothing is chosen.
+    private(set) var displayPetSubject: RepresentativeSubject?
     private(set) var isHatching = false
     private(set) var justEvolvedTo: String?     // 이름(연출/문구)
     private(set) var justGraduated: String?
@@ -179,8 +181,8 @@ final class CompanionStore {
         state.active?.hasGrowthBoost == true ? PokemonBalance.repeatGrowthMultiplier : nil
     }
 
-    /// 메뉴바와 플로팅 펫이 그릴 대표 종과 색. nil 선택은 기존 동작(현재 개체/알)을 보존한다.
-    /// 저장된 값이라 상시 렌더링 경로가 도감 전체를 다시 접거나 불필요한 상태를 관찰하지 않는다.
+    /// 메뉴바와 플로팅 펫이 그릴 종과 색. 저장된 값이라 상시 렌더링 경로가 도감 전체를 다시 접거나
+    /// 불필요한 상태를 관찰하지 않는다.
     struct RepresentativeSubject: Equatable, Sendable {
         let speciesID: Int?
         let isShiny: Bool
@@ -190,24 +192,36 @@ final class CompanionStore {
 
     /// 관련 상태가 바뀌어 저장되는 경계에서만 갱신한다. 고정 종 하나의 이로치 여부만 조회하므로
     /// 이름 해석·정렬을 포함한 `dexSpecies` 계산을 메뉴바/플로팅 펫 렌더마다 반복하지 않는다.
+    /// The menu bar and the main pet always show the raised machine (or the box); the chosen machine
+    /// appears only as the second pet, while that is switched on.
     private func refreshRepresentativeSubject() {
-        let next: RepresentativeSubject
-        if let selected = state.representativeSpeciesID {
-            next = RepresentativeSubject(speciesID: selected, isShiny: state.ownsShinySpecies(selected))
-        } else {
-            next = RepresentativeSubject(speciesID: currentSpeciesID, isShiny: currentIsShiny)
-        }
+        let next = RepresentativeSubject(speciesID: currentSpeciesID, isShiny: currentIsShiny)
         if representativeSubject != next { representativeSubject = next }
+        let display = state.showsDisplayPet ? state.representativeSpeciesID.map {
+            RepresentativeSubject(speciesID: $0, isShiny: state.ownsShinySpecies($0))
+        } : nil
+        if displayPetSubject != display { displayPetSubject = display }
     }
 
-    /// nil 은 자동 추적. 도감에 없는 id 는 저장하지 않는다 — UI 밖 호출이나 손상된 입력도 같은
-    /// 불변식을 지키며, 실패한 요청이 기존 선택을 조용히 해제하지 않도록 false 만 반환한다.
+    /// Choosing a machine also switches the second pet on; nil clears the choice. 도감에 없는 id 는 저장하지
+    /// 않는다 — UI 밖 호출이나 손상된 입력도 같은 불변식을 지키며, 실패한 요청이 기존 선택을 조용히
+    /// 해제하지 않도록 false 만 반환한다.
     @discardableResult
     func setRepresentativeSpeciesID(_ id: Int?) -> Bool {
         if let id, !state.ownsSpecies(id) { return false }
         state.representativeSpeciesID = id
+        if id != nil { state.showsDisplayPet = true }
         save()
         return true
+    }
+
+    /// Second floating pet on/off. The choice is kept while it is off.
+    var showsDisplayPet: Bool { state.showsDisplayPet }
+
+    func setDisplayPetEnabled(_ enabled: Bool) {
+        guard state.showsDisplayPet != enabled else { return }
+        state.showsDisplayPet = enabled
+        save()
     }
 
     func isRepresentative(_ species: DexSpecies) -> Bool {

@@ -118,14 +118,37 @@ final class RepresentativeLocalizationTests: XCTestCase {
         XCTAssertEqual(l.limitPercent, "Limit %")
     }
 
+    /// Settings opens the hangar in pick mode; a pick returns to Settings, and leaving the hangar cancels it.
+    @MainActor
+    func testDisplayPetPickModeOpensHangarAndReturnsToSettings() {
+        let nav = PopoverNavigation()
+        nav.showSettings = true
+        nav.showingCollectionLog = true
+        nav.openRepresentativeDex()
+        XCTAssertTrue(nav.pickingDisplayPet)
+        XCTAssertEqual(nav.tab, .collection)
+        XCTAssertFalse(nav.showingCollectionLog, "pick mode needs the hangar grid, not the build log")
+        XCTAssertFalse(nav.showSettings)
+
+        nav.finishDisplayPetPick()
+        XCTAssertFalse(nav.pickingDisplayPet)
+        XCTAssertTrue(nav.showSettings)
+
+        nav.openRepresentativeDex()
+        nav.tab = .home
+        XCTAssertFalse(nav.pickingDisplayPet, "leaving the hangar cancels the pick")
+        nav.openRepresentativeDex()
+        nav.reset()
+        XCTAssertFalse(nav.pickingDisplayPet, "closing the popover cancels the pick")
+    }
+
     /// 대표 기체는 메뉴바와 플로팅 펫에 함께 쓰이는 독립 개념이다. 모든 언어가 pet 전용 표현으로
     /// 되돌아가거나 언어 추가 뒤 한 언어만 빠지지 않도록 사용자가 보는 핵심 액션을 고정한다.
     func testRepresentativeActionsAreLocalizedInEverySupportedLanguage() {
         let expected: [(AppLanguage, label: String, follow: String, choose: String, set: String)] = [
-            (.ko, "대표 기체", "현재 기체 따라가기", "격납고에서 선택…", "대표로 설정"),
-            (.en, "Representative Mobile Suit", "Follow current suit", "Choose in Hangar…",
-             "Set as representative"),
-            (.ja, "代表機体", "現在の機体に合わせる", "格納庫で選ぶ…", "代表機体に設定"),
+            (.ko, "함께 띄울 기체", "함께 띄우기 해제", "격납고에서 선택…", "함께 띄우기"),
+            (.en, "Second floating suit", "Stop showing", "Choose in Hangar…", "Show beside"),
+            (.ja, "一緒に浮かべる機体", "表示をやめる", "格納庫で選ぶ…", "一緒に浮かべる"),
         ]
 
         XCTAssertEqual(expected.map(\.0), AppLanguage.allCases)

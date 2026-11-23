@@ -577,10 +577,12 @@ struct CompanionState: Codable, Sendable {
     var lastDate = ""
     // 현재 포켓몬(없으면 알)
     var active: MonState?
-    // 메뉴바와 플로팅 펫에 고정한 대표 종. nil = 현재 키우는 포켓몬(또는 알)을 그대로 따라간다.
-    // 종 단위 선택이라 성격 같은 개체 정보는 들고 있지 않는다. 선택 가능한 범위는 도감과 동일하게
+    // 두 번째 플로팅 펫에 함께 띄울 기체(등급 종 id). 메뉴바와 첫 플로팅 펫은 항상 키우는 기체를 그린다.
+    // 종 단위 선택이라 성격 같은 개체 정보는 들고 있지 않는다. 선택 가능한 범위는 격납고와 동일하게
     // 졸업분 + 현재 개체의 도달 단계이며, 그 범위에서 빠지면 reconcileRepresentativeSelection 이 nil 로 복구한다.
     var representativeSpeciesID: Int? = nil
+    // 고른 기체를 두 번째 플로팅 펫으로 띄울지. 고른 기체가 없으면 켜져 있어도 아무것도 띄우지 않는다.
+    var showsDisplayPet = false
     // 도감
     var dex: [DexEntry] = []
     // 소유한 (base,final) 쌍 — 분기 다양성용
@@ -627,6 +629,8 @@ struct CompanionState: Codable, Sendable {
         // active 손상(빈 pathIDs 등) → 알로 폴백하되 도감·인벤토리는 보존.
         active             = c.lenientOptional(MonState.self, forKey: .active)
         representativeSpeciesID = c.lenientOptional(Int.self, forKey: .representativeSpeciesID)
+        // Before this key, a chosen machine replaced the raised one everywhere; keep it on screen as the second pet.
+        showsDisplayPet    = c.lenient(Bool.self, forKey: .showsDisplayPet, default: representativeSpeciesID != nil)
         // 도감은 항목별 격리 — 손상 항목 하나가 도감 전체를 날리지 않게.
         dex                = c.lenient([Lossy<DexEntry>].self, forKey: .dex, default: []).compactMap(\.value)
         collectedFinals    = c.lenient(Set<String>.self, forKey: .collectedFinals, default: [])

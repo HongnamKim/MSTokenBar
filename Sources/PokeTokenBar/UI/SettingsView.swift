@@ -46,7 +46,7 @@ struct SettingsView: View {
 
     private var representativeSelectionText: String {
         guard let species = companion.representativeDexSpecies else {
-            return l.representativeFollowCurrent
+            return l.representativeNoneChosen
         }
         let model = companion.catalog.machine(speciesID: species.id)?.modelNumber
         return "\(model.map { "\($0) " } ?? "")\(species.name)"
@@ -196,17 +196,19 @@ struct SettingsView: View {
                 Text(l.representativePokemonLabel)
                     .lineLimit(1).minimumScaleFactor(0.75)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                Toggle(l.representativePokemonLabel, isOn: Binding(
+                    get: { companion.showsDisplayPet && companion.representativeSpeciesID != nil },
+                    set: { on in
+                        // Nothing chosen yet: switching on goes straight to the hangar to pick one.
+                        if on && companion.representativeSpeciesID == nil { onChooseRepresentative() }
+                        else { companion.setDisplayPetEnabled(on) }
+                    }))
+                    .toggleStyle(.switch).controlSize(.mini).labelsHidden()
                 Menu {
-                    Button {
-                        _ = companion.setRepresentativeSpeciesID(nil)
-                    } label: {
-                        if companion.representativeSpeciesID == nil {
-                            Label(l.representativeFollowCurrent, systemImage: "checkmark")
-                        } else {
-                            Text(l.representativeFollowCurrent)
-                        }
-                    }
                     Button(l.representativeChooseFromDex, action: onChooseRepresentative)
+                    if companion.representativeSpeciesID != nil {
+                        Button(l.representativeFollowCurrent) { _ = companion.setRepresentativeSpeciesID(nil) }
+                    }
                 } label: {
                     HStack(spacing: 3) {
                         Text(representativeSelectionText).lineLimit(1).truncationMode(.tail)

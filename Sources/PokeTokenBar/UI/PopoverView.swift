@@ -33,10 +33,17 @@ extension View {
 @Observable
 final class PopoverNavigation {
     var showSettings = false { didSet { if showSettings { dexDetailCollectionID = nil } } }
-    var tab: PopoverTab = .home { didSet { if tab != .collection { dexDetailCollectionID = nil } } }
+    var tab: PopoverTab = .home {
+        didSet { if tab != .collection { dexDetailCollectionID = nil; pickingDisplayPet = false } }
+    }
+    /// Opened from Settings: tapping a hangar cell picks that machine for the second pet and returns.
+    var pickingDisplayPet = false
     /// 일반적인 컬렉션 재진입에는 마지막 세그먼트를 유지하되, 대표 포켓몬 선택 진입점은 도감으로 강제한다.
     var showingCollectionLog = false {
-        didSet { if showingCollectionLog != oldValue { dexDetailCollectionID = nil } }
+        didSet {
+            if showingCollectionLog != oldValue { dexDetailCollectionID = nil }
+            if showingCollectionLog { pickingDisplayPet = false }
+        }
     }
     /// The usage recap takes over the popover like Settings does; closing the popover drops it.
     var showingRecap = false { didSet { if showingRecap { dexDetailCollectionID = nil } } }
@@ -54,6 +61,7 @@ final class PopoverNavigation {
     var expandAdvancedOnOpen = false
 
     func reset() {
+        pickingDisplayPet = false
         showSettings = false
         expandAdvancedOnOpen = false
         showingRecap = false
@@ -74,12 +82,19 @@ final class PopoverNavigation {
         dexDetailCollectionID = collectionID   // last: the didSets above clear it
     }
 
-    /// 설정의 대표 포켓몬 행에서 기존 도감으로 이동한다. 별도 선택 화면을 만들지 않고
-    /// 컬렉션 세그먼트를 도감으로 명시해, 직전에 포획 로그를 봤어도 선택 액션이 있는 화면을 연다.
+    /// 설정의 「함께 띄울 기체」 행에서 격납고를 선택 모드로 연다. 세그먼트를 격납고로 명시해, 직전에
+    /// 제작 기록을 봤어도 기체 칸이 있는 화면을 연다.
     func openRepresentativeDex() {
         showSettings = false
         showingCollectionLog = false
         tab = .collection
+        pickingDisplayPet = true   // last: the didSets above clear it
+    }
+
+    /// A cell tapped in pick mode: the caller stores the choice; this returns to Settings.
+    func finishDisplayPetPick() {
+        pickingDisplayPet = false
+        showSettings = true
     }
 }
 
