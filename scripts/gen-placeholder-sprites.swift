@@ -2,7 +2,7 @@
 // Generate the placeholders and convert the Gunpla base artwork to bundled idle GIFs.
 // Usage: swift scripts/gen-placeholder-sprites.swift <outdir> [sample-png-dir]
 //   outdir          Sources/PokeTokenBar/Resources/Gunpla/Sprites
-//   default inputs  assets/sprites/rx-78-2 and assets/sprites/first-hguc
+//   default inputs  assets/sprites/first-hguc and assets/sprites/first-series-grades
 //   sample-png-dir  optional RX-78-2 sample directory to convert on its own
 import CoreGraphics
 import Foundation
@@ -78,15 +78,16 @@ write(silhouette(w: 48, h: 48, sd: true), to: outDir.appendingPathComponent("sil
 write(silhouette(w: 48, h: 64, sd: false), to: outDir.appendingPathComponent("silhouette-real.gif"), type: .gif, delay: 0.4)
 write([box()], to: outDir.appendingPathComponent("box.png"), type: .png, delay: nil)
 
-// The HGUC base supersedes the earlier RX-78-2 HG sample with the same filename.
-let sampleDir = URL(fileURLWithPath: args.count > 2 ? args[2] : "assets/sprites/rx-78-2", isDirectory: true)
-var inputs = ["sd", "hg", "rg", "mg", "pg"].map { sampleDir.appendingPathComponent("rx-78-2-\($0).png") }
-if args.count == 2 {
-    let hgucDir = URL(fileURLWithPath: "assets/sprites/first-hguc", isDirectory: true)
-    let hguc = try FileManager.default.contentsOfDirectory(at: hgucDir, includingPropertiesForKeys: nil)
-        .filter { $0.lastPathComponent.hasSuffix("-hg.png") }
-    let replacements = Set(hguc.map(\.lastPathComponent))
-    inputs = inputs.filter { !replacements.contains($0.lastPathComponent) } + hguc
+let inputs: [URL]
+if args.count > 2 {
+    let sampleDir = URL(fileURLWithPath: args[2], isDirectory: true)
+    inputs = ["sd", "hg", "rg", "mg", "pg"].map { sampleDir.appendingPathComponent("rx-78-2-\($0).png") }
+} else {
+    inputs = try ["assets/sprites/first-hguc", "assets/sprites/first-series-grades"].flatMap { path in
+        try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: path, isDirectory: true),
+                                                    includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "png" }
+    }
 }
 for src in inputs {
     guard let source = CGImageSourceCreateWithURL(src as CFURL, nil),

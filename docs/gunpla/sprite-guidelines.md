@@ -2,9 +2,10 @@
 
 2026-11-23 초안 · 이미지를 대량으로 만들 에이전트용
 
-[RX-78-2 샘플](../../assets/sprites/rx-78-2/)은 등급별 형태를 참고하는 데 쓴다.
-특히 [SD 샘플](../../assets/sprites/rx-78-2/rx-78-2-sd.png)은 정면이므로 머리와 몸의 비율만 참고한다.
-SD와 MGSD를 새로 그릴 때는 §1의 3/4 구도를 적용한다. 기존 SD 샘플도 이 구도로 다시 그릴 대상이다.
+『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와
+[SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 각 폴더의 `references.csv`에서
+파일별 키트명, 반다이 상품 정보 또는 설명서, 조립 사진을 확인할 수 있다.
+SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../../assets/sprites/first-series-grades/rx-78-2-sd.png)을 참고한다.
 
 크기·위치·색 수 같은 수치 규격은 샘플 검토 후 정한다(§4). **[결정]** = 사용자가 정한 것, **[제안]** = 아직 확인받지 않은 것,
 표시 없음 = 샘플의 형태에서 읽어낸 것. 스프라이트 전반의 방침은 [설계 문서 §8](../superpowers/specs/2026-11-22-gunpla-tokenbar-design.md)을 따른다.
@@ -23,6 +24,7 @@ SD와 MGSD를 새로 그릴 때는 §1의 3/4 구도를 적용한다. 기존 SD 
   - 직립 자세. 좌우 반전·정면 대칭으로 그리지 않는다.
 - **장비 위치**는 기체 설정을 따른다. RX-78-2의 방패는 왼팔에 들고, 자쿠 II의 실드는 오른쪽 어깨에 고정한다. 이 구도에서 장비 일부가 몸에 가려져도 원래 위치를 유지한다.
 - **그리지 않는 것**: 뒷모습, 배경, 바닥 그림자, 이펙트, 글자, 등급 배지(배지는 앱이 그린다).
+- **등급 배지**는 [공용 PNG 6종](../../Sources/PokeTokenBar/Resources/Gunpla/GradeBadges/)을 사용한다. 플로팅 펫은 같은 펫 크기에서 기본 배지의 가로와 세로를 각각 50%로 줄여 표시 영역 우측 하단에 겹쳐 그린다. 도안을 수정할 때는 각 등급의 박스 표기를 참고하고, 최소 펫 크기인 48pt에서도 색과 윤곽으로 등급 변화를 알아볼 수 있는지 확인한다. [SD](https://www.dalong.net/reviews/sd/e01/p/e01.jpg) · [MGSD](https://www.dalong.net/reviews/sd/mgsd01/p/mgsd01.jpg) · [HG](https://www.dalong.net/reviews/hg/h191/p/h191.jpg) · [RG](https://www.dalong.net/reviews/rg/rg40/p/rg40.jpg) · [MG](https://www.dalong.net/reviews/mg/m172/p/m172.jpg) · [PG](https://www.dalong.net/reviews/pg/p01/p/p01.jpg)
 - **금지**: 공식 일러스트·박스아트·게임 스프라이트를 따거나 트레이싱하기 (설계 문서 §2 반목표).
 
 ## 2. 등급별 형태

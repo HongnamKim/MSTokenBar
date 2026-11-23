@@ -170,9 +170,9 @@ final class GunplaHatchIntegrationTests: XCTestCase {
     /// [회귀, CompanionIdentityTests.testShinyBurstSurvivesOverflowEvolve 이관] 부화 이월로 즉시 한 단계 자라도
     /// 마지막 연출은 전용기 부화 버스트로 남는다 — evolve 가 덮지 않는다.
     func test_variantBurstSurvivesOverflowEvolve() async throws {
-        let s = store(rng: SequenceRNG([0]))   // variant roll hits, weighted pick 0 → machine 3 (rare)
-        let forms = try XCTUnwrap(catalog.machine(id: 3)).grades.count
-        let firstStage = PokemonBalance.phaseThreshold(rarity: .rare, totalForms: forms, stageIndex: 0)
+        let s = store(rng: SequenceRNG([0]))   // variant roll hits, weighted pick 0 → Char's Zaku II
+        let variant = try XCTUnwrap(catalog.machine(id: 3))
+        let firstStage = PokemonBalance.phaseThreshold(rarity: variant.rarity, totalForms: variant.grades.count, stageIndex: 0)
         use(s, 0)
         use(s, s.eggHatchThreshold + firstStage + 1_000)
         await s.hatchIfNeeded()

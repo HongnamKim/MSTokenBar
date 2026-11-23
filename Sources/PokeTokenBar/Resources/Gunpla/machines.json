@@ -1,5 +1,5 @@
 {
-  "_comment": "Mobile Suit Gundam (first) entries list only released kits, each with an official Bandai source. The other series are a development sample and remain unverified.",
+  "_comment": "Grade sources identify the released kits used for the original Mobile Suit Gundam artwork.",
   "machines": [
     {
       "id": 1,
@@ -27,11 +27,11 @@
         "pg": "rx-78-2-pg"
       },
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_1458/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660257622000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/1004",
-        "rg": "https://manual.bandai-hobby.net/menus/detail/656",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/1585",
         "mg": "https://manual.bandai-hobby.net/menus/detail/611",
-        "pg": "https://manual.bandai-hobby.net/menus/detail/985"
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1066"
       }
     },
     {
@@ -53,14 +53,18 @@
         "pg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_1127/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112033307000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/504",
         "rg": "https://manual.bandai-hobby.net/menus/detail/659",
         "mg": "https://manual.bandai-hobby.net/menus/detail/838",
         "pg": "https://manual.bandai-hobby.net/menus/detail/988"
       },
       "sprites": {
-        "hg": "zaku-ii-hg"
+        "sd": "zaku-ii-sd",
+        "hg": "zaku-ii-hg",
+        "rg": "zaku-ii-rg",
+        "mg": "zaku-ii-mg",
+        "pg": "zaku-ii-pg"
       }
     },
     {
@@ -83,14 +87,18 @@
       ],
       "variantOf": 2,
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_2566/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112088291000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/501",
         "rg": "https://manual.bandai-hobby.net/menus/detail/657",
         "mg": "https://manual.bandai-hobby.net/menus/detail/834",
         "pg": "https://manual.bandai-hobby.net/menus/detail/987"
       },
       "sprites": {
-        "hg": "chars-zaku-ii-hg"
+        "sd": "chars-zaku-ii-sd",
+        "hg": "chars-zaku-ii-hg",
+        "rg": "chars-zaku-ii-rg",
+        "mg": "chars-zaku-ii-mg",
+        "pg": "chars-zaku-ii-pg"
       }
     },
     {
@@ -113,7 +121,8 @@
         "mg": "https://manual.bandai-hobby.net/menus/detail/839"
       },
       "sprites": {
-        "hg": "gm-hg"
+        "hg": "gm-hg",
+        "mg": "gm-mg"
       }
     },
     {
@@ -133,12 +142,14 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_825/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425776552000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/464",
         "mg": "https://manual.bandai-hobby.net/menus/detail/840"
       },
       "sprites": {
-        "hg": "gouf-hg"
+        "sd": "gouf-sd",
+        "hg": "gouf-hg",
+        "mg": "gouf-mg"
       }
     },
     {
@@ -265,12 +276,14 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_1407/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112060440000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/1003",
         "mg": "https://manual.bandai-hobby.net/menus/detail/512"
       },
       "sprites": {
-        "hg": "guncannon-hg"
+        "sd": "guncannon-sd",
+        "hg": "guncannon-hg",
+        "mg": "guncannon-mg"
       }
     },
     {
@@ -290,12 +303,14 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_1210/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112040237000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/208",
         "mg": "https://manual.bandai-hobby.net/menus/detail/565"
       },
       "sprites": {
-        "hg": "guntank-hg"
+        "sd": "guntank-sd",
+        "hg": "guntank-hg",
+        "mg": "guntank-mg"
       }
     },
     {
@@ -318,7 +333,8 @@
         "mg": "https://manual.bandai-hobby.net/menus/detail/864"
       },
       "sprites": {
-        "hg": "zaku-i-hg"
+        "hg": "zaku-i-hg",
+        "mg": "zaku-i-mg"
       }
     },
     {
@@ -338,12 +354,14 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_375/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425761558000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/251",
         "mg": "https://manual.bandai-hobby.net/menus/detail/640"
       },
       "sprites": {
-        "hg": "dom-hg"
+        "sd": "dom-sd",
+        "hg": "dom-hg",
+        "mg": "dom-mg"
       }
     },
     {
@@ -366,7 +384,8 @@
         "mg": "https://manual.bandai-hobby.net/menus/detail/831"
       },
       "sprites": {
-        "hg": "gelgoog-hg"
+        "hg": "gelgoog-hg",
+        "mg": "gelgoog-mg"
       }
     },
     {
@@ -387,12 +406,14 @@
       ],
       "variantOf": 17,
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_657/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425247205000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/828",
         "mg": "https://manual.bandai-hobby.net/menus/detail/833"
       },
       "sprites": {
-        "hg": "chars-gelgoog-hg"
+        "sd": "chars-gelgoog-sd",
+        "hg": "chars-gelgoog-hg",
+        "mg": "chars-gelgoog-mg"
       }
     },
     {
@@ -413,13 +434,16 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_429/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425763743000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/203",
         "rg": "https://manual.bandai-hobby.net/menus/detail/2198",
         "mg": "https://manual.bandai-hobby.net/menus/detail/818"
       },
       "sprites": {
-        "hg": "zgok-hg"
+        "sd": "zgok-sd",
+        "hg": "zgok-hg",
+        "rg": "zgok-rg",
+        "mg": "zgok-mg"
       }
     },
     {
@@ -441,13 +465,16 @@
       ],
       "variantOf": 19,
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_4469/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756714000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/219",
         "rg": "https://manual.bandai-hobby.net/menus/detail/952",
         "mg": "https://manual.bandai-hobby.net/menus/detail/524"
       },
       "sprites": {
-        "hg": "chars-zgok-hg"
+        "sd": "chars-zgok-sd",
+        "hg": "chars-zgok-hg",
+        "rg": "chars-zgok-rg",
+        "mg": "chars-zgok-mg"
       }
     },
     {
@@ -467,12 +494,14 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_1916/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112128232000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/901",
         "mg": "https://manual.bandai-hobby.net/menus/detail/535"
       },
       "sprites": {
-        "hg": "acguy-hg"
+        "sd": "acguy-sd",
+        "hg": "acguy-hg",
+        "mg": "acguy-mg"
       }
     },
     {
@@ -495,7 +524,8 @@
         "mg": "https://manual.bandai-hobby.net/menus/detail/540"
       },
       "sprites": {
-        "hg": "gyan-hg"
+        "hg": "gyan-hg",
+        "mg": "gyan-mg"
       }
     },
     {
@@ -516,13 +546,16 @@
         "mg"
       ],
       "gradeSources": {
-        "sd": "https://bandai-hobby.net/item/01_4461/",
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425727882000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/222",
         "rg": "https://manual.bandai-hobby.net/menus/detail/682",
         "mg": "https://manual.bandai-hobby.net/menus/detail/517"
       },
       "sprites": {
-        "hg": "zeong-hg"
+        "sd": "zeong-sd",
+        "hg": "zeong-hg",
+        "rg": "zeong-rg",
+        "mg": "zeong-mg"
       }
     }
   ]
