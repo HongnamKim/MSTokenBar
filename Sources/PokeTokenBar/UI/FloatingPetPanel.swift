@@ -458,7 +458,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     /// Leaves home for a spot next to the cursor and returns the panel frame to animate to.
     func beginRun(cursor: NSPoint, visibleFrame: NSRect) -> NSRect {
         let petSize = CGFloat(store.floatingPetSize)
-        let size = Self.panelSize(petSize: petSize, showingBubble: true)
+        let size = Self.panelSize(petSize: petSize, showingBubble: true, grade: petGrade)
         let origin = Self.runPanelOrigin(cursor: cursor, panelSize: size, visibleFrame: visibleFrame)
         runPhase = .away
         awayPetOrigin = Self.petOrigin(panelOrigin: origin, petSize: petSize, panelSize: size)
@@ -512,13 +512,14 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         onOpenPopover?()
     }
 
-    /// Panel size for a given pet size and bubble visibility. Pure — tested without AppKit layout.
-    static func panelSize(petSize: CGFloat, showingBubble: Bool) -> NSSize {
-        if showingBubble {
-            return NSSize(width: max(petSize, bubbleMinWidth),
-                          height: petSize + bubbleHeadroom)
-        }
-        return NSSize(width: petSize, height: petSize)
+    private var petGrade: GunplaGrade? {
+        companion.representativeSubject.speciesID.flatMap(GunplaID.decode)?.grade
+    }
+
+    static func panelSize(petSize: CGFloat, showingBubble: Bool, grade: GunplaGrade? = nil) -> NSSize {
+        let footer = GunplaGradeBadge.footerHeight(for: petSize, grade: grade)
+        return NSSize(width: showingBubble ? max(petSize, bubbleMinWidth) : petSize,
+                      height: petSize + footer + (showingBubble ? bubbleHeadroom : 0))
     }
 
     static func panelOrigin(petOrigin: NSPoint, petSize: CGFloat, panelSize: NSSize) -> NSPoint {
@@ -769,7 +770,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
     }
 
     private func targetFrame(petSize: CGFloat, showingBubble: Bool) -> NSRect {
-        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble)
+        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble, grade: petGrade)
         let petOrigin: NSPoint
         if runPhase == .away, let awayPetOrigin {
             petOrigin = awayPetOrigin
@@ -834,7 +835,7 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         }
         guard move.persist else { return }
         let petSize = CGFloat(store.floatingPetSize)
-        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble)
+        let size = Self.panelSize(petSize: petSize, showingBubble: showingBubble, grade: petGrade)
         let pet = Self.petOrigin(panelOrigin: panelOrigin, petSize: petSize, panelSize: size)
         defaults.set(Double(pet.x), forKey: Self.originXKey)
         defaults.set(Double(pet.y), forKey: Self.originYKey)
@@ -1020,6 +1021,7 @@ struct FloatingPetView: View {
     var body: some View {
         let size = CGFloat(store.floatingPetSize)
         let subject = companion.representativeSubject
+        let grade = subject.speciesID.flatMap(GunplaID.decode)?.grade
         let bubble = FloatingPetController.bubble(limitAlert: store.currentBubbleAlert, agent: agent.summary)
         VStack(spacing: 8) {
             if let bubble {
@@ -1031,7 +1033,7 @@ struct FloatingPetView: View {
             SpriteView(speciesID: subject.speciesID, size: size, animated: animated,
                        shiny: subject.isShiny,
                        minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore,
-                       back: companion.facesBack, reportsVisibleTop: true)
+                       back: companion.facesBack, reportsVisibleTop: true, showsGradeBadge: false)
                 // One-shot wobble per prayer; keyframes run once per trigger change, never in a loop.
                 .keyframeAnimator(initialValue: 0.0, trigger: burst.wobbleCount) { sprite, angle in
                     sprite.rotationEffect(.degrees(angle))
@@ -1063,6 +1065,12 @@ struct FloatingPetView: View {
                 }
                 // Keep the attached heart and prayer particles aligned with the bobbing sprite.
                 .modifier(AgentBob(active: agent.bobs))
+                .padding(.bottom, GunplaGradeBadge.footerHeight(for: size, grade: grade))
+                .overlay(alignment: .bottom) {
+                    if let grade {
+                        GunplaGradeBadge(grade: grade, spriteSize: size)
+                    }
+                }
                 .zIndex(0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
