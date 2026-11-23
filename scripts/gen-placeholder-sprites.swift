@@ -2,7 +2,7 @@
 // Generate the placeholders and convert the Gunpla base artwork to bundled idle GIFs.
 // Usage: swift scripts/gen-placeholder-sprites.swift <outdir> [sample-png-dir]
 //   outdir          Sources/PokeTokenBar/Resources/Gunpla/Sprites
-//   default inputs  assets/sprites/first-hguc and assets/sprites/first-series-grades
+//   default inputs  production kit directories under assets/sprites
 //   sample-png-dir  optional RX-78-2 sample directory to convert on its own
 import CoreGraphics
 import Foundation
@@ -81,8 +81,12 @@ if args.count > 2 {
     let sampleDir = URL(fileURLWithPath: args[2], isDirectory: true)
     inputs = ["sd", "hg", "rg", "mg", "pg"].map { sampleDir.appendingPathComponent("rx-78-2-\($0).png") }
 } else {
-    inputs = try ["assets/sprites/first-hguc", "assets/sprites/first-series-grades"].flatMap { path in
-        try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: path, isDirectory: true),
+    let spritesRoot = URL(fileURLWithPath: "assets/sprites", isDirectory: true)
+    // Each production directory has a kit reference manifest. The sample directory does not.
+    let directories = try FileManager.default.contentsOfDirectory(at: spritesRoot, includingPropertiesForKeys: nil)
+        .filter { FileManager.default.fileExists(atPath: $0.appendingPathComponent("references.csv").path) }
+    inputs = try directories.flatMap { directory in
+        try FileManager.default.contentsOfDirectory(at: directory,
                                                     includingPropertiesForKeys: nil)
             .filter { $0.pathExtension == "png" }
     }

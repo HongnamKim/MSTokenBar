@@ -2,6 +2,10 @@
 
 Read `CLAUDE.md` for the repository's contribution, testing, and release instructions.
 
+## Gunpla artwork
+
+For sprite generation, editing, and review, follow [the sprite guidelines](docs/gunpla/sprite-guidelines.md), including the equipment placement checks against front and rear kit references before exporting.
+
 ## Pull requests
 
 When creating, preparing, or updating a PR, use `.agents/skills/prepare-pr/SKILL.md`. This repository's rules take precedence over a personal PR skill's default title or body format.

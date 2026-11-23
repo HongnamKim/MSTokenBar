@@ -1,5 +1,5 @@
 {
-  "_comment": "Grade sources identify the released kits used for the original Mobile Suit Gundam artwork.",
+  "_comment": "Grade sources identify the released kits used for each illustrated series.",
   "machines": [
     {
       "id": 1,
@@ -556,6 +556,681 @@
         "hg": "zeong-hg",
         "rg": "zeong-rg",
         "mg": "zeong-mg"
+      }
+    },
+    {
+      "id": 24,
+      "modelNumber": "RX-79[G]",
+      "names": {
+        "ko": "육전형 건담",
+        "en": "Gundam Ground Type",
+        "ja": "陸戦型ガンダム"
+      },
+      "series": "08th-ms-team",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102576149000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/480",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/444"
+      },
+      "sprites": {
+        "sd": "ground-gundam-sd",
+        "hg": "ground-gundam-hg",
+        "mg": "ground-gundam-mg"
+      }
+    },
+    {
+      "id": 25,
+      "modelNumber": "RX-79[G]Ez-8",
+      "names": {
+        "ko": "건담 Ez8",
+        "en": "Gundam Ez8",
+        "ja": "ガンダムEz8"
+      },
+      "series": "08th-ms-team",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425761565000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/378",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/448"
+      },
+      "sprites": {
+        "sd": "gundam-ez8-sd",
+        "hg": "gundam-ez8-hg",
+        "mg": "gundam-ez8-mg"
+      }
+    },
+    {
+      "id": 26,
+      "modelNumber": "RGM-79[G]",
+      "names": {
+        "ko": "육전형 짐",
+        "en": "GM Ground Type",
+        "ja": "陸戦型ジム"
+      },
+      "series": "08th-ms-team",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/468",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/812"
+      },
+      "sprites": {
+        "hg": "ground-gm-hg",
+        "mg": "ground-gm-mg"
+      }
+    },
+    {
+      "id": 27,
+      "modelNumber": "RGM-79[G]",
+      "names": {
+        "ko": "짐 스나이퍼",
+        "en": "GM Sniper",
+        "ja": "ジム・スナイパー"
+      },
+      "series": "08th-ms-team",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://p-bandai.jp/hobby/special-1000007447/",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/829"
+      },
+      "sprites": {
+        "hg": "gm-sniper-hg",
+        "mg": "gm-sniper-mg"
+      }
+    },
+    {
+      "id": 28,
+      "modelNumber": "MS-07B-3",
+      "names": {
+        "ko": "구프 커스텀",
+        "en": "Gouf Custom",
+        "ja": "グフカスタム"
+      },
+      "series": "08th-ms-team",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756745000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/935",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/450"
+      },
+      "sprites": {
+        "sd": "gouf-custom-sd",
+        "hg": "gouf-custom-hg",
+        "mg": "gouf-custom-mg"
+      }
+    },
+    {
+      "id": 29,
+      "modelNumber": "MS-07H-8",
+      "names": {
+        "ko": "구프 플라이트 타입",
+        "en": "Gouf Flight Type",
+        "ja": "グフ・フライトタイプ"
+      },
+      "series": "08th-ms-team",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://p-bandai.jp/hobby/special-1000008406/"
+      },
+      "sprites": {
+        "hg": "gouf-flight-hg"
+      }
+    },
+    {
+      "id": 30,
+      "modelNumber": "RX-78NT-1",
+      "names": {
+        "ko": "건담 NT-1 알렉스",
+        "en": "Gundam NT-1 Alex",
+        "ja": "ガンダムNT-1 アレックス"
+      },
+      "series": "0080",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112314192000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/243",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/634"
+      },
+      "sprites": {
+        "sd": "nt1-alex-sd",
+        "hg": "nt1-alex-hg",
+        "mg": "nt1-alex-mg"
+      }
+    },
+    {
+      "id": 31,
+      "modelNumber": "RGM-79G",
+      "names": {
+        "ko": "짐 커맨드(콜로니전 사양)",
+        "en": "GM Command (Colony Type)",
+        "ja": "ジム・コマンド（コロニー戦仕様）"
+      },
+      "series": "0080",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/242",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/859"
+      },
+      "sprites": {
+        "hg": "gm-command-colony-hg",
+        "mg": "gm-command-colony-mg"
+      }
+    },
+    {
+      "id": 32,
+      "modelNumber": "RGM-79SP",
+      "names": {
+        "ko": "짐 스나이퍼 II",
+        "en": "GM Sniper II",
+        "ja": "ジム・スナイパーII"
+      },
+      "series": "0080",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/374",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/625"
+      },
+      "sprites": {
+        "hg": "gm-sniper-ii-hg",
+        "mg": "gm-sniper-ii-mg"
+      }
+    },
+    {
+      "id": 33,
+      "modelNumber": "RX-77D",
+      "names": {
+        "ko": "양산형 건캐논",
+        "en": "Guncannon Mass Production Type",
+        "ja": "ガンキャノン量産型"
+      },
+      "series": "0080",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/240"
+      },
+      "sprites": {
+        "hg": "guncannon-mp-hg"
+      }
+    },
+    {
+      "id": 34,
+      "modelNumber": "MS-06FZ",
+      "names": {
+        "ko": "자쿠 II 개",
+        "en": "Zaku II Kai",
+        "ja": "ザクII改"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/907"
+      },
+      "sprites": {
+        "hg": "zaku-ii-kai-hg"
+      }
+    },
+    {
+      "id": 35,
+      "modelNumber": "MS-18E",
+      "names": {
+        "ko": "캠퍼",
+        "en": "Kämpfer",
+        "ja": "ケンプファー"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://bandai-hobby.net/item/01_4676/",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/908",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/449"
+      },
+      "sprites": {
+        "sd": "kampfer-sd",
+        "hg": "kampfer-hg",
+        "mg": "kampfer-mg"
+      }
+    },
+    {
+      "id": 36,
+      "modelNumber": "MSM-03C",
+      "names": {
+        "ko": "하이곡그",
+        "en": "Hygogg",
+        "ja": "ハイゴッグ"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/235"
+      },
+      "sprites": {
+        "hg": "hygogg-hg"
+      }
+    },
+    {
+      "id": 37,
+      "modelNumber": "MSM-07E",
+      "names": {
+        "ko": "즈고크 E",
+        "en": "Z’Gok-E",
+        "ja": "ズゴックE"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/236"
+      },
+      "sprites": {
+        "hg": "zgok-e-hg"
+      }
+    },
+    {
+      "id": 38,
+      "modelNumber": "MS-09R-2",
+      "names": {
+        "ko": "릭 돔 II",
+        "en": "Rick Dom II",
+        "ja": "リック・ドムII"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/239"
+      },
+      "sprites": {
+        "hg": "rick-dom-ii-hg"
+      }
+    },
+    {
+      "id": 39,
+      "modelNumber": "MS-14JG",
+      "names": {
+        "ko": "겔구그 예거",
+        "en": "Gelgoog Jäger",
+        "ja": "ゲルググJ"
+      },
+      "series": "0080",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/241"
+      },
+      "sprites": {
+        "hg": "gelgoog-jager-hg"
+      }
+    },
+    {
+      "id": 40,
+      "modelNumber": "RX-78GP01",
+      "names": {
+        "ko": "건담 GP01",
+        "en": "Gundam GP01 Zephyranthes",
+        "ja": "ガンダム試作1号機 ゼフィランサス"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/213",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/664",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/984",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1055"
+      },
+      "sprites": {
+        "hg": "gp01-hg",
+        "rg": "gp01-rg",
+        "mg": "gp01-mg",
+        "pg": "gp01-pg"
+      }
+    },
+    {
+      "id": 41,
+      "modelNumber": "RX-78GP01Fb",
+      "names": {
+        "ko": "GP01Fb 풀버니언",
+        "en": "Gundam GP01Fb Full Burnern",
+        "ja": "ガンダム試作1号機フルバーニアン"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425718774000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/218",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/665",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/419",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1055"
+      },
+      "sprites": {
+        "sd": "gp01fb-sd",
+        "hg": "gp01fb-hg",
+        "rg": "gp01fb-rg",
+        "mg": "gp01fb-mg",
+        "pg": "gp01fb-pg"
+      }
+    },
+    {
+      "id": 42,
+      "modelNumber": "RX-78GP02A",
+      "names": {
+        "ko": "GP02A 사이살리스",
+        "en": "Gundam GP02A Physalis",
+        "ja": "ガンダム試作2号機 サイサリス"
+      },
+      "series": "0083",
+      "faction": "delaz",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425754888000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/898",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/986"
+      },
+      "sprites": {
+        "sd": "gp02a-sd",
+        "hg": "gp02a-hg",
+        "mg": "gp02a-mg"
+      }
+    },
+    {
+      "id": 43,
+      "modelNumber": "RX-78GP03S",
+      "names": {
+        "ko": "GP03S 스테이멘",
+        "en": "Gundam GP03S Stamen",
+        "ja": "ガンダム試作3号機ステイメン"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/225",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/811"
+      },
+      "sprites": {
+        "hg": "gp03s-hg",
+        "mg": "gp03s-mg"
+      }
+    },
+    {
+      "id": 44,
+      "modelNumber": "RX-78GP03",
+      "names": {
+        "ko": "GP03 덴드로비움",
+        "en": "Gundam GP03 Dendrobium",
+        "ja": "ガンダム試作3号機デンドロビウム"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425763736000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/870"
+      },
+      "sprites": {
+        "sd": "gp03-dendrobium-sd",
+        "hg": "gp03-dendrobium-hg"
+      }
+    },
+    {
+      "id": 45,
+      "modelNumber": "AMX-002",
+      "names": {
+        "ko": "노이에 질",
+        "en": "Neue Ziel",
+        "ja": "ノイエ・ジール"
+      },
+      "series": "0083",
+      "faction": "delaz",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112060433000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/992"
+      },
+      "sprites": {
+        "sd": "neue-ziel-sd",
+        "hg": "neue-ziel-hg"
+      }
+    },
+    {
+      "id": 46,
+      "modelNumber": "RGM-79N",
+      "names": {
+        "ko": "짐 커스텀",
+        "en": "GM Custom",
+        "ja": "ジム・カスタム"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425727967000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/421",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/432"
+      },
+      "sprites": {
+        "sd": "gm-custom-sd",
+        "hg": "gm-custom-hg",
+        "mg": "gm-custom-mg"
+      }
+    },
+    {
+      "id": 47,
+      "modelNumber": "RGC-83",
+      "names": {
+        "ko": "짐 캐논 II",
+        "en": "GM Cannon II",
+        "ja": "ジム・キャノンII"
+      },
+      "series": "0083",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/359"
+      },
+      "sprites": {
+        "hg": "gm-cannon-ii-hg"
+      }
+    },
+    {
+      "id": 48,
+      "modelNumber": "MS-06F-2",
+      "names": {
+        "ko": "자쿠 II F2형",
+        "en": "Zaku II F2 (Zeon Forces)",
+        "ja": "ザクII F2型（ジオン軍仕様）"
+      },
+      "series": "0083",
+      "faction": "delaz",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/923",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/515"
+      },
+      "sprites": {
+        "hg": "zaku-ii-f2-hg",
+        "mg": "zaku-ii-f2-mg"
+      }
+    },
+    {
+      "id": 49,
+      "modelNumber": "MS-09F/TROP",
+      "names": {
+        "ko": "돔 트로펜",
+        "en": "Dom Tropen",
+        "ja": "ドム・トローペン"
+      },
+      "series": "0083",
+      "faction": "delaz",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/217"
+      },
+      "sprites": {
+        "hg": "dom-tropen-hg"
+      }
+    },
+    {
+      "id": 50,
+      "modelNumber": "MS-14F",
+      "names": {
+        "ko": "겔구그 마리네",
+        "en": "Gelgoog Marine",
+        "ja": "ゲルググマリーネ"
+      },
+      "series": "0083",
+      "faction": "cima",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/216"
+      },
+      "sprites": {
+        "hg": "gelgoog-marine-hg"
+      }
+    },
+    {
+      "id": 51,
+      "modelNumber": "AGX-04",
+      "names": {
+        "ko": "가베라 테트라",
+        "en": "Gerbera Tetra",
+        "ja": "ガーベラ・テトラ"
+      },
+      "series": "0083",
+      "faction": "cima",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/383"
+      },
+      "sprites": {
+        "hg": "gerbera-tetra-hg"
       }
     }
   ]
