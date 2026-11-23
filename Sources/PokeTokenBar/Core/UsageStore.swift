@@ -183,6 +183,10 @@ final class UsageStore {
     var floatingPetSize: Double {
         didSet { defaults.set(floatingPetSize, forKey: "floatingPetSize") }
     }
+    /// Draw the floating pet's sprite flipped left-right. Default off; only the pet, not the popover or Hangar.
+    var floatingPetMirrored: Bool {
+        didSet { defaults.set(floatingPetMirrored, forKey: "floatingPetMirrored") }
+    }
     /// Show limit alerts as speech bubbles on the floating pet. Default on; independent of Notification Center.
     var floatingPetBubbleAlerts: Bool {
         didSet { defaults.set(floatingPetBubbleAlerts, forKey: "floatingPetBubbleAlerts") }
@@ -963,6 +967,7 @@ final class UsageStore {
         statusChecksEnabled = d.object(forKey: "statusChecksEnabled") as? Bool ?? true
         floatingPetEnabled = d.object(forKey: "floatingPetEnabled") as? Bool ?? false
         floatingPetSize = d.object(forKey: "floatingPetSize") as? Double ?? 96
+        floatingPetMirrored = d.object(forKey: "floatingPetMirrored") as? Bool ?? false
         floatingPetBubbleAlerts = d.object(forKey: "floatingPetBubbleAlerts") as? Bool ?? true
         floatingPetAgentActivity = d.object(forKey: "floatingPetAgentActivity") as? Bool ?? true
         // 기본 powerSaver — 이 설정이 생기기 전의 고정 캡(0.4s)과 같은 프레임 레이트라, 기존

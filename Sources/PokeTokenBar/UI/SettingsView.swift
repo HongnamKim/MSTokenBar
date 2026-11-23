@@ -365,6 +365,8 @@ struct SettingsView: View {
                         .font(.caption).monospacedDigit().frame(width: 44, alignment: .trailing)
                 }
                 Divider()
+                toggleRow(l.floatingPetMirroredLabel, $store.floatingPetMirrored)
+                Divider()
                 toggleRow(l.floatingPetBubbleAlertsLabel, $store.floatingPetBubbleAlerts)
                 Divider()
                 groupRow {
