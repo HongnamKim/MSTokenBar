@@ -589,21 +589,20 @@ final class CompanionStore {
                 return $0.id < $1.id
             }
             return graduated + (active.map { [$0] } ?? [])
-        case .numberAsc:
-            return entries.sorted {
-                if $0.finalID != $1.finalID {
-                    return $0.finalID < $1.finalID
+        case .numberAsc, .numberDesc:
+            // "Series order" matches the hangar: catalog series order, then machine id, then grade.
+            // Sorting by the synthetic id alone grouped by machine id and mixed series together.
+            let seriesOrder = Dictionary(catalog.series.map { ($0.id, $0.order) }, uniquingKeysWith: { first, _ in first })
+            func key(_ entry: DexEntry) -> (Int, Int, Int) {
+                guard let machine = catalog.machine(speciesID: entry.finalID) else {
+                    return (.max, entry.finalID, entry.finalID)   // not in the catalog: last, by id
                 }
-                let d0 = $0.caughtAt ?? .distantPast
-                let d1 = $1.caughtAt ?? .distantPast
-                if d0 != d1 { return d0 > d1 }
-                return $0.id < $1.id
+                return (seriesOrder[machine.series] ?? .max, machine.id, entry.finalID)
             }
-        case .numberDesc:
+            let ascending = sort == .numberAsc
             return entries.sorted {
-                if $0.finalID != $1.finalID {
-                    return $0.finalID > $1.finalID
-                }
+                let k0 = key($0), k1 = key($1)
+                if k0 != k1 { return ascending ? k0 < k1 : k0 > k1 }
                 let d0 = $0.caughtAt ?? .distantPast
                 let d1 = $1.caughtAt ?? .distantPast
                 if d0 != d1 { return d0 > d1 }

@@ -237,6 +237,23 @@ final class DexSearchAndFilterTests: XCTestCase {
         XCTAssertEqual(rarityDesc.map(\.rarity), [.legendary, .rare, .common])
     }
 
+    /// Build-log "Series order" follows the hangar: series order first, so a later series' low machine id
+    /// (Zeta Gundam, 7) comes after a first-series suit with a higher id (Guncannon, 13).
+    func testBuildLogSeriesOrderFollowsSeriesBeforeMachineID() {
+        func entry(_ machineID: Int, _ grade: GunplaGrade, id: String) -> DexEntry {
+            let finalID = GunplaID.encode(machineID: machineID, grade: grade)
+            return DexEntry(id: id, baseID: finalID, finalID: finalID, chainOrder: [finalID],
+                            rarity: .common, caughtAt: now, isShiny: false)
+        }
+        let dex = [entry(7, .hg, id: "zeta"), entry(13, .hg, id: "guncannon"),
+                   entry(1, .mg, id: "gundam-mg"), entry(1, .hg, id: "gundam-hg")]
+        let store = makeStore(dex: dex, provider: MachineCatalog.allBundled)
+        XCTAssertEqual(store.filteredDexEntries(sort: .numberAsc).map(\.id),
+                       ["gundam-hg", "gundam-mg", "guncannon", "zeta"])
+        XCTAssertEqual(store.filteredDexEntries(sort: .numberDesc).map(\.id),
+                       ["zeta", "guncannon", "gundam-mg", "gundam-hg"])
+    }
+
     func testSortOptionLabelsExistInAllLanguages() {
         for lang in AppLanguage.allCases {
             let l = L(lang)
