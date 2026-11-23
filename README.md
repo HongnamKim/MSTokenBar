@@ -33,7 +33,7 @@ When a new version is out, the app shows an update banner. Click **Update** and 
 
 ## Versioning
 
-Each finished series of sprites raises the minor version (0.1.0, 0.2.0, …). Version 1.0.0 ships when every Universal Century series is drawn.
+Each sprite drop, which adds one or more finished series, raises the minor version (0.1.0, 0.2.0, …). Version 1.0.0 ships when every Universal Century series is drawn.
 
 ## Build from source
 
