@@ -72,7 +72,7 @@ final class PreciousCompanionGuardTests: XCTestCase {
         for lang in AppLanguage.allCases {
             let l = L(lang)
             XCTAssertFalse(l.freshEggLegendaryWarning.isEmpty, "전설 경고 문구가 모든 언어(\(lang))에 존재해야 함")
-            XCTAssertTrue(l.freshEggLegendaryWarning.hasPrefix("⚠️"), "경고 접두사 ⚠️ 포함")
+            XCTAssertFalse(l.freshEggLegendaryWarning.contains("⚠"), "Warning art is rendered by the view")
             XCTAssertFalse(l.freshEggDiscardValuable.isEmpty, "놓아주기 버튼 라벨이 모든 언어(\(lang))에 존재해야 함")
         }
 

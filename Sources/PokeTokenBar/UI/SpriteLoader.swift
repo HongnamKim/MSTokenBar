@@ -57,9 +57,6 @@ actor SpriteStore {
         return CGImageDestinationFinalize(dest) ? out as Data : nil
     }
 
-    /// 박스 스프라이트(정적, 번들). 없으면 nil → 뷰가 🥚 로 폴백.
-    func eggData() async -> Data? { BundledSprites.boxPNG() }
-
     /// in-memory 캐시에 넣고 LRU 상한 유지(#H1) — 세션 중 종이 여러 번 바뀌어도 무한 성장 방지.
     private func remember(_ key: String, _ data: Data) {
         mem[key] = data
@@ -92,7 +89,7 @@ enum SpriteLoader {
     }()
 
     /// 메모리·디스크 캐시에 이미 있으면 동기 반환(네트워크 없음). 없으면 nil.
-    /// shiny 캐시 미스는 일반 캐시로 폴백 — 오프라인에서 live mon 이 알 글리프로 보이는 것 방지.
+    /// shiny 캐시 미스는 일반 캐시로 폴백 — 오프라인에서 live mon 이 박스로 보이는 것 방지.
     /// back 캐시 미스는 앞모습으로 폴백 — 뒷모습이 없어도 화면이 비지 않게.
     static func cachedImage(speciesID: Int, animated: Bool = false, shiny: Bool = false,
                             directory: URL = cacheDir, back: Bool = false) -> NSImage? {
@@ -224,22 +221,6 @@ enum SpriteLoader {
         }
         guard back else { return nil }
         return await image(speciesID: speciesID, animated: animated, shiny: shiny, store: store)
-    }
-
-    /// 알 스프라이트는 96×96 캔버스에 실제 알이 28×30(≈29%)만 차지 — 그대로 쓰면 프레임에서 아주 작게
-    /// 보인다(🥚 이모지는 여백이 없어 꽉 찼음). 콘텐츠 경계로 1회 크롭해 여백을 제거하고 캐시 →
-    /// 상점·홈 등 모든 크기에서 이모지처럼 프레임을 꽉 채운다.
-    private static var croppedEgg: NSImage?
-
-    /// 크롭 완료분만 동기 반환(미준비면 nil — 동기 크롭 안 함, 히치 방지). 첫 표시 때만 🥚 폴백 후 eggImage 로 교체.
-    static func cachedEggImage() -> NSImage? { croppedEgg }
-
-    /// 알 스프라이트 — 런타임 로드 + 콘텐츠 크롭(최초 1회 메모이즈). 오프라인/실패면 nil(뷰가 🥚 폴백).
-    static func eggImage() async -> NSImage? {
-        if let c = croppedEgg { return c }
-        guard let d = await SpriteStore.shared.eggData(), let img = NSImage(data: d) else { return nil }
-        croppedEgg = cropToContent(img)
-        return croppedEgg
     }
 
     /// 비투명(alpha>0) 콘텐츠 경계로 크롭 — 큰 투명 여백 제거. 96×96 1회만 수행(메모이즈).

@@ -49,12 +49,23 @@ final class ToolSetTests: XCTestCase {
     func test_itemConstants() {
         XCTAssertEqual(ToolSet.order, [.maskingTape, .panelLinePen, .paintSet, .airbrush])
         XCTAssertEqual(ToolSet.order.compactMap { ToolSet.prices[$0] }, [1_000_000_000, 1_500_000_000, 2_000_000_000, 3_000_000_000])
-        XCTAssertEqual(ToolSet.order.map(\.fallbackEmoji), ["🩹", "🖊️", "🎨", "💨"])
-        XCTAssertEqual(ItemKind.rareCandy.fallbackEmoji, "🧽")
+        XCTAssertEqual(ToolSet.order.map { WorkshopArt(item: $0) }, [.maskingTape, .panelLinePen, .paintSet, .airbrush])
+        XCTAssertEqual(WorkshopArt(item: .rareCandy), .sandingSponge)
         XCTAssertEqual(ItemKind.rareCandy.rawValue, "rareCandy")
         for kind in ToolSet.order { XCTAssertTrue(kind.isPassive) }
         XCTAssertFalse(ItemKind.rareCandy.isPassive)
         XCTAssertEqual(ItemKind.allCases.count, 5)
+    }
+
+    func testWorkshopArtworkDecodesFromThePackage() throws {
+        for art in WorkshopArt.allCases {
+            let image = try XCTUnwrap(art.image, art.rawValue)
+            XCTAssertTrue(image.isValid, art.rawValue)
+        }
+        XCTAssertEqual(WorkshopArt(badge: .series("first")), .seriesMedal)
+        XCTAssertEqual(WorkshopArt(badge: .all), .hangarTrophy)
+        XCTAssertEqual(WorkshopArt(badge: .seriesVariant("first")), .customMedal)
+        XCTAssertEqual(WorkshopArt(badge: .allVariant), .customMedal)
     }
 
     // MARK: store

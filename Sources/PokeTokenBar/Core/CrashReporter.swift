@@ -35,7 +35,7 @@ enum CrashReporter {
 
         // 1) 직전 세션 비정상 종료 감지 — 마커가 남아 있으면 정상 종료되지 않은 것.
         if FileManager.default.fileExists(atPath: markerURL.path) {
-            AppLog.write("⚠️ 직전 세션이 정상 종료되지 않았습니다(크래시·OOM·강제종료 추정). "
+            AppLog.write("경고: 직전 세션이 정상 종료되지 않았습니다(크래시·OOM·강제종료 추정). "
                 + "원인 스택은 ~/Library/Logs/DiagnosticReports/MSTokenBar-*.ips 참조.")
         }
         try? Data().write(to: markerURL, options: .atomic)   // 이번 세션 running 마커

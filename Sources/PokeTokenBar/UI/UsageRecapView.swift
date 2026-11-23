@@ -324,7 +324,7 @@ struct RecapCard: View {
                             // the row, and a trailing sparkle cut "Charizard" to "Chariza…".
                             .overlay(alignment: .topTrailing) {
                                 if graduate.entry.isShiny {
-                                    Text("✨").font(.system(size: 7)).offset(x: 3, y: -2)
+                                    WorkshopIcon(.customMark, size: 9).offset(x: 3, y: -2)
                                 }
                             }
                         Text(graduate.name)

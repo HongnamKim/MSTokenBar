@@ -65,18 +65,16 @@ func silhouette(w: Int, h: Int, sd: Bool) -> [CGImage] {
     }, w: w, h: h)
 }
 
-func box() -> CGImage {
-    let ctx = makeContext(32, 32)
-    ctx.setFillColor(gray)
-    ctx.fill(CGRect(x: 4, y: 4, width: 24, height: 20))
-    ctx.setFillColor(CGColor(red: 0.4, green: 0.42, blue: 0.45, alpha: 1))
-    ctx.fill(CGRect(x: 2, y: 22, width: 28, height: 6))
-    return ctx.makeImage()!
-}
-
 write(silhouette(w: 48, h: 48, sd: true), to: outDir.appendingPathComponent("silhouette-sd.gif"), type: .gif, delay: 0.4)
 write(silhouette(w: 48, h: 64, sd: false), to: outDir.appendingPathComponent("silhouette-real.gif"), type: .gif, delay: 0.4)
-write([box()], to: outDir.appendingPathComponent("box.png"), type: .png, delay: nil)
+
+// A fresh export includes the same hand-drawn box used by the app.
+let boxSource = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+    .appendingPathComponent("Sources/PokeTokenBar/Resources/Gunpla/Sprites/box.png")
+let boxOutput = outDir.appendingPathComponent("box.png")
+if boxSource.standardizedFileURL != boxOutput.standardizedFileURL {
+    try Data(contentsOf: boxSource).write(to: boxOutput, options: .atomic)
+}
 
 let inputs: [URL]
 if args.count > 2 {

@@ -103,14 +103,11 @@ final class SpriteSubjectTests: XCTestCase {
         XCTAssertEqual(next.loadedID, 26)
     }
 
-    /// 알 이미지 로드도 같은 규칙 — 취소면 무시, 아니면 반영하되 loadedID 는 알(nil) 그대로.
-    func testEggImageAppliesOnlyWhenNotCancelled() throws {
-        let egg = image(2)
-        XCTAssertNil(SpriteSubject(image: nil, loadedID: nil).applyingEgg(egg, cancelled: true))
-
-        let applied = try XCTUnwrap(SpriteSubject(image: nil, loadedID: nil).applyingEgg(egg, cancelled: false))
-        XCTAssertTrue(applied.image === egg)
-        XCTAssertNil(applied.loadedID)
+    func testMachineSwitchToBoxUsesTheBundledArtworkImmediately() throws {
+        let box = try XCTUnwrap(WorkshopArt.box.image)
+        let next = SpriteSubject(image: image(4), loadedID: 25).becomingEgg(cachedEgg: box)
+        XCTAssertTrue(next.image === box)
+        XCTAssertNil(next.loadedID)
     }
 
     // MARK: GIF 프레임

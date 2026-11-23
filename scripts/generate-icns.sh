@@ -1,6 +1,5 @@
 #!/bin/bash
-# generate-icon.swift 로 멀티사이즈 네이티브 렌더 → assets/AppIcon.icns 생성.
-# 각 사이즈를 1024 다운스케일이 아니라 직접 렌더해 작은 크기(16/32px)에서 T 가독성을 유지한다.
+# Render the workshop nippers with nearest-neighbor scaling, including the optical 16px master.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -21,5 +20,6 @@ gen icon_512x512@2x.png 1024
 
 iconutil -c icns "$ICONSET" -o assets/AppIcon.icns
 swift scripts/generate-icon.swift assets/icon_1024.png 1024 >/dev/null
+swift scripts/generate-icon.swift assets/icon.png 512 >/dev/null
 rm -rf "$ICONSET"
 echo "done: assets/AppIcon.icns + assets/icon_1024.png"

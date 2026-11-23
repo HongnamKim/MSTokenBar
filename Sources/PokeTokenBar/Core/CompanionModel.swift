@@ -194,16 +194,6 @@ enum ItemKind: String, Codable, Sendable, CaseIterable {
     case paintSet
     case airbrush
 
-    /// 아이템 아이콘(스프라이트 없음 — 이모지만 쓴다).
-    var fallbackEmoji: String {
-        switch self {
-        case .rareCandy: return "🧽"
-        case .maskingTape: return "🩹"
-        case .panelLinePen: return "🖊️"
-        case .paintSet: return "🎨"
-        case .airbrush: return "💨"
-        }
-    }
     /// 상점 판매가(재화 = 사용한 토큰). nil = 상점 미판매.
     var shopPrice: Int? {
         switch self {

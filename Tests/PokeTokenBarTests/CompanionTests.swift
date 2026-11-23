@@ -1681,9 +1681,9 @@ final class CompanionIdentityTests: XCTestCase {
 
     func testLocalizationIncludesDelayedHatchRetry() {
         let expected = [
-            "⏳ 개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
-            "⏳ Unboxing is delayed — retrying on the next refresh",
-            "⏳ 開封が遅れています。次回の更新時に再試行します",
+            "개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
+            "Unboxing is delayed — retrying on the next refresh",
+            "開封が遅れています。次回の更新時に再試行します",
         ]
         XCTAssertEqual(AppLanguage.allCases.count, expected.count)
         for (lang, copy) in zip(AppLanguage.allCases, expected) {

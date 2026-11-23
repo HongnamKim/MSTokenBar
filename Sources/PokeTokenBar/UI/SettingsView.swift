@@ -49,7 +49,7 @@ struct SettingsView: View {
             return l.representativeFollowCurrent
         }
         let model = companion.catalog.machine(speciesID: species.id)?.modelNumber
-        return "\(model.map { "\($0) " } ?? "")\(species.name)\(species.isShiny ? " ✨" : "")"
+        return "\(model.map { "\($0) " } ?? "")\(species.name)"
     }
 
     /// 세이브 봉투에 남길 출처 표기 — 어느 Mac에서 내보낸 파일인지 나중에 알아보기 위한 것.
@@ -208,7 +208,12 @@ struct SettingsView: View {
                     }
                     Button(l.representativeChooseFromDex, action: onChooseRepresentative)
                 } label: {
-                    Text(representativeSelectionText).lineLimit(1).truncationMode(.tail)
+                    HStack(spacing: 3) {
+                        Text(representativeSelectionText).lineLimit(1).truncationMode(.tail)
+                        if companion.representativeDexSpecies?.isShiny == true {
+                            WorkshopIcon(.customMark, size: 12, label: l.dexShinyLabel)
+                        }
+                    }
                 }
                 .controlSize(.small)
                 .frame(width: 150, alignment: .trailing)
