@@ -60,24 +60,41 @@ final class SpriteImageCacheTests: XCTestCase {
                         "an earlier cache miss or decode failure must not be memoized")
     }
 
+    /// Compared by pixel colour, not object identity: `imageCache` is a shared, evictable NSCache, and
+    /// other tests' in-flight sprite loads can push an entry out mid-test, so a reload is a new object.
     func testNormalFallbackDoesNotMaskALaterShinyImage() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("sprite-shiny-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        let bitmap = try XCTUnwrap(NSBitmapImageRep(
-            bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 2, bitsPerSample: 8,
-            samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
-            bytesPerRow: 0, bitsPerPixel: 0))
-        bitmap.bitmapData?.initialize(repeating: 255, count: bitmap.bytesPerRow * bitmap.pixelsHigh)
-        let png = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
-        try png.write(to: dir.appendingPathComponent("25-s.png"))
-        let normal = try XCTUnwrap(SpriteLoader.cachedImage(speciesID: 25, directory: dir))
-        XCTAssertTrue(SpriteLoader.cachedImage(speciesID: 25, shiny: true, directory: dir) === normal)
+        func png(white: Bool) throws -> Data {
+            let bitmap = try XCTUnwrap(NSBitmapImageRep(
+                bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 2, bitsPerSample: 8,
+                samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+                bytesPerRow: 0, bitsPerPixel: 0))
+            // Opaque white or opaque black RGBA bytes.
+            let data = try XCTUnwrap(bitmap.bitmapData)
+            for i in 0..<(bitmap.bytesPerRow * bitmap.pixelsHigh) { data[i] = (white || i % 4 == 3) ? 255 : 0 }
+            return try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
+        }
+        func isWhite(_ image: NSImage?) throws -> Bool {
+            let tiff = try XCTUnwrap(XCTUnwrap(image).tiffRepresentation)
+            let rep = try XCTUnwrap(NSBitmapImageRep(data: tiff))
+            let color = try XCTUnwrap(rep.colorAt(x: 0, y: 0)?.usingColorSpace(.deviceRGB))
+            return color.redComponent > 0.5
+        }
+        let shinyKey = dir.appendingPathComponent("25-shs.png").path as NSString
 
-        try png.write(to: dir.appendingPathComponent("25-shs.png"))
-        let shiny = try XCTUnwrap(SpriteLoader.cachedImage(speciesID: 25, shiny: true, directory: dir))
-        XCTAssertFalse(shiny === normal, "fallback pixels must not be stored under the shiny key")
-        XCTAssertTrue(SpriteLoader.cachedImage(speciesID: 25, directory: dir) === normal)
+        try png(white: true).write(to: dir.appendingPathComponent("25-s.png"))
+        XCTAssertTrue(try isWhite(SpriteLoader.cachedImage(speciesID: 25, directory: dir)))
+        XCTAssertTrue(try isWhite(SpriteLoader.cachedImage(speciesID: 25, shiny: true, directory: dir)),
+                      "a missing shiny image falls back to the normal pixels")
+        XCTAssertNil(SpriteLoader.imageCache.object(forKey: shinyKey),
+                     "fallback pixels must not be stored under the shiny key")
+
+        try png(white: false).write(to: dir.appendingPathComponent("25-shs.png"))
+        XCTAssertFalse(try isWhite(SpriteLoader.cachedImage(speciesID: 25, shiny: true, directory: dir)),
+                       "the shiny image shows once it exists")
+        XCTAssertTrue(try isWhite(SpriteLoader.cachedImage(speciesID: 25, directory: dir)))
     }
 
     func testAsyncLoadsPopulateTheSynchronousCacheAndReuseEachOther() async throws {

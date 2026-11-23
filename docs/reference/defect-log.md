@@ -16,6 +16,14 @@ read_when:
 
 ## 스프라이트 전환
 
+- **Never assert object identity across calls on the shared sprite `NSCache`.** `SpriteLoader.imageCache`
+  is a process-wide, 64-entry, evictable cache. In the full suite, sprite loads still in flight from
+  earlier tests fill it, so an entry can be evicted between two calls and the reload is a new object.
+  `testNormalFallbackDoesNotMaskALaterShinyImage` used `===` to tell normal from shiny pixels and
+  flaked only in the full run. Injecting 80 inserts mid-test reproduced it every time. It now writes
+  white and black PNGs, compares pixel colour, and checks the shiny key directly. Identity checks
+  stay only where a cache hit is the behaviour under test, right after the insert.
+
 - **A transient GIF request failure must not become a permanent static state.** `SpriteView` used
   one `.task(id:)` request, showed its PNG fallback, then returned; neither a later cache fill nor
   network recovery changed the task ID. The menu had the same class of defect: nonempty bob
