@@ -1925,6 +1925,60 @@
         "sd": "jagd-doga-quess-sd",
         "hg": "jagd-doga-quess-hg"
       }
+    },
+    {
+      "id": 78,
+      "modelNumber": "RX-93-ν2",
+      "names": {
+        "ko": "하이뉴 건담",
+        "en": "Hi-Nu Gundam",
+        "ja": "Hi-νガンダム"
+      },
+      "series": "beltorchika-children",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112836434000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/915",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/683",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/953"
+      },
+      "sprites": {
+        "sd": "hi-nu-gundam-sd",
+        "hg": "hi-nu-gundam-hg",
+        "rg": "hi-nu-gundam-rg",
+        "mg": "hi-nu-gundam-mg"
+      }
+    },
+    {
+      "id": 79,
+      "modelNumber": "MSN-04II",
+      "names": {
+        "ko": "나이팅게일",
+        "en": "Nightingale",
+        "ja": "ナイチンゲール"
+      },
+      "series": "beltorchika-children",
+      "faction": "neo_zeon",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4549660257646000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/508"
+      },
+      "sprites": {
+        "sd": "nightingale-sd",
+        "hg": "nightingale-hg"
+      }
     }
   ]
 }

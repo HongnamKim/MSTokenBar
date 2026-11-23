@@ -2,7 +2,7 @@
 
 2026-11-23 초안 · 이미지를 대량으로 만들 에이전트용
 
-『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/) 폴더에 있다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
+『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/), [벨토치카 칠드런](../../assets/sprites/beltorchika-children/) 폴더에 있다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
 SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../../assets/sprites/first-series-grades/rx-78-2-sd.png)을 참고한다.
 
 크기·위치·색 수 같은 수치 규격은 샘플 검토 후 정한다(§4). **[결정]** = 사용자가 정한 것, **[제안]** = 아직 확인받지 않은 것,
