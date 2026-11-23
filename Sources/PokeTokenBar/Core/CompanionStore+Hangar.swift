@@ -52,6 +52,14 @@ extension CompanionStore {
         state.representativeSpeciesID.flatMap(GunplaID.decode)?.machineID == cell.machineID
     }
 
+    /// Hover line for a floating pet: "MS-09 · HG Dom" in the current language, or the box name.
+    func hoverTitle(speciesID: Int?) -> String {
+        guard let speciesID, let decoded = GunplaID.decode(speciesID) else { return l.eggName(state.eggTier) }
+        let name = "\(decoded.grade.label) \(machineName(decoded.machineID))"
+        guard let model = catalog.machine(id: decoded.machineID)?.modelNumber else { return name }
+        return "\(model) · \(name)"
+    }
+
     /// Machine name in the current language, or "#id" when the catalog does not know it.
     func machineName(_ machineID: Int) -> String {
         catalog.machine(id: machineID).flatMap { state.language.resolveName($0.names) } ?? "#\(machineID)"

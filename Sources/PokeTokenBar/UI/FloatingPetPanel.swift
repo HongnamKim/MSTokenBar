@@ -693,7 +693,8 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
             l: L(companion.language),
             sulkIdle: companion.sulkIdle,
             eventLine: eventPopText,
-            prayers: companion.representativeSubject.speciesID == nil ? companion.state.eggPrayers?.count ?? 0 : 0)
+            prayers: companion.representativeSubject.speciesID == nil ? companion.state.eggPrayers?.count ?? 0 : 0,
+            title: companion.hoverTitle(speciesID: companion.representativeSubject.speciesID))
     }
 
     /// A prayer changes the count in the hover text. Rebuild it right here instead of waiting for the observation
@@ -1076,11 +1077,13 @@ struct FloatingPetView: View {
     }
 
     /// `sulkIdle` > 0 appends how long the companion has been sulking: hours below 48 h, days from there.
+    /// `title` names what the pet shows (model number, grade and suit, or the box) on the first line.
     static func hoverTooltip(todayTokens: Int, limitUtilization: Double?,
                              mode: UsageStore.LimitDisplayMode, l: L, sulkIdle: TimeInterval = 0,
-                             eventLine: String? = nil, prayers: Int = 0) -> String {
+                             eventLine: String? = nil, prayers: Int = 0, title: String? = nil) -> String {
         let usage = TokenFormatter.grouped(todayTokens)
         var base = l.floatingPetHoverTokensOnly(usage)
+        if let title, !title.isEmpty { base = title + "\n" + base }
         if let pct = limitUtilization {
             let percent = TokenFormatter.percent(UsageStore.displayPercent(pct, mode: mode))
             base = l.floatingPetHoverWithLimit(usage, mode == .remaining ? l.percentRemaining(percent) : percent)

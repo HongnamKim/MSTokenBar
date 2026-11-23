@@ -141,4 +141,19 @@ final class HangarCellTests: XCTestCase {
         XCTAssertFalse(HangarMachineCell.showsSpriteGradeBadge(isRaising: true))
         XCTAssertTrue(HangarMachineCell.showsSpriteGradeBadge(isRaising: false))
     }
+
+    /// Hovering a floating pet names the suit on the first line; the box names itself.
+    func test_hoverTitleNamesTheSuitOrTheBox() throws {
+        let en = try store(dex: [entry(16, [.sd, .hg])])
+        XCTAssertEqual(en.hoverTitle(speciesID: id(16, .hg)), "MS-09 · HG Dom")
+        XCTAssertEqual(en.hoverTitle(speciesID: nil), en.l.eggName(nil))
+        let ko = try store(dex: [entry(16, [.sd, .hg])], language: .ko)
+        XCTAssertEqual(ko.hoverTitle(speciesID: id(16, .hg)), "MS-09 · HG 돔")
+
+        let l = L(.en)
+        let plain = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: nil, mode: .used, l: l)
+        let titled = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: nil, mode: .used, l: l,
+                                                  title: "MS-09 · HG Dom")
+        XCTAssertEqual(titled, "MS-09 · HG Dom\n" + plain)
+    }
 }
