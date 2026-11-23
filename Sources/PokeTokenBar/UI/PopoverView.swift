@@ -1939,12 +1939,17 @@ struct LimitProgressBar: View {
 
     /// 2.5pt = 2배 화면에서 딱 5px — 반픽셀에 걸려 흐려지지 않는 가장 얇은 "선 아닌 눈금" 굵기.
     private static let markerWidth: CGFloat = 2.5
-    /// 눈금 길이는 `geo.size.height`(=12pt 레이아웃 칸)가 아니라 **실제로 칠해지는 트랙**(6pt)에
+    /// 눈금 길이는 `geo.size.height`(=12pt 레이아웃 칸)가 아니라 **실제로 칠해지는 트랙**에
     /// 맞춘다. 칸 기준으로 잡았더니 6pt 막대에 16pt 눈금이 붙어 막대보다 눈금이 커 보였다.
     /// 위아래 2pt 씩만 물려 막대 위에 얹힌 눈금으로 읽히게 한다.
-    private static let trackHeight: CGFloat = 6
+    /// The system draws the small progress track 6pt tall on macOS 26 but 3pt on macOS 15,
+    /// so a fixed 6pt assumption made the marker more than three times the track there.
+    private static var trackHeight: CGFloat {
+        if #available(macOS 26, *) { return 6 }
+        return 3
+    }
     private static let markerOverhang: CGFloat = 2
-    private static let markerHeight: CGFloat = trackHeight + markerOverhang * 2
+    private static var markerHeight: CGFloat { trackHeight + markerOverhang * 2 }
 }
 
 /// 단계색은 시스템 색 — 라이트/다크에서 각각 조정된 값으로 바뀌고, 최상위(.red)는
