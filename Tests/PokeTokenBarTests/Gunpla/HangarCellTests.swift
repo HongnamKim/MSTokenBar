@@ -151,9 +151,13 @@ final class HangarCellTests: XCTestCase {
         XCTAssertEqual(ko.hoverTitle(speciesID: id(16, .hg)), "MS-09 · HG 돔")
 
         let l = L(.en)
-        let plain = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: nil, mode: .used, l: l)
-        let titled = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: nil, mode: .used, l: l,
-                                                  title: "MS-09 · HG Dom")
-        XCTAssertEqual(titled, "MS-09 · HG Dom\n" + plain)
+        // With and without a limit: the limit line rebuilds the text, and the title must survive it.
+        for limit in [nil, 42.0] as [Double?] {
+            let plain = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: limit, mode: .used, l: l,
+                                                     prayers: 3)
+            let titled = FloatingPetView.hoverTooltip(todayTokens: 1, limitUtilization: limit, mode: .used, l: l,
+                                                      prayers: 3, title: "MS-09 · HG Dom")
+            XCTAssertEqual(titled, "MS-09 · HG Dom\n" + plain, "limit \(String(describing: limit))")
+        }
     }
 }

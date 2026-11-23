@@ -1083,7 +1083,6 @@ struct FloatingPetView: View {
                              eventLine: String? = nil, prayers: Int = 0, title: String? = nil) -> String {
         let usage = TokenFormatter.grouped(todayTokens)
         var base = l.floatingPetHoverTokensOnly(usage)
-        if let title, !title.isEmpty { base = title + "\n" + base }
         if let pct = limitUtilization {
             let percent = TokenFormatter.percent(UsageStore.displayPercent(pct, mode: mode))
             base = l.floatingPetHoverWithLimit(usage, mode == .remaining ? l.percentRemaining(percent) : percent)
@@ -1093,7 +1092,10 @@ struct FloatingPetView: View {
             base += " · " + (hours < 48 ? l.floatingPetHoverSulkHours(hours) : l.floatingPetHoverSulkDays(hours / 24))
         }
         if let eventLine { base += "\n" + eventLine }
-        return prayers > 0 ? base + "\n" + l.prayerHoverLine(prayers) : base
+        if prayers > 0 { base += "\n" + l.prayerHoverLine(prayers) }
+        // Prepended last: the limit branch above rebuilds `base`, which would drop an earlier title.
+        guard let title, !title.isEmpty else { return base }
+        return title + "\n" + base
     }
 }
 
