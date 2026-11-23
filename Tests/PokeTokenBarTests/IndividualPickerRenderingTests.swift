@@ -20,7 +20,7 @@ final class IndividualPickerRenderingTests: XCTestCase {
                     names: [sd: ["en": "SD Gundam"], hg: ["en": "HG Gundam"]])
             }
             try JSONEncoder().encode(state).write(to: file)
-            let store = CompanionStore(provider: MachineCatalog.shared, fileURL: file)
+            let store = CompanionStore(provider: MachineCatalog.allBundled, fileURL: file)
             let species = try XCTUnwrap(store.dexSpecies.first { $0.id == hg })
             let view = PokemonDetailView(store: store, species: species, onBack: {},
                 spriteStore: SpriteStore(directory: dir))

@@ -505,7 +505,7 @@ final class RareCandyStoreTests: XCTestCase {
     /// 건프라: 기체 4(커먼, HG·MG)를 졸업한 뒤 다시 나온 개체(반복 성장 부스트)에도 사탕 1개 = 최대 1단계.
     func testSingleCandyAdvancesAtMostOneBoostedStage() async {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("rc-\(UUID().uuidString).json")
-        let s = CompanionStore(provider: MachineCatalog.shared, clock: { rcNow }, fileURL: url, rng: SeededRNG(seed: 7))
+        let s = CompanionStore(provider: MachineCatalog.allBundled, clock: { rcNow }, fileURL: url, rng: SeededRNG(seed: 7))
         let start = GunplaID.encode(machineID: 4, grade: .hg)
         await s.hatch(baseID: start)
         for stage in 0..<2 {

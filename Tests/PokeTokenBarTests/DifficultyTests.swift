@@ -39,7 +39,7 @@ final class DifficultyTests: XCTestCase {
     /// 건프라: 기체 4(커먼, HG·MG)를 한 번 졸업하면 다음에 그 기체가 나올 때 반복 성장 부스트가 붙는다.
     func testRepeatBoostComposesWithDifficultyAndLiveChanges() async {
         let start = GunplaID.encode(machineID: 4, grade: .hg)
-        let s = store(growth: 0.5, provider: MachineCatalog.shared)
+        let s = store(growth: 0.5, provider: MachineCatalog.allBundled)
         await s.hatch(baseID: start)
         s.applyUsage(PokemonBalance.graduationTotal(.common) / 2)
         XCTAssertNil(s.state.active)

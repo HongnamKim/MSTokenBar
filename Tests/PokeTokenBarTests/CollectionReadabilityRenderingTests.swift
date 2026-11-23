@@ -15,7 +15,7 @@ final class CollectionReadabilityRenderingTests: XCTestCase {
         let directory = URL(fileURLWithPath: output)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         // Real catalog machines (first 18 base kits), one HG cell each; names come from the catalog.
-        let machines = Array(MachineCatalog.shared.machines.filter { !$0.isVariant && $0.grades.contains(.hg) }.prefix(18))
+        let machines = Array(MachineCatalog.allBundled.machines.filter { !$0.isVariant && $0.grades.contains(.hg) }.prefix(18))
         let ids = machines.map { GunplaID.encode(machineID: $0.id, grade: .hg) }
         let names = Dictionary(uniqueKeysWithValues: zip(ids, machines).map { ($0, $1.names) })
         let requestedLanguage = ProcessInfo.processInfo.environment["PTB_COLLECTION_SCREENSHOT_LANGUAGE"]
@@ -29,7 +29,7 @@ final class CollectionReadabilityRenderingTests: XCTestCase {
                          caughtAt: Date(timeIntervalSince1970: 1_700_000_000 + Double(offset)), names: names.filter { $0.key == id })
             }
             try JSONEncoder().encode(state).write(to: file)
-            let store = CompanionStore(provider: MachineCatalog.shared, fileURL: file)
+            let store = CompanionStore(provider: MachineCatalog.allBundled, fileURL: file)
             for log in [false, true] {
                 let navigation = PopoverNavigation()
                 navigation.showingCollectionLog = log

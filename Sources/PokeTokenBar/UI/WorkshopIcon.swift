@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Original pixel art shared by the companion, hangar, shop and menu bar.
 enum WorkshopArt: String, CaseIterable {
-    case box, airbrush, prayer, warning, hourglass, update
+    case box, airbrush, warning, hourglass, update
+    case boxQuestion = "box-question"
     case sandingSponge = "sanding-sponge"
     case maskingTape = "masking-tape"
     case panelLinePen = "panel-line-pen"

@@ -21,7 +21,7 @@ final class DexCompletionStoreTests: XCTestCase {
             .appendingPathComponent("ptb-dex-\(UUID().uuidString).json")
     }
 
-    private let catalog = MachineCatalog.shared
+    private let catalog = MachineCatalog.allBundled
 
     /// One DexEntry per machine, owning the given grades (every released grade when nil).
     private func entries(_ owned: [Int: [GunplaGrade]?]) -> [DexEntry] {

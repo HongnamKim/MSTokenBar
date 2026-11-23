@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class GunplaHatchIntegrationTests: XCTestCase {
-    private let catalog = MachineCatalog.shared
+    private let catalog = MachineCatalog.allBundled
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
     private func tempURL() -> URL {
