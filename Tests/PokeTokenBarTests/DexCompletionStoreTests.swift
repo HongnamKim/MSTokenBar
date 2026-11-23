@@ -42,8 +42,17 @@ final class DexCompletionStoreTests: XCTestCase {
         return CompanionStore(provider: catalog, fileURL: url)
     }
 
-    /// Zeta = machines 6 and 7, four grades each, no variants.
-    private let zeta: [Int: [GunplaGrade]?] = [6: nil, 7: nil]
+    private var zeta: [Int: [GunplaGrade]?] {
+        Dictionary(uniqueKeysWithValues: catalog.machines.filter { $0.series == "zeta" }.map {
+            ($0.id, nil as [GunplaGrade]?)
+        })
+    }
+
+    private var zetaWithoutPGZetaGundam: [Int: [GunplaGrade]?] {
+        var owned = zeta
+        owned[7] = [.sd, .hg, .rg, .mg]
+        return owned
+    }
 
     func testEmptyStoreHasNoCompletionsAndIsSeeded() throws {
         let url = tempURL()
@@ -58,7 +67,7 @@ final class DexCompletionStoreTests: XCTestCase {
     func testCompleteSeriesIsReportedComplete() throws {
         let s = try store(owning: zeta)
         let completion = s.dexCompletions.first { $0.seriesID == "zeta" }
-        XCTAssertEqual(completion?.ownedCells, 8)
+        XCTAssertEqual(completion?.ownedCells, 30)
         XCTAssertTrue(completion?.isComplete ?? false)
         XCTAssertTrue(s.earnedDexBadges.contains(.series("zeta")))
     }
@@ -94,13 +103,13 @@ final class DexCompletionStoreTests: XCTestCase {
 
     /// The raising machine's reached grade is owned before it graduates, so it can finish a series.
     func testActiveReachedGradeCompletesTheSeries() throws {
-        let partial = try store(owning: [6: nil, 7: [.hg, .rg, .mg]])
+        let partial = try store(owning: zetaWithoutPGZetaGundam)
         XCTAssertFalse(partial.earnedDexBadges.contains(.series("zeta")))
 
         let pg = GunplaID.encode(machineID: 7, grade: .pg)
         let active = MonState(baseID: pg, pathIDs: [pg], stageIndex: 0, usedAtStage: 0,
                               rarity: .rare, totalForms: 1)
-        let complete = try store(owning: [6: nil, 7: [.hg, .rg, .mg]], active: active)
+        let complete = try store(owning: zetaWithoutPGZetaGundam, active: active)
         XCTAssertTrue(complete.earnedDexBadges.contains(.series("zeta")))
         XCTAssertTrue(complete.state.notifiedDexCompletions.contains("series.zeta"))
     }
@@ -124,7 +133,7 @@ final class DexCompletionStoreTests: XCTestCase {
         defaults.set(1.0, forKey: "growthDifficulty")
 
         var legacy = CompanionState()
-        var owned: [Int: [GunplaGrade]?] = [6: nil, 7: [.hg, .rg, .mg]]
+        var owned: [Int: [GunplaGrade]?] = zetaWithoutPGZetaGundam
         if existingFirst {
             for machine in catalog.machines where machine.series == "first" && !machine.isVariant {
                 owned[machine.id] = .some(nil)

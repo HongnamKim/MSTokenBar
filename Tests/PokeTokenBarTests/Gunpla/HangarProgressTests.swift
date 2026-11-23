@@ -36,7 +36,7 @@ final class HangarProgressTests: XCTestCase {
 
     func test_completionsFollowCatalogSeriesOrder() {
         XCTAssertEqual(HangarProgress.completions(owned: [], catalog: catalog).map(\.seriesID),
-                       ["first", "08th-ms-team", "0080", "0083", "zeta", "cca", "uc"])
+                       ["first", "08th-ms-team", "0080", "0083", "zeta", "zz", "cca", "uc"])
     }
 
     func test_seriesBadgeWhenAllBaseCellsOwned() throws {
@@ -57,13 +57,13 @@ final class HangarProgressTests: XCTestCase {
         let first = try XCTUnwrap(completion("first", variants))
         XCTAssertTrue(first.isVariantComplete)
         XCTAssertFalse(first.isComplete)
-        // Every dev-data variant is in the first series, so its variant set is also every variant.
+        // The ZZ and CCA variants still need to be collected for the global badge.
         XCTAssertEqual(HangarProgress.earnedBadges(HangarProgress.completions(owned: variants, catalog: catalog)),
-                       [.seriesVariant("first"), .allVariant])
+                       [.seriesVariant("first")])
     }
 
     func test_seriesWithoutVariantsHasNoVariantBadge() throws {
-        let zetaCells = [cell(6), cell(7)]
+        let zetaCells = catalog.machines.filter { $0.series == "zeta" }.map { cell($0.id) }
         let zeta = try XCTUnwrap(completion("zeta", zetaCells))
         XCTAssertTrue(zeta.isComplete)
         XCTAssertEqual(zeta.variantTotalCells, 0)
@@ -76,7 +76,8 @@ final class HangarProgressTests: XCTestCase {
         let everything = catalog.machines.map { cell($0.id) }
         let badges = HangarProgress.earnedBadges(HangarProgress.completions(owned: everything, catalog: catalog))
         XCTAssertEqual(badges, [.series("first"), .seriesVariant("first"), .series("08th-ms-team"),
-                                .series("0080"), .series("0083"), .series("zeta"), .series("cca"), .series("uc"), .all, .allVariant])
+                                .series("0080"), .series("0083"), .series("zeta"), .series("zz"), .seriesVariant("zz"),
+                                .series("cca"), .seriesVariant("cca"), .series("uc"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))

@@ -39,11 +39,20 @@
     {
       "id": "zeta",
       "names": {
-        "ko": "제타",
-        "en": "Zeta",
-        "ja": "ゼータ"
+        "ko": "Z건담",
+        "en": "Mobile Suit Zeta Gundam",
+        "ja": "機動戦士Ζガンダム"
       },
       "order": 4
+    },
+    {
+      "id": "zz",
+      "names": {
+        "ko": "건담 ZZ",
+        "en": "Mobile Suit Gundam ZZ",
+        "ja": "機動戦士ガンダムΖΖ"
+      },
+      "order": 5
     },
     {
       "id": "cca",
@@ -52,7 +61,7 @@
         "en": "Char's Counterattack",
         "ja": "逆襲のシャア"
       },
-      "order": 5
+      "order": 6
     },
     {
       "id": "uc",
@@ -61,7 +70,7 @@
         "en": "Unicorn",
         "ja": "ユニコーン"
       },
-      "order": 6
+      "order": 7
     }
   ]
 }
