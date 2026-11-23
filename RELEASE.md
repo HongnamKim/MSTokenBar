@@ -1,6 +1,6 @@
 # 릴리스 프로세스
 
-버전 배포 시 **코드뿐 아니라 문서(README·웹페이지·cask)까지 일관되게** 갱신하기 위한 런북.
+버전 배포 시 **코드뿐 아니라 문서(README·웹페이지)까지 일관되게** 갱신하기 위한 런북. MSTokenBar 는 아직 Homebrew cask 가 없어 GitHub Release 의 zip 으로만 배포한다.
 기계적 단계는 `scripts/release.sh` 가 자동화하고, 내용 판단이 필요한 부분은 아래 체크리스트로 검토한다.
 
 ## 한 줄 배포
@@ -20,11 +20,10 @@ PTB_NOTES_FILE=/tmp/notes.md PTB_CONTRIBUTORS_FILE=/tmp/contributors.txt ./scrip
 1. **test-gate** (`./scripts/test-gate.sh`) — 전체 테스트 + 로직 커버리지. 실패 시 중단.
 2. **문서 일관성 검토** — 정적 버전 배지·제거된 의존성(예: `ccusage`) 잔존을 자동 경고 + 아래 수동 체크리스트 출력. 경고 시 진행 여부를 묻는다.
 3. **VERSION 범프** (`scripts/build-app.sh`, 아직 미커밋).
-4. **빌드 + zip** (`build/PokeTokenBar.zip`) + 빌드 버전 일치 + universal(arm64 + x86_64) 바이너리 확인 — **push 전 검증**(실패해도 범프 미커밋이라 origin/main 무손상).
+4. **빌드 + zip** (`build/MSTokenBar.zip`) + 빌드 버전 일치 + universal(arm64 + x86_64) 바이너리 확인 — **push 전 검증**(실패해도 범프 미커밋이라 origin/main 무손상).
 5. **커밋 + push** (`git push origin main`, 빌드 성공 후).
 6. **GitHub Release** 생성 (`PTB_NOTES_FILE` 원문 사용, 최소 노트 자동 대체 없음).
-7. **Homebrew cask** 버전 갱신 (`chattymin/homebrew-tap`).
-8. **GitHub Pages 재빌드** 요청 (랜딩 동적 배지 갱신 유도).
+7. **GitHub Pages 재빌드** 요청 (랜딩 동적 배지 갱신 유도).
 
 > `main` 브랜치에서만 실행(스크립트가 가드). 비-main 에서 실행 시 즉시 중단.
 
@@ -80,7 +79,6 @@ status item(AX)→팝오버 오픈(AXPress)까지 7개 체크. 5단계는 터미
   - 릴리스 배지는 **동적**(`img.shields.io/github/v/release/...`) → 버전 자동 반영. **기능/문구만 수동.**
   - i18n 사전 **en/ko/ja 동시** 갱신 + 마크업 키 ⊆ 사전, en==ko==ja 키 정합 유지.
   - 갱신은 worktree 로: `git worktree add /tmp/ptb-gh-pages gh-pages` → 편집 → commit/push → `git worktree remove`.
-- [ ] **homebrew-tap cask** caveats — 설치 요구사항(의존성 등) 최신인지. 버전은 release.sh 가 갱신.
 
 ## 자동으로 갱신되는 것 (수동 불필요)
 
@@ -90,10 +88,10 @@ status item(AX)→팝오버 오픈(AXPress)까지 7개 체크. 5단계는 터미
 ## 배포 후 검증
 
 ```bash
-brew update && brew upgrade --cask poke-token-bar
+gh release view v<version> --repo HongnamKim/MSTokenBar
 ```
 
-`brew list --cask --versions poke-token-bar` 와 `/Applications/PokeTokenBar.app` 버전이 새 버전인지 확인.
+릴리스에 `MSTokenBar.zip` 이 첨부됐는지, 이전 버전 앱이 업데이트 배너를 띄우는지 확인.
 
 ## 서명 (2026-07-08 부터)
 

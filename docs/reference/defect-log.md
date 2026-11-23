@@ -860,6 +860,15 @@ read_when:
 
 ## 표시·UI
 
+- **System control metrics differ by macOS version; do not hard-code them.** The pace marker
+  assumed the small `ProgressView` track is 6pt tall (macOS 26), but macOS 15 draws it 3pt, so
+  the 10pt marker was over three times the track. `testPaceMarkerStaysCloseToPaintedTrackHeight`
+  measured the painted track and failed on macOS 15 from the start, yet it was dismissed as a
+  "pre-existing upstream failure" because upstream CI only ran macOS 26. A rendering test that
+  fails on one supported OS is a real defect on that OS, not noise. The marker now uses 6pt on
+  macOS 26 and 3pt earlier; the same test passes on macOS 15. When sizing overlays against a
+  system control, measure it on every supported OS or draw the control yourself.
+
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.
   Keeping either side of their conflict alone discards egg prayers or agent acknowledgement, or

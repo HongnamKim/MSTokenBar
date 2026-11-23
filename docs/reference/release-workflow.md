@@ -23,7 +23,8 @@ read_when:
   (팝오버 라이브 캡처 아님) — Chrome `--headless --screenshot --force-device-scale-factor=2` 로 다크
   팝오버를 720px PNG 로 그린다. 애니 GIF(home)는 프레임 합성 후 `gifsicle -O3 --lossy` 로 최적화
   (PIL 재인코딩 단독은 용량 팽창 주의). 언어별 이미지(`settings.png`/`-ko`/`-ja` 등) 각 README 참조.
-- homebrew-tap cask caveat.
+- **랜딩**: 포크에는 GitHub Pages 가 켜져 있지 않다(`gh-pages` 는 원본 랜딩 사본). Pages 를 켜기 전까지는 랜딩 갱신을 건너뛴다.
+- Homebrew cask 는 아직 없다. 설치·업그레이드는 릴리스의 `MSTokenBar.zip` 으로 안내한다.
 
 ### 게이트의 함정
 
@@ -56,9 +57,9 @@ PTB_NOTES_FILE=/tmp/ptb-notes.md PTB_CONTRIBUTORS_FILE=/tmp/ptb-contributors.txt
 ```
 
 스크립트가 노트·Contributors 검증 → test-gate → 문서검토 → 범프 → 빌드검증 → 커밋·push →
-GitHub Release → cask → Pages를 순서대로 수행한다. 빌드 단계에서 기존 로컬 앱 종료·교체도 수행한다.
+GitHub Release → Pages를 순서대로 수행한다. 빌드 단계에서 기존 로컬 앱 종료·교체도 수행한다.
 노트나 기여자가 누락되면 앱 교체·push 전에 중단하며, 게시에는 검증한 노트 파일을 그대로 사용한다.
 
 ## 3. 검증
 
-완료 후 `brew upgrade --cask poke-token-bar` 로 실제 업그레이드 동작을 확인한다.
+완료 후 릴리스 페이지에 `MSTokenBar.zip` 이 올라왔는지, 이전 버전 앱이 업데이트 배너를 띄우는지 확인한다.
