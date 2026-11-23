@@ -20,10 +20,17 @@ struct GunplaGradeBadge: View {
 
     private var badgeScale: CGFloat { isFloatingMark ? 0.5 : 1 }
 
+    /// Pixel scale steps every 48pt so the art stays crisp. In-app sprites cap at 3x; the floating
+    /// pet can grow to 384pt, so its corner mark keeps growing with the pet instead of stopping at 144pt.
+    nonisolated static func imageScale(spriteSize: CGFloat, isFloatingMark: Bool) -> CGFloat {
+        let step = max(1.5, (spriteSize / 48).rounded(.down))
+        return isFloatingMark ? step * 0.5 : min(3, step)
+    }
+
     var body: some View {
         Group {
             if spriteSize >= 48, let image = Self.images[grade] {
-                let scale = min(3, max(1.5, (spriteSize / 48).rounded(.down))) * badgeScale
+                let scale = Self.imageScale(spriteSize: spriteSize, isFloatingMark: isFloatingMark)
                 Image(nsImage: image)
                     .renderingMode(.original)
                     .resizable()

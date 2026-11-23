@@ -1312,6 +1312,13 @@ read_when:
 
 ## 렌더 기하 (스프라이트·이미지)
 
+- **A size cap tuned for one surface must not ride along to a larger one.** The grade badge capped
+  its pixel scale at 3x for hangar and home sprites, and the floating pet reused it at half size.
+  The pet slider reaches 384pt, so from 144pt on the badge stayed 19.5pt while the pet grew 2.7x.
+  The original test asserted only "floating mark = half the in-app badge", which encoded the cap
+  instead of checking the pet's range. The floating mark now steps 0.5x per 48pt without a cap,
+  and `testFloatingMarkGrowsWithThePet` checks heights across the whole 48-384pt slider range.
+
 - **`.resizable()` + `.frame(w:h:)` 는 "맞춤"이 아니라 "늘여 채움"이다.** 대조 없이 정사각 프레임에 넣으면
   비정사각 원본은 그대로 왜곡된다. 이 부류가 오래 안 잡힌 이유가 핵심이다 — **정적 자산이 전부 정사각이라
   증상이 안 났다**(종 PNG 96×96, 아이템 30×30). 왜곡은 캔버스가 종마다 크롭된 **Gen-V 움직이는 GIF**
