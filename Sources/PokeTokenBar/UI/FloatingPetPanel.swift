@@ -1032,6 +1032,8 @@ struct FloatingPetView: View {
                        shiny: subject.isShiny,
                        minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore,
                        back: companion.facesBack, reportsVisibleTop: true)
+                // Only the sprite flips; bubbles, hearts and prayer emoji below keep reading left to right.
+                .scaleEffect(x: store.floatingPetMirrored ? -1 : 1, y: 1)
                 // One-shot wobble per prayer; keyframes run once per trigger change, never in a loop.
                 .keyframeAnimator(initialValue: 0.0, trigger: burst.wobbleCount) { sprite, angle in
                     sprite.rotationEffect(.degrees(angle))

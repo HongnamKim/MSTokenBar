@@ -430,6 +430,7 @@ struct L {
           "機体が画面の上に浮かびます — ドラッグで移動できます")
     }
     var floatingPetSizeLabel: String { t("크기", "Size", "サイズ", "Tamaño", "Taille", "Tamanho", "Größe", "Размер") }
+    var floatingPetMirroredLabel: String { t("좌우 반전", "Flip horizontally", "左右反転") }
     /// 푸터 눈 아이콘의 툴팁(켜져 있을 때) — 켜는 쪽 문구는 floatingPetEnableLabel 을 그대로 쓴다.
     var floatingPetHideLabel: String {
         t("플로팅 펫 숨기기", "Hide floating pet", "フローティングペットを隠す")
