@@ -1,8 +1,8 @@
-# Contributing to PokeTokenBar
+# Contributing to MSTokenBar
 
 **English** · [한국어](CONTRIBUTING.ko.md) · [日本語](CONTRIBUTING.ja.md)
 
-Thanks for your interest in contributing! PokeTokenBar is a small, non-commercial
+Thanks for your interest in contributing! MSTokenBar is a small, non-commercial
 fan project, and contributions of all sizes are welcome — bug reports, fixes,
 new usage providers, translations, and documentation.
 
@@ -97,19 +97,21 @@ The app is provider-agnostic by design. When extending it, follow these rules
 
 ## Legal / intellectual property
 
-PokeTokenBar is an **unofficial, non-commercial fan project** and is not
-affiliated with Nintendo, Game Freak, Creatures Inc., or The Pokémon Company
-(see the disclaimer in the [README](README.md#license--disclaimer)). To keep the
-project safe to maintain and distribute, contributions **must** follow these
-rules:
+MSTokenBar is an **unofficial, non-commercial fan project** and is not
+affiliated with Bandai Namco or Sunrise (see the disclaimer in the
+[README](README.md#disclaimer)). To keep the project safe to maintain and
+distribute, contributions **must** follow these rules:
 
-- **Do not commit or bundle any Pokémon (or other third-party) copyrighted
-  assets** — sprites, artwork, audio, fonts, or bulk name/data files. Pokémon
-  species data and sprites are fetched **at runtime** from the public
-  [PokéAPI](https://pokeapi.co) and cached locally on the user's device; keep it
-  that way.
-- **Do not add features intended for commercial use**, or features that
-  redistribute or export copyrighted assets.
+- **Do not commit, bundle, trace, or copy third-party copyrighted assets** —
+  official artwork, box art, screenshots, game sprites, audio, or fonts. Mobile
+  suit sprites must be **original pixel art**; see the
+  [sprite guidelines](docs/gunpla/sprite-guidelines.md).
+- **Keep catalog data factual** — model numbers, released kit grades, series,
+  and source links. Do not copy description text from wikis or official sites.
+- **Do not use the "Gundam" or "Gunpla" trademarks, or Bandai Namco or Sunrise
+  logos, in the app name or icon.**
+- **Do not add features intended for commercial use** (including donation or
+  sponsor links), or features that redistribute or export copyrighted assets.
 - **Do not commit secrets, credentials, or references to private/internal
   tooling.** Keep everything in the repository generic and public-safe.
 - By submitting a contribution, you confirm it is your **own original work** and
@@ -119,7 +121,7 @@ rules:
 
 ## Reporting bugs & requesting features
 
-Please use the issue templates. For bugs, include your macOS version, the app
+Please open an issue. For bugs, include your macOS version, the app
 version, which AI CLI(s) you use, and steps to reproduce.
 
 If you are a rights holder with a concern about this project, please open an
