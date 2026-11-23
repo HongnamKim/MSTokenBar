@@ -4,7 +4,7 @@ import XCTest
 /// The hangar groups the dex's synthetic (machine × grade) species into one cell per machine.
 @MainActor
 final class HangarCellTests: XCTestCase {
-    private let catalog = MachineCatalog.shared
+    private let catalog = MachineCatalog.allBundled
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
     private func id(_ machineID: Int, _ grade: GunplaGrade) -> Int {

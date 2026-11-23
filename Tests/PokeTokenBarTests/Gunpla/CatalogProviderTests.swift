@@ -7,7 +7,7 @@ final class CatalogProviderTests: XCTestCase {
     }
 
     func test_lineFromFirstGradeCoversAllReleasedGrades() async throws {
-        let line = try await MachineCatalog.shared.line(baseSpeciesID: GunplaID.encode(machineID: 2, grade: .sd))
+        let line = try await MachineCatalog.allBundled.line(baseSpeciesID: GunplaID.encode(machineID: 2, grade: .sd))
         XCTAssertEqual(pathIDs(line.tree), [.sd, .hg, .rg, .mg, .pg].map { GunplaID.encode(machineID: 2, grade: $0) })
         XCTAssertEqual(line.totalForms, 5)
         XCTAssertEqual(line.rarity, .common)
@@ -15,7 +15,7 @@ final class CatalogProviderTests: XCTestCase {
     }
 
     func test_lineFromResumedGradeStartsThere() async throws {
-        let line = try await MachineCatalog.shared.line(baseSpeciesID: GunplaID.encode(machineID: 1, grade: .rg))
+        let line = try await MachineCatalog.allBundled.line(baseSpeciesID: GunplaID.encode(machineID: 1, grade: .rg))
         XCTAssertEqual(line.totalForms, 3) // rg, mg, pg
     }
 
@@ -31,7 +31,7 @@ final class CatalogProviderTests: XCTestCase {
 
     func test_unreleasedGradeThrows() async {
         do {
-            _ = try await MachineCatalog.shared.line(baseSpeciesID: GunplaID.encode(machineID: 4, grade: .rg))
+            _ = try await MachineCatalog.allBundled.line(baseSpeciesID: GunplaID.encode(machineID: 4, grade: .rg))
             XCTFail("expected throw")
         } catch {
             XCTAssertEqual(error as? CatalogProviderError, .unreleasedGrade(GunplaID.encode(machineID: 4, grade: .rg)))
@@ -40,7 +40,7 @@ final class CatalogProviderTests: XCTestCase {
 
     func test_unknownSpeciesThrows() async {
         do {
-            _ = try await MachineCatalog.shared.line(baseSpeciesID: 25)
+            _ = try await MachineCatalog.allBundled.line(baseSpeciesID: 25)
             XCTFail("expected throw")
         } catch {
             XCTAssertEqual(error as? CatalogProviderError, .unknownSpecies(25))
@@ -48,15 +48,15 @@ final class CatalogProviderTests: XCTestCase {
     }
 
     func test_unusedProviderMethodsAreEmpty() async throws {
-        let index = try await MachineCatalog.shared.baseSpeciesIndex()
+        let index = try await MachineCatalog.allBundled.baseSpeciesIndex()
         XCTAssertTrue(index.isEmpty)
-        let one = try await MachineCatalog.shared.baseSpecies(id: 1)
+        let one = try await MachineCatalog.allBundled.baseSpecies(id: 1)
         XCTAssertNil(one)
     }
 
     func test_englishNameForUnnamedLanguageFallback() async throws {
         let id = GunplaID.encode(machineID: 2, grade: .hg)
-        let line = try await MachineCatalog.shared.line(baseSpeciesID: id)
+        let line = try await MachineCatalog.allBundled.line(baseSpeciesID: id)
         XCTAssertTrue(line.localizedName(id, .en).hasPrefix("HG "))
     }
 }

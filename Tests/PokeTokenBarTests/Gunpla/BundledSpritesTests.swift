@@ -32,7 +32,7 @@ final class BundledSpritesTests: XCTestCase {
             "MS-09": "dom", "MS-14A": "gelgoog", "MS-14S": "chars-gelgoog", "MSM-07": "zgok",
             "MSM-07S": "chars-zgok", "MSM-04": "acguy", "YMS-15": "gyan", "MSN-02": "zeong",
         ]
-        let first = MachineCatalog.shared.machines.filter { $0.series == "first" }
+        let first = MachineCatalog.allBundled.machines.filter { $0.series == "first" }
         for (model, art) in expected {
             let machine = try XCTUnwrap(first.first { $0.modelNumber == model }, model)
             XCTAssertTrue(machine.grades.contains(.hg), model)

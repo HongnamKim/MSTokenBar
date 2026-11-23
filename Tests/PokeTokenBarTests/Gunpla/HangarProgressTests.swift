@@ -3,7 +3,7 @@ import XCTest
 
 /// Series completion counts (machine, released grade) cells; base machines and variants are tallied apart.
 final class HangarProgressTests: XCTestCase {
-    private let catalog = MachineCatalog.shared
+    private let catalog = MachineCatalog.allBundled
 
     /// A hangar cell owning `grades` of machine `id` (every released grade when nil).
     private func cell(_ id: Int, _ grades: [GunplaGrade]? = nil) -> HangarCell {

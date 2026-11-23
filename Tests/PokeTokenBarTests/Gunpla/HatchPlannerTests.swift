@@ -2,7 +2,7 @@ import XCTest
 @testable import PokeTokenBar
 
 final class HatchPlannerTests: XCTestCase {
-    private let catalog = MachineCatalog.shared
+    private let catalog = MachineCatalog.allBundled
     private var allIDs: Set<Int> { Set(catalog.machines.map(\.id)) }
     private var variantIDs: Set<Int> { Set(catalog.machines.filter(\.isVariant).map(\.id)) }
     private var allBaseIDs: Set<Int> { allIDs.subtracting(variantIDs) }

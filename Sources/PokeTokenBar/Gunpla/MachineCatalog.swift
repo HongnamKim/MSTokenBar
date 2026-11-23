@@ -87,6 +87,17 @@ struct MachineCatalog: Sendable {
         )
     }
 
+    /// Only machines with bundled art for every released grade can appear (the silhouette is a fallback,
+    /// not art). A variant leaves with its base, and a series with no machine left is hidden.
+    func keepingMachinesWithArt(bundle: Bundle = GunplaResources.bundle) throws -> MachineCatalog {
+        let ready = Set(machines.filter { machine in
+            machine.grades.allSatisfy { BundledSprites.artName(sprites: machine.sprites, grade: $0, bundle: bundle) != nil }
+        }.map(\.id))
+        let kept = machines.filter { ready.contains($0.id) && $0.variantOf.map(ready.contains) ?? true }
+        let keptSeries = Set(kept.map(\.series))
+        return try MachineCatalog(machines: kept, series: series.filter { keptSeries.contains($0.id) })
+    }
+
     // The bundled data is guaranteed valid by MachineCatalogTests.
-    static let shared: MachineCatalog = try! bundled()
+    static let shared: MachineCatalog = try! bundled().keepingMachinesWithArt()
 }

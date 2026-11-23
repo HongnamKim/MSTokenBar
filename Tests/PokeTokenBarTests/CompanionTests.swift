@@ -1185,7 +1185,7 @@ final class CompanionStoreTests: XCTestCase {
             .appendingPathComponent("poke-repeat-persist-\(UUID().uuidString).json")
         // 건프라: 기체 4(커먼, HG·MG)를 졸업한 뒤 다시 키우면 부스트가 붙고 재시작에도 유지된다.
         let start = GunplaID.encode(machineID: 4, grade: .hg)
-        let s1 = CompanionStore(provider: MachineCatalog.shared, clock: { fixedNow },
+        let s1 = CompanionStore(provider: MachineCatalog.allBundled, clock: { fixedNow },
                                 fileURL: url, rng: SeededRNG(seed: 1))
         await s1.hatch(baseID: start)
         for stage in 0..<2 {
@@ -1195,7 +1195,7 @@ final class CompanionStoreTests: XCTestCase {
         await s1.hatch(baseID: start)
         XCTAssertTrue(s1.state.active?.hasGrowthBoost == true)
 
-        let s2 = CompanionStore(provider: MachineCatalog.shared, clock: { fixedNow },
+        let s2 = CompanionStore(provider: MachineCatalog.allBundled, clock: { fixedNow },
                                 fileURL: url, rng: SeededRNG(seed: 1))
         XCTAssertTrue(s2.state.active?.hasGrowthBoost == true)
         XCTAssertEqual(s2.tokensToNext, PokemonBalance.phaseThreshold(
