@@ -7,14 +7,13 @@
 #   ./scripts/release.sh --check-only     # 문서 일관성 검토만(배포 안 함)
 #
 # 단계: 1)test-gate 2)문서 검토 3)VERSION 범프 4)build+zip 5)커밋·push
-#       6)GitHub Release 7)Homebrew cask 8)Pages 재빌드. 각 단계 실패 시 즉시 중단(set -e).
+#       6)GitHub Release 7)Pages 재빌드. 각 단계 실패 시 즉시 중단(set -e).
+# MSTokenBar has no Homebrew cask yet, so releases ship only the zip on GitHub Releases.
 #
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 REPO="HongnamKim/MSTokenBar"
-TAP_REPO="chattymin/homebrew-tap"
-CASK_PATH="Casks/poke-token-bar.rb"
 
 # ── 문서 일관성 검토 (배포 전 항상 실행) ───────────────────────────────────
 # 기계적으로 잡을 수 있는 것만 자동 경고. 내용(기능 설명) 변경 여부는 사람이 체크리스트로 판단.
@@ -70,7 +69,6 @@ doc_check() {
    [ ] 랜딩(gh-pages/index.html): hero·features·install·works-with·요구사항·푸터
        · 버전 배지는 동적(github/v/release) → 자동. 기능/문구만 수동.
        · 3개 언어 i18n 사전(en/ko/ja) 동시 갱신 + 키 정합 유지.
-   [ ] homebrew-tap cask: caveats(설치 요구사항) 최신 상태인지
   ─────────────────────────────────────────────────────────────────
 CHECK
   return $warn
@@ -93,7 +91,7 @@ NOTES_FILE="${PTB_NOTES_FILE:-}"
 python3 scripts/release-metadata.py check-notes "$NOTES_FILE" "${PTB_CONTRIBUTORS_FILE:-}"
 COMMIT_MESSAGE=$(python3 scripts/release-metadata.py commit-message "$VERSION" "${PTB_COAUTHORS_FILE:-}")
 
-echo "▶ 1/8 릴리스 전 테스트 게이트"
+echo "▶ 1/7 릴리스 전 테스트 게이트"
 ./scripts/test-gate.sh >/dev/null || { echo "✗ test-gate 실패 — 중단"; exit 1; }
 echo "  ✓ 통과"
 
@@ -130,10 +128,10 @@ fi
 echo "  ✓ '$SIGN_IDENTITY' leaf=$LEAF — 안정적 서명으로 배포(사용자 재프롬프트 없음)"
 export PTB_REQUIRE_STABLE_SIGN=1   # build-app.sh 방어선: ad-hoc 폴백으로 새면 즉시 실패
 
-echo "▶ 3/8 VERSION 범프 $PREV → $VERSION (아직 미커밋)"
+echo "▶ 3/7 VERSION 범프 $PREV → $VERSION (아직 미커밋)"
 perl -pi -e "s/VERSION=\"[0-9.]+\"/VERSION=\"$VERSION\"/" scripts/build-app.sh
 
-echo "▶ 4/8 빌드 + zip (push 전 검증 — 실패해도 범프 미커밋이라 origin/main 무손상)"
+echo "▶ 4/7 빌드 + zip (push 전 검증 — 실패해도 범프 미커밋이라 origin/main 무손상)"
 ./scripts/build-app.sh >/dev/null
 rm -f build/MSTokenBar.zip
 ditto -c -k --keepParent build/MSTokenBar.app build/MSTokenBar.zip
@@ -143,26 +141,16 @@ BUILT=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" build/MSTo
 lipo build/MSTokenBar.app/Contents/MacOS/MSTokenBar -verify_arch arm64 x86_64 \
   || { echo "✗ universal 바이너리 아님: $(lipo -archs build/MSTokenBar.app/Contents/MacOS/MSTokenBar) (arm64 + x86_64 필요)"; exit 1; }
 
-echo "▶ 5/8 커밋 + push (빌드 성공 후)"
+echo "▶ 5/7 커밋 + push (빌드 성공 후)"
 git add scripts/build-app.sh
 git commit -q -m "$COMMIT_MESSAGE"
 git push -q origin main
 
-echo "▶ 6/8 GitHub Release v$VERSION"
+echo "▶ 6/7 GitHub Release v$VERSION"
 gh release create "v$VERSION" build/MSTokenBar.zip --repo "$REPO" \
   --title "MSTokenBar v$VERSION" --target main --notes-file "$NOTES_FILE"
 
-echo "▶ 7/8 Homebrew cask $VERSION"
-TMP_CASK=$(mktemp)
-gh api "repos/$TAP_REPO/contents/$CASK_PATH" --jq '.content' | base64 -d \
-  | perl -pe "s/version \"[0-9.]+\"/version \"$VERSION\"/" > "$TMP_CASK"
-SHA=$(gh api "repos/$TAP_REPO/contents/$CASK_PATH" --jq '.sha')
-gh api -X PUT "repos/$TAP_REPO/contents/$CASK_PATH" \
-  -f message="cask: poke-token-bar $VERSION" \
-  -f content="$(base64 -i "$TMP_CASK")" -f sha="$SHA" --jq '.commit.html_url'
-rm -f "$TMP_CASK"
-
-echo "▶ 8/8 GitHub Pages 재빌드(랜딩 동적 배지 갱신 유도)"
+echo "▶ 7/7 GitHub Pages 재빌드(랜딩 동적 배지 갱신 유도)"
 gh api -X POST "repos/$REPO/pages/builds" >/dev/null 2>&1 || true
 
-echo "✓ v$VERSION 배포 완료. 검증: brew upgrade --cask poke-token-bar"
+echo "✓ v$VERSION 배포 완료. 검증: https://github.com/$REPO/releases/tag/v$VERSION 에서 MSTokenBar.zip 확인"

@@ -30,9 +30,9 @@ Thank you all.
 
 ---
 
-**Install:** `brew install --cask chattymin/tap/poke-token-bar` — or download `PokeTokenBar.zip` below.
+**Install:** download `MSTokenBar.zip` below, unzip it, and move `MSTokenBar.app` to Applications. On first launch, right-click the app and choose Open.
 
-**Upgrade:** `brew upgrade --cask poke-token-bar`
+**Upgrade:** when the app shows a new version, download `MSTokenBar.zip` from that release and replace the app in Applications.
 """
 
 
@@ -62,7 +62,7 @@ class ReleaseMetadataTests(unittest.TestCase):
             self.check()
 
     def test_all_sections_and_install_instructions_are_required(self):
-        for value in ("## New", "## Fixed", "## Other", "## Contributors", "brew upgrade --cask poke-token-bar"):
+        for value in ("## New", "## Fixed", "## Other", "## Contributors", "MSTokenBar.zip"):
             with self.subTest(value=value):
                 self.notes.write_text(NOTES.replace(value, "removed"))
                 with self.assertRaises(ValueError):

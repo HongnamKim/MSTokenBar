@@ -21,9 +21,9 @@ def check_notes(notes_path, contributors_path):
     for name in ("New", "Fixed", "Other", "Contributors"):
         if not sections.get(name):
             raise ValueError(f"Release notes need a nonempty '## {name}' section")
-    for command in ("brew install --cask chattymin/tap/poke-token-bar", "brew upgrade --cask poke-token-bar"):
-        if command not in visible:
-            raise ValueError(f"Release notes are missing: {command}")
+    for required in ("**Install:**", "**Upgrade:**", "MSTokenBar.zip"):
+        if required not in visible:
+            raise ValueError(f"Release notes are missing: {required}")
 
     roster = read_file(contributors_path, "PTB_CONTRIBUTORS_FILE")
     expected = set()
@@ -38,7 +38,7 @@ def check_notes(notes_path, contributors_path):
         return {name.lower() for name, bot in re.findall(
             r"@([A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)(\[bot\])?", text, re.I) if not bot}
     # Also catch a credited contributor accidentally omitted from the final roster.
-    expected |= mentions("\n".join(sections[name] for name in ("New", "Fixed", "Other"))) - {"chattymin"}
+    expected |= mentions("\n".join(sections[name] for name in ("New", "Fixed", "Other"))) - {"chattymin", "hongnamkim"}
     actual = mentions(sections["Contributors"])
     missing = expected - actual
     if missing:

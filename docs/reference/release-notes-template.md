@@ -23,6 +23,6 @@ When there are none, write exactly: No external contributors in this release. --
 
 ---
 
-**Install:** `brew install --cask chattymin/tap/poke-token-bar` — or download `PokeTokenBar.zip` below.
+**Install:** download `MSTokenBar.zip` below, unzip it, and move `MSTokenBar.app` to Applications. On first launch, right-click the app and choose Open.
 
-**Upgrade:** `brew upgrade --cask poke-token-bar`
+**Upgrade:** when the app shows a new version, download `MSTokenBar.zip` from that release and replace the app in Applications.
