@@ -59,6 +59,7 @@ final class DisplayPetController: NSObject, NSWindowDelegate {
             _ = store.floatingPetEnabled
             _ = store.floatingPetSize
             _ = companion.displayPetSubject
+            _ = companion.language   // the hover name is localized
         } onChange: { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
@@ -82,6 +83,8 @@ final class DisplayPetController: NSObject, NSWindowDelegate {
             p.contentView = makeHostingView(animated: wantAnimated)
             builtAnimated = wantAnimated
         }
+        // Hovering names the suit, like the main pet's first hover line.
+        p.contentView?.toolTip = companion.hoverTitle(speciesID: companion.displayPetSubject?.speciesID)
         let size = CGFloat(store.floatingPetSize)
         p.setFrame(NSRect(origin: savedOrigin(petSize: size), size: NSSize(width: size, height: size)), display: true)
         p.orderFrontRegardless()
