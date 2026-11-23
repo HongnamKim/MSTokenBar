@@ -44,19 +44,20 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 50)
+        XCTAssertEqual(c.machines.count, 76)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
-        XCTAssertEqual(c.series.count, 7)
+        XCTAssertEqual(c.series.count, 8)
     }
 
     func test_completedSeriesServeGradeSpecificArtAndKitSources() throws {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
                                         "www.bandaispirits.co.jp", "p-bandai.jp"]
-        let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12]
+        let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
+                      "zeta": 13, "zz": 10, "cca": 8]
         for (series, count) in counts {
             let machines = catalog.machines.filter { $0.series == series }
             XCTAssertEqual(machines.count, count, series)

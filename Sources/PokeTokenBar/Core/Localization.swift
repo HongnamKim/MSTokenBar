@@ -1288,6 +1288,7 @@ struct L {
         case "delaz": return t("데라즈 플리트", "Delaz Fleet", "デラーズ・フリート")
         case "cima": return t("시마 함대", "Cima Fleet", "シーマ艦隊")
         case "aeug": return t("에우고", "AEUG", "エゥーゴ")
+        case "karaba": return t("카라바", "Karaba", "カラバ")
         case "titans": return t("티탄즈", "Titans", "ティターンズ")
         case "axis": return t("액시즈", "Axis", "アクシズ")
         case "neo_zeon": return t("네오지온", "Neo Zeon", "ネオ・ジオン")

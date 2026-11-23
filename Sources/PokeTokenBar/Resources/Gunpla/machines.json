@@ -156,19 +156,34 @@
       "id": 6,
       "modelNumber": "RX-178",
       "names": {
-        "ko": "건담 Mk-II",
-        "en": "Gundam Mk-II",
-        "ja": "ガンダムMk-II"
+        "ko": "건담 Mk-II(에우고)",
+        "en": "Gundam Mk-II (AEUG)",
+        "ja": "ガンダムMk-II（エゥーゴ）"
       },
       "series": "zeta",
       "faction": "aeug",
       "rarity": "rare",
       "grades": [
+        "sd",
         "hg",
         "rg",
         "mg",
         "pg"
-      ]
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425244914000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1007",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/661",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/537",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/651"
+      },
+      "sprites": {
+        "sd": "mk-ii-aeug-sd",
+        "hg": "mk-ii-aeug-hg",
+        "rg": "mk-ii-aeug-rg",
+        "mg": "mk-ii-aeug-mg",
+        "pg": "mk-ii-aeug-pg"
+      }
     },
     {
       "id": 7,
@@ -182,17 +197,32 @@
       "faction": "aeug",
       "rarity": "rare",
       "grades": [
+        "sd",
         "hg",
         "rg",
         "mg",
         "pg"
-      ]
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660303664000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/471",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/846",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/647",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/649"
+      },
+      "sprites": {
+        "sd": "zeta-gundam-sd",
+        "hg": "zeta-gundam-hg",
+        "rg": "zeta-gundam-rg",
+        "mg": "zeta-gundam-mg",
+        "pg": "zeta-gundam-pg"
+      }
     },
     {
       "id": 8,
       "modelNumber": "RX-93",
       "names": {
-        "ko": "ν 건담",
+        "ko": "뉴 건담",
         "en": "Nu Gundam",
         "ja": "νガンダム"
       },
@@ -203,8 +233,23 @@
         "sd",
         "hg",
         "rg",
-        "mg"
-      ]
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609281000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/847",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/679",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/604",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/4200"
+      },
+      "sprites": {
+        "sd": "nu-gundam-sd",
+        "hg": "nu-gundam-hg",
+        "rg": "nu-gundam-rg",
+        "mg": "nu-gundam-mg",
+        "pg": "nu-gundam-pg"
+      }
     },
     {
       "id": 9,
@@ -222,23 +267,46 @@
         "hg",
         "rg",
         "mg"
-      ]
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609298000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/403",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/677",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/949"
+      },
+      "sprites": {
+        "sd": "sazabi-sd",
+        "hg": "sazabi-hg",
+        "rg": "sazabi-rg",
+        "mg": "sazabi-mg"
+      }
     },
     {
       "id": 10,
       "modelNumber": "RGZ-91",
       "names": {
-        "ko": "리 가지",
+        "ko": "리가지",
         "en": "Re-GZ",
         "ja": "リ・ガズィ"
       },
       "series": "cca",
       "faction": "londo_bell",
-      "rarity": "common",
+      "rarity": "uncommon",
       "grades": [
+        "sd",
         "hg",
         "mg"
-      ]
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425243931000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/401",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/869"
+      },
+      "sprites": {
+        "sd": "re-gz-sd",
+        "hg": "re-gz-hg",
+        "mg": "re-gz-mg"
+      }
     },
     {
       "id": 11,
@@ -1231,6 +1299,631 @@
       },
       "sprites": {
         "hg": "gerbera-tetra-hg"
+      }
+    },
+    {
+      "id": 52,
+      "modelNumber": "MSN-00100",
+      "names": {
+        "ko": "백식",
+        "en": "Hyaku Shiki",
+        "ja": "百式"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112052681000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/467",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/853"
+      },
+      "sprites": {
+        "sd": "hyaku-shiki-sd",
+        "hg": "hyaku-shiki-hg",
+        "mg": "hyaku-shiki-mg"
+      }
+    },
+    {
+      "id": 53,
+      "modelNumber": "RMS-099",
+      "names": {
+        "ko": "릭 디아스",
+        "en": "Rick Dias",
+        "ja": "リック・ディアス"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/210",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/820"
+      },
+      "sprites": {
+        "hg": "rick-dias-hg",
+        "mg": "rick-dias-mg"
+      }
+    },
+    {
+      "id": 54,
+      "modelNumber": "MSA-005",
+      "names": {
+        "ko": "메타스",
+        "en": "Methuss",
+        "ja": "メタス"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/896"
+      },
+      "sprites": {
+        "hg": "methuss-hg"
+      }
+    },
+    {
+      "id": 55,
+      "modelNumber": "MSK-008",
+      "names": {
+        "ko": "디제",
+        "en": "Dijeh",
+        "ja": "ディジェ"
+      },
+      "series": "zeta",
+      "faction": "karaba",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/485"
+      },
+      "sprites": {
+        "hg": "dijeh-hg"
+      }
+    },
+    {
+      "id": 56,
+      "modelNumber": "RMS-106",
+      "names": {
+        "ko": "하이잭",
+        "en": "Hizack",
+        "ja": "ハイザック"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/212",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/529"
+      },
+      "sprites": {
+        "hg": "hizack-hg",
+        "mg": "hizack-mg"
+      }
+    },
+    {
+      "id": 57,
+      "modelNumber": "RMS-108",
+      "names": {
+        "ko": "마라사이",
+        "en": "Marasai",
+        "ja": "マラサイ"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/247",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/603"
+      },
+      "sprites": {
+        "hg": "marasai-hg",
+        "mg": "marasai-mg"
+      }
+    },
+    {
+      "id": 58,
+      "modelNumber": "RX-110",
+      "names": {
+        "ko": "가브슬레이",
+        "en": "Gabthley",
+        "ja": "ガブスレイ"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/895"
+      },
+      "sprites": {
+        "hg": "gabthley-hg"
+      }
+    },
+    {
+      "id": 59,
+      "modelNumber": "RX-139",
+      "names": {
+        "ko": "함브라비",
+        "en": "Hambrabi",
+        "ja": "ハンブラビ"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/371"
+      },
+      "sprites": {
+        "hg": "hambrabi-hg"
+      }
+    },
+    {
+      "id": 60,
+      "modelNumber": "RX-160",
+      "names": {
+        "ko": "바이아란",
+        "en": "Byarlant",
+        "ja": "バイアラン"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/482"
+      },
+      "sprites": {
+        "hg": "byarlant-hg"
+      }
+    },
+    {
+      "id": 61,
+      "modelNumber": "AMX-004",
+      "names": {
+        "ko": "큐베레이",
+        "en": "Qubeley",
+        "ja": "キュベレイ"
+      },
+      "series": "zeta",
+      "faction": "axis",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112024053000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/462",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/509"
+      },
+      "sprites": {
+        "sd": "qubeley-sd",
+        "hg": "qubeley-hg",
+        "mg": "qubeley-mg"
+      }
+    },
+    {
+      "id": 62,
+      "modelNumber": "PMX-003",
+      "names": {
+        "ko": "디 오",
+        "en": "The O",
+        "ja": "ジ・O"
+      },
+      "series": "zeta",
+      "faction": "titans",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112017895000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/234",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/583"
+      },
+      "sprites": {
+        "sd": "the-o-sd",
+        "hg": "the-o-hg",
+        "mg": "the-o-mg"
+      }
+    },
+    {
+      "id": 63,
+      "modelNumber": "MSZ-010",
+      "names": {
+        "ko": "더블제타 건담",
+        "en": "ZZ Gundam",
+        "ja": "ダブルゼータガンダム"
+      },
+      "series": "zz",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425776286000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/417",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/629"
+      },
+      "sprites": {
+        "sd": "zz-gundam-sd",
+        "hg": "zz-gundam-hg",
+        "mg": "zz-gundam-mg"
+      }
+    },
+    {
+      "id": 64,
+      "modelNumber": "AMX-107",
+      "names": {
+        "ko": "바우",
+        "en": "Bawoo",
+        "ja": "バウ"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/215"
+      },
+      "sprites": {
+        "hg": "bawoo-hg"
+      }
+    },
+    {
+      "id": 65,
+      "modelNumber": "AMX-011",
+      "names": {
+        "ko": "자쿠 III",
+        "en": "Zaku III",
+        "ja": "ザクIII"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425244921000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/214"
+      },
+      "sprites": {
+        "sd": "zaku-iii-sd",
+        "hg": "zaku-iii-hg"
+      }
+    },
+    {
+      "id": 66,
+      "modelNumber": "AMX-011S",
+      "names": {
+        "ko": "자쿠 III 개",
+        "en": "Zaku III Custom",
+        "ja": "ザクIII改"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425727868000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/206"
+      },
+      "variantOf": 65,
+      "sprites": {
+        "sd": "zaku-iii-custom-sd",
+        "hg": "zaku-iii-custom-hg"
+      }
+    },
+    {
+      "id": 67,
+      "modelNumber": "AMX-009",
+      "names": {
+        "ko": "드라이센",
+        "en": "Dreissen",
+        "ja": "ドライセン"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/396"
+      },
+      "sprites": {
+        "hg": "dreissen-hg"
+      }
+    },
+    {
+      "id": 68,
+      "modelNumber": "AMX-014",
+      "names": {
+        "ko": "도벤 울프",
+        "en": "Döven Wolf",
+        "ja": "ドーベン・ウルフ"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/951"
+      },
+      "sprites": {
+        "hg": "doven-wolf-hg"
+      }
+    },
+    {
+      "id": 69,
+      "modelNumber": "AMX-102",
+      "names": {
+        "ko": "즈사",
+        "en": "Zssa",
+        "ja": "ズサ"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2252"
+      },
+      "sprites": {
+        "hg": "zssa-hg"
+      }
+    },
+    {
+      "id": 70,
+      "modelNumber": "AMX-104",
+      "names": {
+        "ko": "R·쟈쟈",
+        "en": "R-Jarja",
+        "ja": "R・ジャジャ"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/483"
+      },
+      "sprites": {
+        "hg": "r-jarja-hg"
+      }
+    },
+    {
+      "id": 71,
+      "modelNumber": "AMX-004-2",
+      "names": {
+        "ko": "큐베레이 Mk-II(플기)",
+        "en": "Qubeley Mk-II (Ple)",
+        "ja": "キュベレイMk-II（エルピー・プル専用機）"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112040312000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/211",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/841"
+      },
+      "variantOf": 61,
+      "sprites": {
+        "sd": "qubeley-mk-ii-ple-sd",
+        "hg": "qubeley-mk-ii-ple-hg",
+        "mg": "qubeley-mk-ii-ple-mg"
+      }
+    },
+    {
+      "id": 72,
+      "modelNumber": "AMX-004-3",
+      "names": {
+        "ko": "큐베레이 Mk-II(플 투기)",
+        "en": "Qubeley Mk-II (Ple Two)",
+        "ja": "キュベレイMk-II（プルツー専用機）"
+      },
+      "series": "zz",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112040312000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2284",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/526"
+      },
+      "variantOf": 61,
+      "sprites": {
+        "sd": "qubeley-mk-ii-ple-two-sd",
+        "hg": "qubeley-mk-ii-ple-two-hg",
+        "mg": "qubeley-mk-ii-ple-two-mg"
+      }
+    },
+    {
+      "id": 73,
+      "modelNumber": "RGM-89",
+      "names": {
+        "ko": "제간",
+        "en": "Jegan",
+        "ja": "ジェガン"
+      },
+      "series": "cca",
+      "faction": "londo_bell",
+      "rarity": "common",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425237589000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/411",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/860"
+      },
+      "sprites": {
+        "sd": "jegan-sd",
+        "hg": "jegan-hg",
+        "mg": "jegan-mg"
+      }
+    },
+    {
+      "id": 74,
+      "modelNumber": "AMS-119",
+      "names": {
+        "ko": "기라 도가",
+        "en": "Geara Doga",
+        "ja": "ギラ・ドーガ"
+      },
+      "series": "cca",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425243924000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/909",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/850"
+      },
+      "sprites": {
+        "sd": "geara-doga-sd",
+        "hg": "geara-doga-hg",
+        "mg": "geara-doga-mg"
+      }
+    },
+    {
+      "id": 75,
+      "modelNumber": "AMS-119",
+      "names": {
+        "ko": "레즌 전용 기라 도가",
+        "en": "Geara Doga (Rezin Schneider)",
+        "ja": "ギラ・ドーガ（レズン・シュナイダー専用機）"
+      },
+      "series": "cca",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112538024000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/409",
+        "mg": "https://p-bandai.jp/press/2013/07/1000000182/"
+      },
+      "variantOf": 74,
+      "sprites": {
+        "sd": "geara-doga-rezin-sd",
+        "hg": "geara-doga-rezin-hg",
+        "mg": "geara-doga-rezin-mg"
+      }
+    },
+    {
+      "id": 76,
+      "modelNumber": "MSN-03",
+      "names": {
+        "ko": "야크트 도가(규네이기)",
+        "en": "Jagd Doga (Gyunei Guss)",
+        "ja": "ヤクト・ドーガ（ギュネイ・ガス専用機）"
+      },
+      "series": "cca",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425236476000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/905"
+      },
+      "sprites": {
+        "sd": "jagd-doga-gyunei-sd",
+        "hg": "jagd-doga-gyunei-hg"
+      }
+    },
+    {
+      "id": 77,
+      "modelNumber": "MSN-03",
+      "names": {
+        "ko": "야크트 도가(퀘스기)",
+        "en": "Jagd Doga (Quess Paraya)",
+        "ja": "ヤクト・ドーガ（クェス・パラヤ専用機）"
+      },
+      "series": "cca",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425727813000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/906"
+      },
+      "sprites": {
+        "sd": "jagd-doga-quess-sd",
+        "hg": "jagd-doga-quess-hg"
       }
     }
   ]

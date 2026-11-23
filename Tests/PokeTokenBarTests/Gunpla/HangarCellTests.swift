@@ -68,7 +68,8 @@ final class HangarCellTests: XCTestCase {
     }
 
     func test_storeCompletionsAndBadgesComeFromHangarCells() throws {
-        let s = try store(dex: [entry(6, [.hg, .rg, .mg, .pg]), entry(7, [.hg, .rg, .mg, .pg]), entry(3, [.sd])])
+        let completedZeta = catalog.machines.filter { $0.series == "zeta" }.map { entry($0.id, $0.grades) }
+        let s = try store(dex: completedZeta + [entry(3, [.sd])])
         let zeta = try XCTUnwrap(s.dexCompletions.first { $0.seriesID == "zeta" })
         XCTAssertTrue(zeta.isComplete)
         XCTAssertEqual(s.dexCompletions.first { $0.seriesID == "first" }?.variantOwnedCells, 1)
