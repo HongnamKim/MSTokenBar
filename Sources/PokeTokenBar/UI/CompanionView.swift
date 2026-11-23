@@ -1010,6 +1010,17 @@ struct CollectionView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
 
+                if nav.pickingDisplayPet && !nav.showingCollectionLog {
+                    HStack(spacing: 6) {
+                        Text(store.l.representativePickPrompt)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                        Spacer()
+                        Button(store.l.cancel) { nav.finishDisplayPetPick() }
+                            .controlSize(.small)
+                    }
+                }
+
                 filterToolbar
 
                 if nav.showingCollectionLog {
@@ -1023,7 +1034,14 @@ struct CollectionView: View {
                         selectedRarity: $selectedRarity,
                         selectedSeries: $selectedSeries,
                         returnAnchor: dexReturnAnchor,
-                        onSelectCell: { cell in nav.dexDetailCollectionID = store.hangarDetailCollectionID(cell) },
+                        onSelectCell: { cell in
+                            if nav.pickingDisplayPet {
+                                _ = store.setRepresentativeSpeciesID(store.hangarRepresentativeSpeciesID(cell))
+                                nav.finishDisplayPetPick()
+                            } else {
+                                nav.dexDetailCollectionID = store.hangarDetailCollectionID(cell)
+                            }
+                        },
                         onResetFilters: resetFilters
                     )
                     // The grid kept its own copy of the anchor; a later rebuild (segment switch) starts on page 1.

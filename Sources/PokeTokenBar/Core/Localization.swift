@@ -28,7 +28,7 @@ struct L {
     var home: String { t("홈", "Home", "ホーム", "Inicio", "Accueil", "Início", "Startseite", "Главная") }
     /// 상위 탭 이름 — 안에서 도감/포획 로그를 세그먼트로 전환하므로 둘을 아우르는 말이어야 한다.
     /// (ko 가 "도감"이면 탭과 세그먼트가 같은 이름이 돼 en/ja 의 Collection/コレクション 과도 어긋난다.)
-    var collection: String { t("컬렉션", "Collection", "コレクション", "Colección", "Collection", "Coleção", "Sammlung", "Коллекция") }
+    var collection: String { t("격납고", "Hangar", "格納庫") }
 
     var costUnavailable: String { t("계산 불가", "Unavailable", "計算不可", "No disponible", "Indisponible", "Indisponível", "Nicht verfügbar", "Недоступно") }
     var costEstimateHint: String { t("모델 단가로 환산한 추정 비용입니다. 구독료나 실제 청구액이 아닙니다.", "Estimated from model token rates; not a subscription fee or invoice. Service-tier and other unlogged charges are excluded.", "モデル単価による推定です。購読料や実際の請求額ではありません。", "Estimación por tarifas del modelo; no es la cuota ni la factura real.", "Estimation selon les tarifs du modèle, pas un abonnement ni une facture.", "Estimativa pelas tarifas do modelo; não é assinatura nem fatura.", "Schätzung anhand der Modellpreise, keine Abogebühr oder Rechnung.", "Оценка по тарифам моделей за токены — не плата за подписку и не счёт. Наценки за уровень обслуживания и другие незаписанные расходы не учтены.") }
@@ -387,18 +387,25 @@ struct L {
         t("\(percent) 남음", "\(percent) left", "残り\(percent)", "\(percent) restante", "\(percent) restant", "\(percent) restante", "\(percent) übrig", "осталось \(percent)")
     }
     var allOffHint: String { t("전부 끄면 캐릭터만 표시됩니다", "All off shows only the character", "すべてオフにするとキャラクターのみ表示") }
-    // MARK: 대표 포켓몬
+    // MARK: 함께 띄울 기체 (두 번째 플로팅 펫)
     var representativePokemonLabel: String {
-        t("대표 기체", "Representative Mobile Suit", "代表機体")
+        t("함께 띄울 기체", "Second floating suit", "一緒に浮かべる機体")
     }
+    /// Clears the chosen machine (hangar menus, detail footer and Settings).
     var representativeFollowCurrent: String {
-        t("현재 기체 따라가기", "Follow current suit", "現在の機体に合わせる")
+        t("함께 띄우기 해제", "Stop showing", "表示をやめる")
     }
     var representativeChooseFromDex: String {
         t("격납고에서 선택…", "Choose in Hangar…", "格納庫で選ぶ…")
     }
     var representativeSet: String {
-        t("대표로 설정", "Set as representative", "代表機体に設定")
+        t("함께 띄우기", "Show beside", "一緒に浮かべる")
+    }
+    var representativeNoneChosen: String {
+        t("선택 안 함", "None chosen", "未選択")
+    }
+    var representativePickPrompt: String {
+        t("함께 띄울 기체를 고르세요", "Pick a suit to float beside", "一緒に浮かべる機体を選んでください")
     }
     var representativeBadge: String { t("대표", "Representative", "代表", "Representante", "Représentatif", "Representante", "Repräsentativ", "Основной") }
     // MARK: 난이도
