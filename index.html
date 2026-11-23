@@ -7,57 +7,153 @@
 <meta name="description" content="A macOS menu bar app that turns your AI coding tokens into Gunpla.">
 <link rel="icon" href="assets/icon.png">
 <style>
-  :root { --bg: #f6f7f9; --fg: #18202e; --muted: #5b6576; --card: #ffffff; --line: #dde2ea; --accent: #2f6fd6; }
+  :root { --bg: #f6f7f9; --fg: #18202e; --muted: #5b6576; --card: #ffffff; --line: #dde2ea; --accent: #2f6fd6; --on-accent: #ffffff; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #11151c; --fg: #e8ecf2; --muted: #9aa4b4; --card: #1a2029; --line: #2a323e; --accent: #7aa7ff; }
+    :root { --bg: #11151c; --fg: #e8ecf2; --muted: #9aa4b4; --card: #1a2029; --line: #2a323e; --accent: #7aa7ff; --on-accent: #0d1420; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Hiragino Sans", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  nav { display: flex; justify-content: flex-end; margin-bottom: 24px; }
+  .langs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); }
+  .langs button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 0.85rem; padding: 6px 14px; cursor: pointer; }
+  .langs button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
   header { display: flex; gap: 16px; align-items: center; }
-  header img { width: 72px; height: 72px; image-rendering: pixelated; border-radius: 16px; }
+  header img { width: 72px; height: 72px; image-rendering: pixelated; border-radius: 16px; flex: none; }
   h1 { margin: 0; font-size: 2rem; }
   .tag { margin: 4px 0 0; color: var(--muted); }
   .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0; }
   .button { display: inline-block; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--fg); text-decoration: none; font-weight: 600; }
-  .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   figure { margin: 0 0 28px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; text-align: center; }
   figure img { max-width: 100%; width: 332px; height: auto; }
   ul { padding-left: 1.2em; }
+  li { margin-bottom: 6px; }
   footer { margin-top: 40px; color: var(--muted); font-size: 0.85rem; }
   a { color: var(--accent); }
 </style>
 </head>
 <body>
 <main>
+  <nav>
+    <div class="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+      <button type="button" data-lang="en" aria-pressed="true">English</button>
+      <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
+    </div>
+  </nav>
+
   <header>
     <img src="assets/icon.png" alt="">
     <div>
       <h1>MSTokenBar</h1>
-      <p class="tag">Turn your AI coding tokens into Gunpla, right in your macOS menu bar.</p>
+      <p class="tag" data-i18n="tagline">Turn your AI coding tokens into Gunpla, right in your macOS menu bar.</p>
     </div>
   </header>
 
   <div class="actions">
-    <a class="button primary" href="https://github.com/HongnamKim/MSTokenBar/releases/latest">Download the latest release</a>
-    <a class="button" href="https://github.com/HongnamKim/MSTokenBar">View on GitHub</a>
+    <a class="button primary" href="https://github.com/HongnamKim/MSTokenBar/releases/latest" data-i18n="download">Download the latest release</a>
+    <a class="button" href="https://github.com/HongnamKim/MSTokenBar" data-i18n="github">View on GitHub</a>
   </div>
 
   <figure>
-    <img src="assets/hangar.png" alt="The hangar, listing the mobile suits of Mobile Suit Gundam">
+    <img id="hangar" src="assets/hangar.png" alt="The hangar, listing the mobile suits of Mobile Suit Gundam" data-i18n-alt="hangarAlt">
   </figure>
 
   <ul>
-    <li><strong>Unbox:</strong> the tokens you spend in Claude Code, Codex, Gemini CLI and more open a Kit Box, and a mobile suit comes out.</li>
-    <li><strong>Grade up:</strong> keep coding and the suit climbs through the kit grades actually released for it, SD to PG.</li>
-    <li><strong>Hangar:</strong> completed suits are saved by series, and commander and ace customs appear as rare variants.</li>
+    <li data-i18n-html="unbox"><strong>Unbox:</strong> the tokens you spend in Claude Code, Codex, Gemini CLI and more open a Kit Box, and a mobile suit comes out.</li>
+    <li data-i18n-html="grade"><strong>Grade up:</strong> keep coding and the suit climbs through the kit grades actually released for it, SD to PG.</li>
+    <li data-i18n-html="hangar"><strong>Hangar:</strong> completed suits are saved by series, and commander and ace customs appear as rare variants.</li>
   </ul>
-  <p>Requires macOS 14 or later. The app is not notarized, so right-click it and choose Open on first launch.</p>
+  <p data-i18n="requires">Requires macOS 14 or later. The app is not notarized, so right-click it and choose Open on first launch.</p>
 
   <footer>
-    Unofficial, non-commercial fan project. Not affiliated with Bandai Namco or Sunrise. All rights to the original works belong to their owners.
-    Forked from <a href="https://github.com/chattymin/PokeTokenBar">PokeTokenBar</a> by chattymin.
+    <span data-i18n="disclaimer">Unofficial, non-commercial fan project. Not affiliated with Bandai Namco or Sunrise. All rights to the original works belong to their owners.</span>
+    <span data-i18n-html="fork">Forked from <a href="https://github.com/chattymin/PokeTokenBar">PokeTokenBar</a> by chattymin.</span>
   </footer>
 </main>
+<script>
+(function () {
+  var upstream = '<a href="https://github.com/chattymin/PokeTokenBar">PokeTokenBar</a>';
+  var strings = {
+    en: {
+      title: "MSTokenBar",
+      tagline: "Turn your AI coding tokens into Gunpla, right in your macOS menu bar.",
+      download: "Download the latest release",
+      github: "View on GitHub",
+      hangarAlt: "The hangar, listing the mobile suits of Mobile Suit Gundam",
+      hangarImage: "assets/hangar.png",
+      unbox: "<strong>Unbox:</strong> the tokens you spend in Claude Code, Codex, Gemini CLI and more open a Kit Box, and a mobile suit comes out.",
+      grade: "<strong>Grade up:</strong> keep coding and the suit climbs through the kit grades actually released for it, SD to PG.",
+      hangar: "<strong>Hangar:</strong> completed suits are saved by series, and commander and ace customs appear as rare variants.",
+      requires: "Requires macOS 14 or later. The app is not notarized, so right-click it and choose Open on first launch.",
+      disclaimer: "Unofficial, non-commercial fan project. Not affiliated with Bandai Namco or Sunrise. All rights to the original works belong to their owners.",
+      fork: "Forked from " + upstream + " by chattymin."
+    },
+    ko: {
+      title: "MSTokenBar",
+      tagline: "AI 코딩 토큰을 macOS 메뉴바에서 건프라로 바꿔 보세요.",
+      download: "최신 릴리스 내려받기",
+      github: "GitHub에서 보기",
+      hangarAlt: "「기동전사 건담」 기체가 늘어선 격납고 화면",
+      hangarImage: "assets/hangar-ko.png",
+      unbox: "<strong>개봉:</strong> Claude Code, Codex, Gemini CLI 등에서 쓴 토큰으로 건프라 박스가 열리고 기체가 나옵니다.",
+      grade: "<strong>등급 업:</strong> 계속 코딩하면 그 기체로 실제 출시된 키트 등급을 따라 SD부터 PG까지 올라갑니다.",
+      hangar: "<strong>격납고:</strong> 완성한 기체는 작품별로 보존되고, 지휘관기·에이스 전용기는 희귀한 변형으로 나옵니다.",
+      requires: "macOS 14 이상이 필요합니다. Apple 공증을 받지 않은 앱이라 처음 실행할 때는 앱을 우클릭하고 「열기」를 누르세요.",
+      disclaimer: "비공식 비영리 팬 프로젝트입니다. 반다이남코·선라이즈와 무관하며, 원저작물의 모든 권리는 각 원저작자에게 있습니다.",
+      fork: "chattymin의 " + upstream + "를 포크했습니다."
+    },
+    ja: {
+      title: "MSTokenBar",
+      tagline: "AI コーディングのトークンを、macOS メニューバーでガンプラに変えよう。",
+      download: "最新リリースをダウンロード",
+      github: "GitHub で見る",
+      hangarAlt: "『機動戦士ガンダム』の機体が並ぶ格納庫の画面",
+      hangarImage: "assets/hangar-ja.png",
+      unbox: "<strong>開封:</strong> Claude Code・Codex・Gemini CLI などで使ったトークンでキットボックスが開き、機体が登場します。",
+      grade: "<strong>グレードアップ:</strong> コーディングを続けると、その機体で実際に発売されたキットのグレードを SD から PG まで上がっていきます。",
+      hangar: "<strong>格納庫:</strong> 完成した機体は作品ごとに保存され、指揮官機・エース専用機はレアな変種として登場します。",
+      requires: "macOS 14 以降が必要です。Apple の公証を受けていないため、初回起動時はアプリを右クリックして「開く」を選んでください。",
+      disclaimer: "非公式・非営利のファンプロジェクトです。バンダイナムコ・サンライズとは無関係です。原作品の権利はすべて各権利者に帰属します。",
+      fork: "chattymin 氏の " + upstream + " のフォークです。"
+    }
+  };
+
+  function detect() {
+    var saved = null;
+    try { saved = localStorage.getItem("mstokenbar-lang"); } catch (e) {}
+    if (saved && strings[saved]) return saved;
+    var langs = navigator.languages || [navigator.language || "en"];
+    for (var i = 0; i < langs.length; i++) {
+      var code = String(langs[i]).toLowerCase().slice(0, 2);
+      if (strings[code]) return code;
+    }
+    return "en";
+  }
+
+  function apply(lang) {
+    var t = strings[lang];
+    document.documentElement.lang = lang;
+    document.title = t.title;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = t[el.dataset.i18n]; });
+    document.querySelectorAll("[data-i18n-html]").forEach(function (el) { el.innerHTML = t[el.dataset.i18nHtml]; });
+    var img = document.getElementById("hangar");
+    img.src = t.hangarImage;
+    img.alt = t.hangarAlt;
+    document.querySelectorAll(".langs button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    });
+  }
+
+  document.querySelectorAll(".langs button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      try { localStorage.setItem("mstokenbar-lang", b.dataset.lang); } catch (e) {}
+      apply(b.dataset.lang);
+    });
+  });
+  apply(detect());
+})();
+</script>
 </body>
 </html>
