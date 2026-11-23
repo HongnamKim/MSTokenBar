@@ -35,7 +35,7 @@ final class EggPrayerRenderTests: XCTestCase {
         }
         let file = directory.appendingPathComponent("state.json")
         try JSONEncoder().encode(state).write(to: file)
-        let store = CompanionStore(provider: MachineCatalog.shared, fileURL: file, defaults: defaults)
+        let store = CompanionStore(provider: MachineCatalog.allBundled, fileURL: file, defaults: defaults)
         return store
     }
 
@@ -85,7 +85,7 @@ final class EggPrayerRenderTests: XCTestCase {
         }
     }
 
-    /// The floating egg with three 🙏 frozen mid-flight at fixed spots (the live ones use random x).
+    /// The floating egg with three ❔ frozen mid-flight at fixed spots (the live ones use random x).
     func testWriteFloatingEggWithPrayers() async throws {
         guard let directory = ProcessInfo.processInfo.environment["PTB_PRAYER_RENDER_DIR"] else {
             throw XCTSkip("PTB_PRAYER_RENDER_DIR not set")

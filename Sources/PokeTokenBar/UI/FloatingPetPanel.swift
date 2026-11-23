@@ -1094,7 +1094,7 @@ struct FloatingPetView: View {
     }
 }
 
-/// The 🙏 particles floating up from the egg. Each one removes itself after `lifetime`; no standing timer.
+/// The ❔ particles floating up from the shaken box. Each one removes itself after `lifetime`; no standing timer.
 /// Pure presentation state: it never touches an RNG that feeds a hatch roll.
 @MainActor @Observable
 final class PrayerBurst {
@@ -1157,7 +1157,7 @@ struct PrayerEmojiFrame: View {
         let x = emojiSize / 2 + CGFloat(xFraction) * (petSize - emojiSize)
         let startY = petSize * 0.7
         let endY = emojiSize / 2
-        Text("🙏")
+        Text("❔")
             .font(.system(size: emojiSize * 0.8))
             .frame(width: emojiSize, height: emojiSize)
             .position(x: x, y: startY + (endY - startY) * CGFloat(progress))

@@ -7,12 +7,20 @@ enum BundledSprites {
     static func resourceName(speciesID: Int, catalog: MachineCatalog = .shared,
                              bundle: Bundle = GunplaResources.bundle) -> String? {
         guard let decoded = GunplaID.decode(speciesID) else { return nil }
-        let sprites = catalog.machine(id: decoded.machineID)?.sprites
-        let bodyKey = decoded.grade.bodyType == .sd ? "sdBody" : "realBody"
-        for key in [decoded.grade.rawValue, bodyKey] {
-            if let name = sprites?[key], url(name, "gif", bundle) != nil { return name }
+        if let name = artName(sprites: catalog.machine(id: decoded.machineID)?.sprites, grade: decoded.grade, bundle: bundle) {
+            return name
         }
         return decoded.grade.bodyType == .sd ? "silhouette-sd" : "silhouette-real"
+    }
+
+    /// The bundled art for one grade (per-grade first, then body-type), or nil when only the silhouette is left.
+    static func artName(sprites: [String: String]?, grade: GunplaGrade,
+                        bundle: Bundle = GunplaResources.bundle) -> String? {
+        let bodyKey = grade.bodyType == .sd ? "sdBody" : "realBody"
+        for key in [grade.rawValue, bodyKey] {
+            if let name = sprites?[key], url(name, "gif", bundle) != nil { return name }
+        }
+        return nil
     }
 
     static func gifData(speciesID: Int, catalog: MachineCatalog = .shared,

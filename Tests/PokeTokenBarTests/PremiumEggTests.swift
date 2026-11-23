@@ -226,10 +226,10 @@ final class PremiumEggTests: XCTestCase {
         var guaranteedRarities: [Rarity] = []
         var controlRarities: [Rarity] = []
         for seed in UInt64(1)...20 {
-            let g = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.shared)
+            let g = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.allBundled)
             await g.hatchIfNeeded()
             if let r = g.state.active?.rarity { guaranteedRarities.append(r) }
-            let c = eggStore(tier: nil, seed: seed, provider: MachineCatalog.shared)
+            let c = eggStore(tier: nil, seed: seed, provider: MachineCatalog.allBundled)
             await c.hatchIfNeeded()
             if let r = c.state.active?.rarity { controlRarities.append(r) }
         }
@@ -250,7 +250,7 @@ final class PremiumEggTests: XCTestCase {
     func testUncommonEggHatchesUncommonAndExcludesOnlyCommon() async {
         var sawUncommon = false
         for seed in UInt64(1)...20 {
-            let s = eggStore(tier: .uncommon, seed: seed, provider: MachineCatalog.shared)
+            let s = eggStore(tier: .uncommon, seed: seed, provider: MachineCatalog.allBundled)
             await s.hatchIfNeeded()
             guard let r = s.state.active?.rarity else { return XCTFail("부화 실패 seed \(seed)") }
             XCTAssertNotEqual(r, .common)
@@ -264,7 +264,7 @@ final class PremiumEggTests: XCTestCase {
     func testLegendaryStillReachableFromPremiumEgg() async {
         var sawLegendary = false
         for seed in UInt64(1)...60 {
-            let s = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.shared)
+            let s = eggStore(tier: .rare, seed: seed, provider: MachineCatalog.allBundled)
             await s.hatchIfNeeded()
             if s.state.active?.rarity == .legendary { sawLegendary = true; break }
         }
@@ -294,7 +294,7 @@ final class PremiumEggTests: XCTestCase {
     // MARK: 보증 소비 — 다음 알로 새면 영구 프리미엄이 된다
 
     func testHatchConsumesGuarantee() async {
-        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.shared)
+        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.allBundled)
         await s.hatchIfNeeded()
         XCTAssertNotNil(s.state.active)
         XCTAssertNil(s.state.eggTier, "부화로 보증 소비")
@@ -304,7 +304,7 @@ final class PremiumEggTests: XCTestCase {
     /// 졸업으로 받는 다음 알은 무료 알이어야 한다 — 보증이 따라가면 산 적 없는 프리미엄이 영구히 붙는다.
     /// 구매→부화→졸업 전 구간에서 보증이 되살아나지 않는지 실제 흐름으로 확인한다.
     func testGuaranteeDoesNotSurviveIntoTheNextEgg() async {
-        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.shared)
+        let s = eggStore(tier: .rare, seed: 1, provider: MachineCatalog.allBundled)
         await s.hatchIfNeeded()
         guard let active = s.state.active else { return XCTFail("부화 실패") }
         XCTAssertNil(s.state.eggTier, "부화 시점에 보증 소비")
@@ -355,7 +355,7 @@ final class PremiumEggTests: XCTestCase {
     /// 전엔 앱을 못 쓴다(디코드가 *성공*하므로 load() 의 .corrupt 복구도 안 걸린다).
     /// **디코드되는지가 아니라 실제로 부화하는지**를 검증한다 — 정규화가 빠지면 여기서 걸린다.
     func testUnsatisfiableGuaranteeIsNormalizedAwayAndEggStillHatches() async {
-        let s = eggStore(tier: .legendary, seed: 1, provider: MachineCatalog.shared)
+        let s = eggStore(tier: .legendary, seed: 1, provider: MachineCatalog.allBundled)
         XCTAssertNil(s.state.eggTier, "만족 불가능한 보증은 읽는 순간 떨어져 나간다")
         await s.hatchIfNeeded()
         XCTAssertNotNil(s.state.active, "알이 정상적으로 부화해야 한다(벽돌 상태 아님)")

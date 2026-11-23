@@ -1185,60 +1185,60 @@ struct L {
     var notifShinyHatchTitle: String { t("✨ 전용기!", "✨ Custom Mobile Suit!", "✨ 専用機！") }
     /// 실제 판정에 쓴 분모를 받는다 — 도색 공구를 보유하면 32 가 아니다.
     func notifShinyHatchBody(_ name: String, odds: UInt64) -> String { t("전용기 \(KoreanParticle.subject.attach(to: name)) 나왔어요! (1/\(odds))", "A Custom \(name) came out! (1 in \(odds))", "専用機の \(name) が登場しました！(1/\(odds))") }
-    // MARK: 기도하기 (알 위약 버튼)
-    func prayerBornWith(_ n: Int) -> String { t("기도 \(n)번 받고 태어남", "Born after \(n) prayers", "お祈り\(n)回を受けて誕生", "Nació tras \(n) oraciones", "Né après \(n) prières", "Nasceu após \(n) orações", "Geboren nach \(n) Gebeten", "Родился после \(n) молитв") }
-    var prayerReachedHeaven: String { t("기도가 하늘에 닿았어요. 아마도요.", "Your prayers reached the heavens. Probably.", "祈りは天に届きました。たぶん。", "Tus plegarias llegaron al cielo. Probablemente.", "Tes prières sont montées jusqu'au ciel. Probablement.", "Suas preces chegaram aos céus. Provavelmente.", "Deine Gebete haben den Himmel erreicht. Vermutlich.", "Молитвы дошли до небес. Наверное.") }
+    // MARK: 박스 흔들기 (박스 위약 버튼 — 코드 식별자는 세이브 호환을 위해 prayer 그대로)
+    func prayerBornWith(_ n: Int) -> String { t("박스를 \(n)번 흔들고 개봉함", "Unboxed after \(n) shakes", "ボックスを\(n)回振ってから開封") }
+    var prayerReachedHeaven: String { t("흔든다고 내용물이 바뀌진 않아요. 아마도요.", "Shaking doesn't change what's inside. Probably.", "振っても中身は変わりません。たぶん。") }
 
-    /// Prayers per quip (and per usage refresh): the joke advances every 30 prayers.
+    /// Shakes per quip (and per usage refresh): the joke advances every 30 shakes.
     static let prayersPerQuip = 30
     static let prayerQuipCount = 11
 
-    /// Index into the ordered quip list: `count / 30`, capped at the last one. nil at 0 prayers (nothing to say yet).
+    /// Index into the ordered quip list: `count / 30`, capped at the last one. nil at 0 shakes (nothing to say yet).
     static func prayerQuipIndex(_ prayers: Int) -> Int? {
         guard prayers > 0 else { return nil }
         return min(prayers / prayersPerQuip, prayerQuipCount - 1)
     }
 
-    /// Floating-pet hover line: "{n} prayers · {quip}".
+    /// Floating-pet hover line: "{n} shakes · {quip}".
     func prayerHoverLine(_ n: Int) -> String {
         guard n > 0 else { return "" }
         let count = n == 1
-            ? t("기도 1회", "1 prayer", "お祈り1回", "1 oración", "1 prière", "1 oração", "1 Gebet", "Молитв: 1")
-            : t("기도 \(n)회", "\(n) prayers", "お祈り\(n)回", "\(n) oraciones", "\(n) prières", "\(n) orações", "\(n) Gebete", "Молитв: \(n)")
+            ? t("흔들기 1회", "1 shake", "1回振った")
+            : t("흔들기 \(n)회", "\(n) shakes", "\(n)回振った")
         return count + " · " + prayerQuip(n)
     }
 
     func prayerQuip(_ n: Int) -> String {
         switch Self.prayerQuipIndex(n) ?? 0 {
-        case 0: return t("일단 한번 빌어봄", "just trying it out", "とりあえず祈ってみた")
-        case 1: return t("하늘이 아직 확인 안 함", "heaven hasn't checked yet", "天国はまだ確認していない")
-        case 2: return t("박스가 살짝 부담스러워함", "the box feels a little pressured", "ボックスがちょっとプレッシャーを感じてる")
-        case 3: return t("손 모으는 자세가 제법 프로", "your praying form is getting pro", "手を合わせるフォームが様になってきた")
-        case 4: return t("하늘 서버 응답 지연 중", "heaven's servers are lagging", "天国のサーバーが応答遅延中")
-        case 5: return t("하늘 대기열 3,812번째", "you're #3,812 in heaven's queue", "天国の順番待ち3,812番目")
-        case 6: return t("손바닥이 닳는 중", "your palms are wearing thin", "手のひらがすり減ってきた")
-        case 7: return t("이쯤 되면 박스도 같이 빌어줌", "at this point the box is praying with you", "ここまで来るとボックスも一緒に祈ってる")
-        case 8: return t("하늘: \"접수했습니다. 검토 후 답변드릴게요\"", "heaven: \"received, we'll get back to you\"", "天国「受け付けました。確認後ご連絡します」")
+        case 0: return t("일단 한번 흔들어봄", "just giving it a shake", "とりあえず振ってみた")
+        case 1: return t("런너가 달그락거림", "the runners are rattling", "ランナーがカタカタ鳴ってる")
+        case 2: return t("설명서가 안에서 펄럭임", "the manual is flapping around inside", "中で説明書がバサバサしてる")
+        case 3: return t("흔드는 손목이 제법 프로", "your wrist technique is getting pro", "振る手首が様になってきた")
+        case 4: return t("데칼이 걱정되기 시작함", "starting to worry about the decals", "デカールが心配になってきた")
+        case 5: return t("박스 모서리가 살짝 찌그러짐", "the box corner is getting dented", "箱の角がちょっとへこんだ")
+        case 6: return t("부품 하나가 런너에서 떨어진 것 같음", "pretty sure a part just snapped off the runner", "パーツがランナーから外れた気がする")
+        case 7: return t("박스가 어지러워함", "the box is getting dizzy", "ボックスが目を回してる")
+        case 8: return t("모형점 점원이 쳐다보는 중", "the hobby shop clerk is staring", "模型店の店員がこっちを見てる")
         case 9: return t("박스가 방금 \"그만…\"이라고 한 것 같음", "the box just whispered \"please stop\"", "ボックスが今「やめて…」ってささやいた気がする")
-        default: return t("전설 나오면 이건 실력임", "if a legendary drops, that's pure skill", "伝説が出たらそれは実力")
+        default: return t("레전더리 나오면 이건 실력임", "if a legendary drops, that's pure skill", "レジェンダリーが出たらそれは実力")
         }
     }
 
-    /// Hatch notification body once the egg was prayed over; the joke follows the outcome.
+    /// Unbox notification body once the box was shaken; the joke follows the outcome.
     func notifPrayerHatchBody(_ name: String, prayers n: Int, shiny: Bool, rarity: Rarity) -> String {
         if shiny && rarity == .legendary {
-            return t("기도 \(n)번… 하늘이 진심이었다. 전용기 \(name)!", "\(n) prayers… heaven went all in. Custom \(name)!", "お祈り\(n)回… 天も本気だった。専用機の\(name)！")
+            return t("\(n)번 흔든 보람이 있었다. 전용기 \(name)!", "\(n) shakes… totally worth it. Custom \(name)!", "\(n)回振った甲斐があった。専用機の\(name)！")
         }
         if rarity == .legendary {
-            return t("기도 \(n)번… 통했다?! \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(n) prayers… it worked?! \(name) came out!", "お祈り\(n)回… 通じた？！\(name) が生まれました！")
+            return t("\(n)번 흔들었더니… 통했다?! \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(n) shakes… it worked?! \(name) came out!", "\(n)回振ったら… 通じた？！\(name) が出てきました！")
         }
         if shiny {
-            return t("기도 \(n)번에 전용기까지?! \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(n) prayers AND it's a Custom?! \(name) came out!", "お祈り\(n)回で専用機まで？！\(name) が生まれました！")
+            return t("\(n)번 흔들었더니 전용기까지?! \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(n) shakes AND it's a Custom?! \(name) came out!", "\(n)回振ったら専用機まで？！\(name) が出てきました！")
         }
         if rarity == .common {
-            return t("기도 \(n)번 끝에 \(KoreanParticle.subject.attach(to: name)) 나왔어요. 하늘도 오늘 바빴나 봐요.", "\(n) prayers later: \(name). Heaven must be swamped today.", "お祈り\(n)回の末、\(name) が生まれました。天国も今日は忙しかったみたい。")
+            return t("\(n)번 흔든 끝에 \(KoreanParticle.subject.attach(to: name)) 나왔어요. 흔든다고 바뀌진 않나 봐요.", "\(n) shakes later: \(name). Shaking didn't change a thing.", "\(n)回振った末、\(name) が出てきました。振っても変わらないみたい。")
         }
-        return t("기도 \(n)번 끝에 \(KoreanParticle.subject.attach(to: name)) 나왔어요. 반은 통한 걸로 칩시다.", "\(n) prayers later: \(name). Let's call it half a miracle.", "お祈り\(n)回の末、\(name) が生まれました。半分は通じたってことにしよう。")
+        return t("\(n)번 흔든 끝에 \(KoreanParticle.subject.attach(to: name)) 나왔어요. 반은 통한 걸로 칩시다.", "\(n) shakes later: \(name). Let's call it half a miracle.", "\(n)回振った末、\(name) が出てきました。半分は通じたってことにしよう。")
     }
     var eggImminent: String { t("곧 개봉해요!", "About to unbox!", "もうすぐ開封！") }
     /// 첫 실행(아직 토큰 적립 0) 안내 — "왜 아무 일도 안 일어나지"를 방지.

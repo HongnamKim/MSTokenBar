@@ -86,4 +86,44 @@ final class MachineCatalogTests: XCTestCase {
         XCTAssertEqual(c.machine(id: 2)?.variantOf, 1)
         XCTAssertNil(c.machine(id: 5))
     }
+
+    // MARK: only machines with art appear
+
+    private func art(_ id: Int, grades: [GunplaGrade], series: String = "first", variantOf: Int? = nil,
+                     sprites: [String: String]?) -> MachineRecord {
+        MachineRecord(id: id, modelNumber: "X-\(id)", names: ["ko": "가", "en": "A", "ja": "あ"], series: series,
+                      faction: "efsf", rarity: .common, grades: grades, gradeSources: nil,
+                      variantOf: variantOf, sprites: sprites)
+    }
+
+    func test_keepsOnlyMachinesWithArtForEveryGrade() throws {
+        let series = [SeriesRecord(id: "first", names: [:], order: 0), SeriesRecord(id: "zeta", names: [:], order: 1)]
+        let catalog = try MachineCatalog(machines: [
+            art(1, grades: [.hg, .mg], sprites: ["hg": "zaku-ii-hg", "mg": "zaku-ii-mg"]),     // every grade drawn
+            art(2, grades: [.hg, .mg], sprites: ["hg": "zaku-ii-hg"]),                          // MG missing
+            art(3, grades: [.hg], variantOf: 2, sprites: ["hg": "zaku-ii-hg"]),                 // base missing art
+            art(4, grades: [.hg, .mg], sprites: ["realBody": "zaku-ii-hg"]),                    // body-type art counts
+            art(5, grades: [.hg], sprites: ["hg": "no-such-sprite"]),                           // file not bundled
+            art(6, grades: [.hg], series: "zeta", sprites: nil),                                // series left empty
+        ], series: series).keepingMachinesWithArt()
+
+        XCTAssertEqual(catalog.machines.map(\.id), [1, 4])
+        XCTAssertNil(catalog.machine(id: 3), "a variant leaves with its base")
+        XCTAssertEqual(catalog.series.map(\.id), ["first"], "a series with no machine left is hidden")
+    }
+
+    func test_sharedCatalogOnlyServesMachinesWithArt() throws {
+        let shared = MachineCatalog.shared
+        XCTAssertFalse(shared.machines.isEmpty)
+        for machine in shared.machines {
+            for grade in machine.grades {
+                XCTAssertNotNil(BundledSprites.artName(sprites: machine.sprites, grade: grade),
+                                "\(machine.modelNumber) \(grade.label) would show a silhouette")
+            }
+        }
+        let bundled = try MachineCatalog.bundled()
+        let artless = bundled.machines.filter { $0.sprites == nil }
+        XCTAssertFalse(artless.isEmpty, "the bundled data still lists machines without art")
+        for machine in artless { XCTAssertNil(shared.machine(id: machine.id), machine.modelNumber) }
+    }
 }

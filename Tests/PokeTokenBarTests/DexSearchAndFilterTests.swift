@@ -60,15 +60,16 @@ final class DexSearchAndFilterTests: XCTestCase {
     private func createHangarStore(language: AppLanguage = .en) -> CompanionStore {
         let owned: [(Int, [GunplaGrade])] = [(1, [.sd, .hg]), (2, [.hg]), (3, [.hg]), (7, [.hg]), (8, [.sd])]
         let dex = owned.map { machineID, grades in
-            let machine = MachineCatalog.shared.machine(id: machineID)!
+            let machine = MachineCatalog.allBundled.machine(id: machineID)!
             let ids = grades.map { GunplaID.encode(machineID: machineID, grade: $0) }
             return DexEntry(baseID: ids[0], finalID: ids[ids.count - 1], chainOrder: ids, rarity: machine.rarity,
                             caughtAt: now, isShiny: machine.isVariant)
         }
-        return makeStore(dex: dex, language: language)
+        return makeStore(dex: dex, language: language, provider: MachineCatalog.allBundled)
     }
 
-    private func makeStore(dex: [DexEntry], active: MonState? = nil, language: AppLanguage = .en) -> CompanionStore {
+    private func makeStore(dex: [DexEntry], active: MonState? = nil, language: AppLanguage = .en,
+                           provider: any PokeProviding = MockPokeProvider()) -> CompanionStore {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("dex-search-\(UUID().uuidString).json")
         var state = CompanionState()
         state.dex = dex
@@ -76,7 +77,7 @@ final class DexSearchAndFilterTests: XCTestCase {
         state.language = language
         try? JSONEncoder().encode(state).write(to: url)
 
-        return CompanionStore(provider: MockPokeProvider(), clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 42))
+        return CompanionStore(provider: provider, clock: { self.now }, fileURL: url, rng: SeededRNG(seed: 42))
     }
 
     /// Sprite → Pokédex page links. Every dex species (graduated chains and the raising Pokémon's
