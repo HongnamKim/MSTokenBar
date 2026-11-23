@@ -17,10 +17,10 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesCompletionCountsReleasedCellsOnly() throws {
-        // Includes the original TV roster and the catalog's existing Johnny Ridden MG variant.
+        // 13 base machines with 41 released grades; 3 variants (Char's Zaku II, Gelgoog, Z'Gok) with 12.
         let empty = try XCTUnwrap(completion("first", []))
         XCTAssertEqual(empty.totalCells, 41)
-        XCTAssertEqual(empty.variantTotalCells, 13)
+        XCTAssertEqual(empty.variantTotalCells, 12)
         XCTAssertEqual(empty.ownedCells, 0)
         XCTAssertEqual(empty.variantOwnedCells, 0)
 

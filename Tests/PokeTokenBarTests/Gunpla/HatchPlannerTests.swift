@@ -29,10 +29,10 @@ final class HatchPlannerTests: XCTestCase {
 
     func test_neverPicksGraduatedMachine() {
         var rng: any RandomNumberGenerator = SeededRNG(seed: 7)
-        let snap = snapshot(graduated: allIDs.subtracting([12]))
+        let snap = snapshot(graduated: allIDs.subtracting([3]))
         for _ in 0..<1000 {
             let choice = choose(snap, rng: &rng)
-            XCTAssertEqual(machineID(choice), 12)
+            XCTAssertEqual(machineID(choice), 3)
             XCTAssertEqual(choice?.isDuplicatePhase, false)
         }
     }

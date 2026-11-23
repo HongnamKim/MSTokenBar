@@ -44,12 +44,29 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 23)
+        XCTAssertEqual(c.machines.count, 22)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
         XCTAssertEqual(c.series.count, 4)
+    }
+
+    /// Verified series list only released kits: every grade cites an official Bandai page, and nothing
+    /// outside the confirmed roster (docs/gunpla/initial-roster.md) is left in the series.
+    func test_firstSeriesCitesABandaiSourceForEveryGrade() throws {
+        let first = try MachineCatalog.bundled().machines.filter { $0.series == "first" }
+        XCTAssertEqual(first.count, 16, "the confirmed Mobile Suit Gundam roster")
+        let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
+                                        "www.bandaispirits.co.jp", "p-bandai.jp"]
+        for machine in first {
+            let sources = machine.gradeSources ?? [:]
+            XCTAssertEqual(Set(sources.keys), Set(machine.grades.map(\.rawValue)), machine.modelNumber)
+            for (grade, url) in sources {
+                let host = URL(string: url)?.host ?? ""
+                XCTAssertTrue(bandaiHosts.contains(host), "\(machine.modelNumber) \(grade): \(url)")
+            }
+        }
     }
 
     func test_rejectsInvalidRecords() {

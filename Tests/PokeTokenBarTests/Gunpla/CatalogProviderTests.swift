@@ -20,7 +20,12 @@ final class CatalogProviderTests: XCTestCase {
     }
 
     func test_singleGradeMachineHasOneStage() async throws {
-        let line = try await MachineCatalog.shared.line(baseSpeciesID: GunplaID.encode(machineID: 12, grade: .mg))
+        let series = SeriesRecord(id: "first", names: ["ko": "가", "en": "A", "ja": "あ"], order: 0)
+        let mgOnly = MachineRecord(
+            id: 1, modelNumber: "X-1", names: ["ko": "가", "en": "A", "ja": "あ"], series: "first",
+            faction: "zeon", rarity: .rare, grades: [.mg], gradeSources: nil, variantOf: nil, sprites: nil)
+        let catalog = try MachineCatalog(machines: [mgOnly], series: [series])
+        let line = try await catalog.line(baseSpeciesID: GunplaID.encode(machineID: 1, grade: .mg))
         XCTAssertEqual(line.totalForms, 1)
     }
 

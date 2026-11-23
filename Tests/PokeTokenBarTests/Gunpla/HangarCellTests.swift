@@ -44,10 +44,10 @@ final class HangarCellTests: XCTestCase {
     }
 
     func test_cellsSortBySeriesOrderThenMachineID() throws {
-        // 12 (first, order 0) sorts before 6 (zeta, order 1) despite the larger id.
-        let s = try store(dex: [entry(11, [.sd]), entry(6, [.hg]), entry(12, [.mg]), entry(1, [.sd])])
-        XCTAssertEqual(s.hangarCells.map(\.machineID), [1, 12, 6, 11])
-        XCTAssertEqual(s.hangarCells.first { $0.machineID == 12 }?.isVariant, true)
+        // 18 (first, order 0) sorts before 6 (zeta, order 1) despite the larger id.
+        let s = try store(dex: [entry(11, [.sd]), entry(6, [.hg]), entry(18, [.mg]), entry(1, [.sd])])
+        XCTAssertEqual(s.hangarCells.map(\.machineID), [1, 18, 6, 11])
+        XCTAssertEqual(s.hangarCells.first { $0.machineID == 18 }?.isVariant, true)
         XCTAssertTrue(s.hangarCells.allSatisfy { !$0.isRaising })
     }
 
