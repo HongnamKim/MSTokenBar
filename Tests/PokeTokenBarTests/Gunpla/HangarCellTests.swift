@@ -134,4 +134,11 @@ final class HangarCellTests: XCTestCase {
         XCTAssertEqual(s.pokemonIndividuals(speciesID: id(2, .hg)).count, 1)
         XCTAssertEqual(s.dexSpecies.filter(\.isRaising).map(\.id), [id(1, .hg)])
     }
+
+    /// The raising cell's RAISING badge sat on top of the sprite's grade mark; only one of them may draw.
+    @MainActor
+    func test_raisingCellDropsTheSpriteGradeMark() {
+        XCTAssertFalse(HangarMachineCell.showsSpriteGradeBadge(isRaising: true))
+        XCTAssertTrue(HangarMachineCell.showsSpriteGradeBadge(isRaising: false))
+    }
 }

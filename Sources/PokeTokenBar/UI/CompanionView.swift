@@ -1858,7 +1858,7 @@ private extension Array where Element == String {
 /// 격납고 한 칸 = 기체 하나 — 형식번호 + 최고 보유 등급 스프라이트 + 이름 + 출시 등급 라벨(보유는 강조, 미보유는 흐리게).
 /// 정적 스프라이트만 쓴다(animated 생략) — 한 페이지 16칸을 GIF 로 동시 재생하면 CPU 가 안 된다.
 @MainActor
-private struct HangarMachineCell: View {
+struct HangarMachineCell: View {
     let store: CompanionStore
     let cell: HangarCell
     let isSelected: Bool
@@ -1868,13 +1868,18 @@ private struct HangarMachineCell: View {
 
     private static let thumb: CGFloat = 50
 
+    /// A 50pt thumb cannot hold both the grade mark (bottom-trailing) and the RAISING badge (bottom),
+    /// so the raising cell drops the mark; its bold grade in the grade row still shows the current grade.
+    static func showsSpriteGradeBadge(isRaising: Bool) -> Bool { !isRaising }
+
     private var machine: MachineRecord? { store.catalog.machine(id: cell.machineID) }
     private var name: String { store.machineName(cell.machineID) }
 
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 1) {
-                SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb)
+                SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
+                           showsGradeBadge: Self.showsSpriteGradeBadge(isRaising: cell.isRaising))
                     .frame(width: Self.thumb, height: Self.thumb)
                     // Keep the raising badge over the sprite to leave room for the name.
                     .overlay(alignment: .bottom) {
