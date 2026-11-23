@@ -1,5 +1,4 @@
 {
-  "_comment": "dev sample — grades unverified",
   "series": [
     {
       "id": "first",
@@ -11,13 +10,40 @@
       "order": 0
     },
     {
+      "id": "08th-ms-team",
+      "names": {
+        "ko": "제08MS소대",
+        "en": "The 08th MS Team",
+        "ja": "第08MS小隊"
+      },
+      "order": 1
+    },
+    {
+      "id": "0080",
+      "names": {
+        "ko": "0080 주머니 속의 전쟁",
+        "en": "0080: War in the Pocket",
+        "ja": "0080 ポケットの中の戦争"
+      },
+      "order": 2
+    },
+    {
+      "id": "0083",
+      "names": {
+        "ko": "0083 스타더스트 메모리",
+        "en": "0083: Stardust Memory",
+        "ja": "0083 STARDUST MEMORY"
+      },
+      "order": 3
+    },
+    {
       "id": "zeta",
       "names": {
         "ko": "제타",
         "en": "Zeta",
         "ja": "ゼータ"
       },
-      "order": 1
+      "order": 4
     },
     {
       "id": "cca",
@@ -26,7 +52,7 @@
         "en": "Char's Counterattack",
         "ja": "逆襲のシャア"
       },
-      "order": 2
+      "order": 5
     },
     {
       "id": "uc",
@@ -35,7 +61,7 @@
         "en": "Unicorn",
         "ja": "ユニコーン"
       },
-      "order": 3
+      "order": 6
     }
   ]
 }

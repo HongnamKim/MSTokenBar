@@ -36,7 +36,7 @@ final class HangarProgressTests: XCTestCase {
 
     func test_completionsFollowCatalogSeriesOrder() {
         XCTAssertEqual(HangarProgress.completions(owned: [], catalog: catalog).map(\.seriesID),
-                       ["first", "zeta", "cca", "uc"])
+                       ["first", "08th-ms-team", "0080", "0083", "zeta", "cca", "uc"])
     }
 
     func test_seriesBadgeWhenAllBaseCellsOwned() throws {
@@ -75,8 +75,8 @@ final class HangarProgressTests: XCTestCase {
     func test_everyMachineEarnsAllAndAllVariantInStableOrder() {
         let everything = catalog.machines.map { cell($0.id) }
         let badges = HangarProgress.earnedBadges(HangarProgress.completions(owned: everything, catalog: catalog))
-        XCTAssertEqual(badges, [.series("first"), .seriesVariant("first"), .series("zeta"), .series("cca"),
-                                .series("uc"), .all, .allVariant])
+        XCTAssertEqual(badges, [.series("first"), .seriesVariant("first"), .series("08th-ms-team"),
+                                .series("0080"), .series("0083"), .series("zeta"), .series("cca"), .series("uc"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))

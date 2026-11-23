@@ -1285,6 +1285,8 @@ struct L {
         switch key {
         case "efsf": return t("지구연방군", "Earth Federation", "地球連邦軍")
         case "zeon": return t("지온공국군", "Principality of Zeon", "ジオン公国軍")
+        case "delaz": return t("데라즈 플리트", "Delaz Fleet", "デラーズ・フリート")
+        case "cima": return t("시마 함대", "Cima Fleet", "シーマ艦隊")
         case "aeug": return t("에우고", "AEUG", "エゥーゴ")
         case "titans": return t("티탄즈", "Titans", "ティターンズ")
         case "axis": return t("액시즈", "Axis", "アクシズ")
