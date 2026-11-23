@@ -17,10 +17,10 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesCompletionCountsReleasedCellsOnly() throws {
-        // Base: 1 (5) + 2 (5) + 4 (2) + 5 (2) = 14. Variants: 3 (4) + 12 (1) = 5.
+        // The first-series HG roster adds nine base cells and two variant cells to the sample catalog.
         let empty = try XCTUnwrap(completion("first", []))
-        XCTAssertEqual(empty.totalCells, 14)
-        XCTAssertEqual(empty.variantTotalCells, 5)
+        XCTAssertEqual(empty.totalCells, 23)
+        XCTAssertEqual(empty.variantTotalCells, 7)
         XCTAssertEqual(empty.ownedCells, 0)
         XCTAssertEqual(empty.variantOwnedCells, 0)
 
@@ -40,7 +40,7 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesBadgeWhenAllBaseCellsOwned() throws {
-        let base = [1, 2, 4, 5].map { cell($0) }
+        let base = catalog.machines.filter { $0.series == "first" && !$0.isVariant }.map { cell($0.id) }
         let first = try XCTUnwrap(completion("first", base))
         XCTAssertTrue(first.isComplete)
         XCTAssertFalse(first.isVariantComplete)
@@ -48,12 +48,12 @@ final class HangarProgressTests: XCTestCase {
         XCTAssertEqual(badges, [.series("first")])
 
         // One missing grade (RX-78-2 PG) withholds the badge.
-        let almost = [cell(1, [.sd, .hg, .rg, .mg])] + [2, 4, 5].map { cell($0) }
+        let almost = [cell(1, [.sd, .hg, .rg, .mg])] + base.filter { $0.machineID != 1 }
         XCTAssertTrue(HangarProgress.earnedBadges(HangarProgress.completions(owned: almost, catalog: catalog)).isEmpty)
     }
 
     func test_variantBadgeSeparate() throws {
-        let variants = [cell(3), cell(12)]
+        let variants = catalog.machines.filter { $0.series == "first" && $0.isVariant }.map { cell($0.id) }
         let first = try XCTUnwrap(completion("first", variants))
         XCTAssertTrue(first.isVariantComplete)
         XCTAssertFalse(first.isComplete)

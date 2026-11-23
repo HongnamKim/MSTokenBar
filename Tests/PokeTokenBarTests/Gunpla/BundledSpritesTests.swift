@@ -25,9 +25,28 @@ final class BundledSpritesTests: XCTestCase {
         return try MachineCatalog(machines: [machine], series: [series])
     }
 
-    func test_perGradeSpriteIsUsedWhenBundled() {
-        let id = GunplaID.encode(machineID: 1, grade: .hg)
-        XCTAssertEqual(BundledSprites.resourceName(speciesID: id, catalog: .shared), "rx-78-2-hg")
+    func test_firstSeriesHGArtLoadsForStaticAndAnimatedViews() throws {
+        let expected = [
+            "RX-78-2": "rx-78-2", "RX-77-2": "guncannon", "RX-75": "guntank", "RGM-79": "gm",
+            "MS-05B": "zaku-i", "MS-06F": "zaku-ii", "MS-06S": "chars-zaku-ii", "MS-07B": "gouf",
+            "MS-09": "dom", "MS-14A": "gelgoog", "MS-14S": "chars-gelgoog", "MSM-07": "zgok",
+            "MSM-07S": "chars-zgok", "MSM-04": "acguy", "YMS-15": "gyan", "MSN-02": "zeong",
+        ]
+        let first = MachineCatalog.shared.machines.filter { $0.series == "first" }
+        for (model, art) in expected {
+            let machine = try XCTUnwrap(first.first { $0.modelNumber == model }, model)
+            XCTAssertTrue(machine.grades.contains(.hg), model)
+            let id = GunplaID.encode(machineID: machine.id, grade: .hg)
+            XCTAssertEqual(BundledSprites.resourceName(speciesID: id), "\(art)-hg", model)
+            for animated in [false, true] {
+                let data = try XCTUnwrap(SpriteStore.bundledGunplaData(speciesID: id, animated: animated), model)
+                let source = try XCTUnwrap(CGImageSourceCreateWithData(data as CFData, nil), model)
+                XCTAssertEqual(CGImageSourceGetCount(source), animated ? 2 : 1, model)
+                let frame = try XCTUnwrap(CGImageSourceCreateImageAtIndex(source, 0, nil), model)
+                XCTAssertEqual(frame.width, 128, model)
+                XCTAssertEqual(frame.height, 128, model)
+            }
+        }
     }
 
     func test_missingSpriteFallsBackToSilhouette() throws {

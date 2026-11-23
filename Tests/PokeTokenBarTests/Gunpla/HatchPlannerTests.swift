@@ -3,8 +3,9 @@ import XCTest
 
 final class HatchPlannerTests: XCTestCase {
     private let catalog = MachineCatalog.shared
-    private let allBaseIDs: Set<Int> = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11]
-    private let allIDs = Set(1...12)
+    private var allIDs: Set<Int> { Set(catalog.machines.map(\.id)) }
+    private var variantIDs: Set<Int> { Set(catalog.machines.filter(\.isVariant).map(\.id)) }
+    private var allBaseIDs: Set<Int> { allIDs.subtracting(variantIDs) }
 
     private func snapshot(graduated: Set<Int> = [], reached: [Int: GunplaGrade] = [:]) -> CollectionSnapshot {
         CollectionSnapshot(graduatedMachineIDs: graduated, highestReachedGrade: reached)
@@ -28,7 +29,7 @@ final class HatchPlannerTests: XCTestCase {
 
     func test_neverPicksGraduatedMachine() {
         var rng: any RandomNumberGenerator = SeededRNG(seed: 7)
-        let snap = snapshot(graduated: Set(1...11))
+        let snap = snapshot(graduated: allIDs.subtracting([12]))
         for _ in 0..<1000 {
             let choice = choose(snap, rng: &rng)
             XCTAssertEqual(machineID(choice), 12)
@@ -40,7 +41,7 @@ final class HatchPlannerTests: XCTestCase {
         for pick: UInt64 in [0, 5, 11, 12, 23, 100, 12_345] {
             let choice = choose(snapshot(), sequence: [0, pick])
             XCTAssertEqual(choice?.isVariant, true)
-            XCTAssertTrue([3, 12].contains(machineID(choice) ?? -1), "pick=\(pick)")
+            XCTAssertTrue(variantIDs.contains(machineID(choice) ?? -1), "pick=\(pick)")
             XCTAssertEqual(choice?.isDuplicatePhase, false)
         }
     }
@@ -53,7 +54,7 @@ final class HatchPlannerTests: XCTestCase {
 
     func test_emptyVariantPoolFallsBackToBases() {
         for pick: UInt64 in [0, 7, 99, 1_000] {
-            let choice = choose(snapshot(graduated: [3, 12]), sequence: [0, pick])
+            let choice = choose(snapshot(graduated: variantIDs), sequence: [0, pick])
             XCTAssertEqual(choice?.isVariant, false)
             XCTAssertTrue(allBaseIDs.contains(machineID(choice) ?? -1))
             XCTAssertEqual(choice?.isDuplicatePhase, false)
@@ -64,7 +65,7 @@ final class HatchPlannerTests: XCTestCase {
         for pick: UInt64 in [0, 7, 99, 1_000] {
             let choice = choose(snapshot(graduated: allBaseIDs), sequence: [1, pick])
             XCTAssertEqual(choice?.isVariant, true)
-            XCTAssertTrue([3, 12].contains(machineID(choice) ?? -1))
+            XCTAssertTrue(variantIDs.contains(machineID(choice) ?? -1))
             XCTAssertEqual(choice?.isDuplicatePhase, false)
         }
     }
@@ -134,7 +135,7 @@ final class HatchPlannerTests: XCTestCase {
 
     func test_hasCandidatesReflectsTierAndGraduation() {
         XCTAssertTrue(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(), tier: nil))
-        let rarePlus: Set<Int> = [1, 3, 6, 7, 8, 9, 11, 12]
+        let rarePlus = Set(catalog.machines.filter { $0.rarity.sortRank >= Rarity.rare.sortRank }.map(\.id))
         XCTAssertFalse(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(graduated: rarePlus), tier: .rare))
         XCTAssertTrue(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(graduated: rarePlus), tier: .uncommon))
         XCTAssertFalse(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(graduated: allIDs), tier: nil))

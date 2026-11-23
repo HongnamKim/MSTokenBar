@@ -1,8 +1,9 @@
 #!/usr/bin/env swift
-// Placeholder Gunpla sprites + conversion of the RX-78-2 sample art.
+// Generate the placeholders and convert the Gunpla base artwork to bundled idle GIFs.
 // Usage: swift scripts/gen-placeholder-sprites.swift <outdir> [sample-png-dir]
 //   outdir          Sources/PokeTokenBar/Resources/Gunpla/Sprites
-//   sample-png-dir  assets/sprites/rx-78-2 (default; source PNGs are only read)
+//   default inputs  assets/sprites/rx-78-2 and assets/sprites/first-hguc
+//   sample-png-dir  optional RX-78-2 sample directory to convert on its own
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -14,7 +15,6 @@ guard args.count >= 2 else {
     exit(1)
 }
 let outDir = URL(fileURLWithPath: args[1], isDirectory: true)
-let sampleDir = URL(fileURLWithPath: args.count > 2 ? args[2] : "assets/sprites/rx-78-2", isDirectory: true)
 try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
 func makeContext(_ w: Int, _ h: Int) -> CGContext {
@@ -78,9 +78,17 @@ write(silhouette(w: 48, h: 48, sd: true), to: outDir.appendingPathComponent("sil
 write(silhouette(w: 48, h: 64, sd: false), to: outDir.appendingPathComponent("silhouette-real.gif"), type: .gif, delay: 0.4)
 write([box()], to: outDir.appendingPathComponent("box.png"), type: .png, delay: nil)
 
-// RX-78-2 sample art (dev machine id 1): PNG -> 2-frame bob GIF.
-for grade in ["sd", "hg", "rg", "mg", "pg"] {
-    let src = sampleDir.appendingPathComponent("rx-78-2-\(grade).png")
+// The HGUC base supersedes the earlier RX-78-2 HG sample with the same filename.
+let sampleDir = URL(fileURLWithPath: args.count > 2 ? args[2] : "assets/sprites/rx-78-2", isDirectory: true)
+var inputs = ["sd", "hg", "rg", "mg", "pg"].map { sampleDir.appendingPathComponent("rx-78-2-\($0).png") }
+if args.count == 2 {
+    let hgucDir = URL(fileURLWithPath: "assets/sprites/first-hguc", isDirectory: true)
+    let hguc = try FileManager.default.contentsOfDirectory(at: hgucDir, includingPropertiesForKeys: nil)
+        .filter { $0.lastPathComponent.hasSuffix("-hg.png") }
+    let replacements = Set(hguc.map(\.lastPathComponent))
+    inputs = inputs.filter { !replacements.contains($0.lastPathComponent) } + hguc
+}
+for src in inputs {
     guard let source = CGImageSourceCreateWithURL(src as CFURL, nil),
           let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
         FileHandle.standardError.write(Data("skip missing \(src.path)\n".utf8))
@@ -90,6 +98,6 @@ for grade in ["sd", "hg", "rg", "mg", "pg"] {
     let frames = bob({ ctx, up in
         ctx.draw(image, in: CGRect(x: 0, y: up, width: w, height: h))
     }, w: w, h: h)
-    write(frames, to: outDir.appendingPathComponent("rx-78-2-\(grade).gif"), type: .gif, delay: 0.4)
+    write(frames, to: outDir.appendingPathComponent(src.deletingPathExtension().lastPathComponent + ".gif"), type: .gif, delay: 0.4)
 }
 print("wrote sprites to \(outDir.path)")

@@ -125,7 +125,11 @@ final class DexCompletionStoreTests: XCTestCase {
 
         var legacy = CompanionState()
         var owned: [Int: [GunplaGrade]?] = [6: nil, 7: [.hg, .rg, .mg]]
-        if existingFirst { for id in [1, 2, 4, 5] { owned[id] = .some(nil) } }
+        if existingFirst {
+            for machine in catalog.machines where machine.series == "first" && !machine.isVariant {
+                owned[machine.id] = .some(nil)
+            }
+        }
         legacy.dex = entries(owned)
         legacy.eggUsage = PokemonBalance.eggHatchThreshold
         // The final missing Zeta cell (Zeta Gundam PG), ready to hatch after import.

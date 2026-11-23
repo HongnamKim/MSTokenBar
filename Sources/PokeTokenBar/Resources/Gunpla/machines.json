@@ -1,5 +1,5 @@
 {
-  "_comment": "dev sample — grades unverified",
+  "_comment": "The first-series HG entries cite released kits. Other grades from the development sample remain unverified.",
   "machines": [
     {
       "id": 1,
@@ -25,6 +25,9 @@
         "rg": "rx-78-2-rg",
         "mg": "rx-78-2-mg",
         "pg": "rx-78-2-pg"
+      },
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1004"
       }
     },
     {
@@ -44,7 +47,13 @@
         "rg",
         "mg",
         "pg"
-      ]
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/504"
+      },
+      "sprites": {
+        "hg": "zaku-ii-hg"
+      }
     },
     {
       "id": 3,
@@ -63,7 +72,13 @@
         "rg",
         "mg"
       ],
-      "variantOf": 2
+      "variantOf": 2,
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/501"
+      },
+      "sprites": {
+        "hg": "chars-zaku-ii-hg"
+      }
     },
     {
       "id": 4,
@@ -79,7 +94,13 @@
       "grades": [
         "hg",
         "mg"
-      ]
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/220"
+      },
+      "sprites": {
+        "hg": "gm-hg"
+      }
     },
     {
       "id": 5,
@@ -95,7 +116,13 @@
       "grades": [
         "hg",
         "mg"
-      ]
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/464"
+      },
+      "sprites": {
+        "hg": "gouf-hg"
+      }
     },
     {
       "id": 6,
@@ -219,6 +246,239 @@
         "mg"
       ],
       "variantOf": 2
+    },
+    {
+      "id": 13,
+      "modelNumber": "RX-77-2",
+      "names": {
+        "ko": "건캐논",
+        "en": "Guncannon",
+        "ja": "ガンキャノン"
+      },
+      "series": "first",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1003"
+      },
+      "sprites": {
+        "hg": "guncannon-hg"
+      }
+    },
+    {
+      "id": 14,
+      "modelNumber": "RX-75",
+      "names": {
+        "ko": "건탱크",
+        "en": "Guntank",
+        "ja": "ガンタンク"
+      },
+      "series": "first",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/208"
+      },
+      "sprites": {
+        "hg": "guntank-hg"
+      }
+    },
+    {
+      "id": 15,
+      "modelNumber": "MS-05B",
+      "names": {
+        "ko": "자쿠 I",
+        "en": "Zaku I",
+        "ja": "ザクI"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/253"
+      },
+      "sprites": {
+        "hg": "zaku-i-hg"
+      }
+    },
+    {
+      "id": 16,
+      "modelNumber": "MS-09",
+      "names": {
+        "ko": "돔",
+        "en": "Dom",
+        "ja": "ドム"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/251"
+      },
+      "sprites": {
+        "hg": "dom-hg"
+      }
+    },
+    {
+      "id": 17,
+      "modelNumber": "MS-14A",
+      "names": {
+        "ko": "양산형 겔구그",
+        "en": "Gelgoog",
+        "ja": "量産型ゲルググ"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/904"
+      },
+      "sprites": {
+        "hg": "gelgoog-hg"
+      }
+    },
+    {
+      "id": 18,
+      "modelNumber": "MS-14S",
+      "names": {
+        "ko": "샤아 전용 겔구그",
+        "en": "Char's Gelgoog",
+        "ja": "シャア専用ゲルググ"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "variantOf": 17,
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/828"
+      },
+      "sprites": {
+        "hg": "chars-gelgoog-hg"
+      }
+    },
+    {
+      "id": 19,
+      "modelNumber": "MSM-07",
+      "names": {
+        "ko": "즈고크",
+        "en": "Z'Gok",
+        "ja": "ズゴック"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/203"
+      },
+      "sprites": {
+        "hg": "zgok-hg"
+      }
+    },
+    {
+      "id": 20,
+      "modelNumber": "MSM-07S",
+      "names": {
+        "ko": "샤아 전용 즈고크",
+        "en": "Char's Z'Gok",
+        "ja": "シャア専用ズゴック"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "variantOf": 19,
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/219"
+      },
+      "sprites": {
+        "hg": "chars-zgok-hg"
+      }
+    },
+    {
+      "id": 21,
+      "modelNumber": "MSM-04",
+      "names": {
+        "ko": "앗가이",
+        "en": "Acguy",
+        "ja": "アッガイ"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/901"
+      },
+      "sprites": {
+        "hg": "acguy-hg"
+      }
+    },
+    {
+      "id": 22,
+      "modelNumber": "YMS-15",
+      "names": {
+        "ko": "걍",
+        "en": "Gyan",
+        "ja": "ギャン"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/465"
+      },
+      "sprites": {
+        "hg": "gyan-hg"
+      }
+    },
+    {
+      "id": 23,
+      "modelNumber": "MSN-02",
+      "names": {
+        "ko": "지옹",
+        "en": "Zeong",
+        "ja": "ジオング"
+      },
+      "series": "first",
+      "faction": "zeon",
+      "rarity": "legendary",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/222"
+      },
+      "sprites": {
+        "hg": "zeong-hg"
+      }
     }
   ]
 }
