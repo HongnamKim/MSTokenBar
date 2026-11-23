@@ -1325,6 +1325,13 @@ read_when:
   width). `menuBarLayout` now fits 20pt tall up to `menuBarSpriteMaxWidth` (36pt, 645/649 at full
   height). Measure a new cap against every canvas in the dex, not the cached few; the guard is
   `testWideSpriteFillsMenuBarHeightUntilTheWidthCap` with the real Swanna and Tynamo canvases.
+- **Transform the artwork, not the composed `SpriteView`.** The first floating-pet flip mirrored the
+  whole `SpriteView` from outside, which also mirrored the grade badge that `SpriteView` overlays at
+  the bottom-right ("HG" read backwards, at the bottom-left). It was caught before merge; the only
+  test covered the setting's persistence, and nothing rendered the flip with the badge visible.
+  `SpriteView(mirrored:)` now flips only the image inside `fitted`, so its own overlays and the
+  ones callers attach stay unflipped. Before transforming `SpriteView` from a caller, check what it
+  already draws on top (grade badge, visible-top preference).
 
 ## 프로세스 제어·업데이트
 

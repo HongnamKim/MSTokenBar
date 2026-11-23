@@ -95,6 +95,8 @@ struct SpriteView: View {
     var back: Bool = false
     /// Emit `SpriteVisibleTopKey` so an overlay can sit on the visible sprite instead of its box.
     var reportsVisibleTop = false
+    /// Flip the artwork left-right. Only the image flips; the grade badge stays readable at the bottom-right.
+    var mirrored = false
     private let spriteStore: SpriteStore
     @State private var subject: SpriteSubject
     @State private var up = false
@@ -104,8 +106,9 @@ struct SpriteView: View {
     init(speciesID: Int?, size: CGFloat = 84, bob: Bool = false, animated: Bool = false,
          shiny: Bool = false, minFrameDelay: TimeInterval = 0, spriteStore: SpriteStore = .shared,
          back: Bool = false,
-         reportsVisibleTop: Bool = false) {
+         reportsVisibleTop: Bool = false, mirrored: Bool = false) {
         self.reportsVisibleTop = reportsVisibleTop
+        self.mirrored = mirrored
         self.speciesID = speciesID
         self.spriteStore = spriteStore
         self.back = back
@@ -181,6 +184,7 @@ struct SpriteView: View {
         let fit = Self.imageSize(for: image, box: size * scale)
         Image(nsImage: image).resizable().interpolation(.none)
             .frame(width: fit.width, height: fit.height)
+            .scaleEffect(x: mirrored ? -1 : 1, y: 1)
             .frame(width: size, height: size)
     }
 
