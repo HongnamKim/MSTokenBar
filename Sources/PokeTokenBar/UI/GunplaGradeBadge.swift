@@ -18,20 +18,12 @@ struct GunplaGradeBadge: View {
         return images
     }()
 
-    private var markHeight: CGFloat { min(12, max(4, (spriteSize / 16).rounded())) }
-
-    private func pixelScale(for image: NSImage) -> CGFloat {
-        if isFloatingMark {
-            // The four-letter MGSD mark also fits in the corner of a 48-point pet.
-            return min(markHeight / image.size.height, (spriteSize / 6) / image.size.width)
-        }
-        return min(3, max(1.5, (spriteSize / 48).rounded(.down)))
-    }
+    private var badgeScale: CGFloat { isFloatingMark ? 0.5 : 1 }
 
     var body: some View {
         Group {
             if spriteSize >= 48, let image = Self.images[grade] {
-                let scale = pixelScale(for: image)
+                let scale = min(3, max(1.5, (spriteSize / 48).rounded(.down))) * badgeScale
                 Image(nsImage: image)
                     .renderingMode(.original)
                     .resizable()
@@ -39,10 +31,10 @@ struct GunplaGradeBadge: View {
                     .frame(width: image.size.width * scale, height: image.size.height * scale)
             } else {
                 Text(verbatim: grade.label)
-                    .font(.system(size: isFloatingMark ? markHeight * 0.65 : min(18, max(7, spriteSize * 0.14)),
+                    .font(.system(size: min(18, max(7, spriteSize * 0.14)) * badgeScale,
                                   weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, isFloatingMark ? 1 : 3)
+                    .padding(.horizontal, 3 * badgeScale)
                     .background(Capsule().fill(Color.black.opacity(0.65)))
             }
         }
