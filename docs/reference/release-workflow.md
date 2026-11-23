@@ -23,7 +23,7 @@ read_when:
   (팝오버 라이브 캡처 아님) — Chrome `--headless --screenshot --force-device-scale-factor=2` 로 다크
   팝오버를 720px PNG 로 그린다. 애니 GIF(home)는 프레임 합성 후 `gifsicle -O3 --lossy` 로 최적화
   (PIL 재인코딩 단독은 용량 팽창 주의). 언어별 이미지(`settings.png`/`-ko`/`-ja` 등) 각 README 참조.
-- **랜딩**: 포크에는 GitHub Pages 가 켜져 있지 않다(`gh-pages` 는 원본 랜딩 사본). Pages 를 켜기 전까지는 랜딩 갱신을 건너뛴다.
+- **랜딩**: `gh-pages` 는 MSTokenBar 안내 페이지(`index.html` + `assets/icon.png`·`assets/hangar.png`) 하나다. GitHub 는 `gh-pages` 브랜치가 있으면 Pages 해제를 막으므로, 원본 랜딩이 다시 올라가지 않게 이 브랜치에 원본 파일을 되살리지 않는다. 기능 문구나 격납고 스크린샷이 크게 바뀌면 함께 갱신한다.
 - Homebrew cask 는 아직 없다. 설치·업그레이드는 릴리스의 `MSTokenBar.zip` 으로 안내한다.
 
 ### 게이트의 함정
@@ -62,4 +62,4 @@ GitHub Release → Pages를 순서대로 수행한다. 빌드 단계에서 기�
 
 ## 3. 검증
 
-완료 후 릴리스 페이지에 `MSTokenBar.zip` 이 올라왔는지, 이전 버전 앱이 업데이트 배너를 띄우는지 확인한다.
+완료 후 릴리스 페이지에 `MSTokenBar.zip` 이 올라왔는지, 이전 버전 앱이 업데이트 배너를 띄우고 **업데이트** 버튼으로 교체·재실행되는지 확인한다. 앱 내 교체(`SelfUpdater`)는 같은 「MSTokenBar Local」 인증서로 서명된 zip 만 받아들이므로, 인증서가 바뀌면 사용자는 zip 을 한 번 직접 교체해야 한다.
