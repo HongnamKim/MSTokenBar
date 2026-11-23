@@ -13,15 +13,14 @@ func rarityColor(_ r: Rarity?) -> Color {
 /// 순수 표시 순서다. 목록 정렬에는 쓰지 않는다.
 let rarityDisplayOrder: [Rarity] = [.legendary, .rare, .uncommon, .common]
 
-/// 아이템 아이콘 — 이모지(스프라이트 없음).
+/// The shop and inventory share the same tool artwork.
 @MainActor
 struct ItemIconView: View {
     let kind: ItemKind
     var size: CGFloat = 30
 
     var body: some View {
-        Text(kind.fallbackEmoji).font(.system(size: size))
-            .frame(width: size, height: size)
+        WorkshopIcon(WorkshopArt(item: kind), size: size)
     }
 }
 
@@ -45,7 +44,7 @@ struct SpriteSubject: Equatable {
     }
 
     /// 주체가 알로 바뀌었다(졸업·새 알). 이전 **개체**의 이미지는 다른 주체의 픽셀이라 버린다.
-    /// 이미 알이던 경우(loadedID == nil)엔 손대지 않는다 — 시드된 알 이미지를 지워 🥚 글리프로 깜빡이게 하지 않기 위해.
+    /// 이미 박스 상태면 첫 화면에 표시한 이미지를 유지한다.
     func becomingEgg(cachedEgg: NSImage?) -> SpriteSubject {
         guard loadedID != nil else { return self }
         return SpriteSubject(image: cachedEgg, loadedID: nil)
@@ -55,7 +54,7 @@ struct SpriteSubject: Equatable {
     /// 취소는 곧 주체가 바뀌었다는 뜻이고, 협조적 취소라 continuation 은 그대로 실행되므로 후속 `.task`
     /// 가 이미 새 주체로 잡아 둔 상태를 뒤늦게 덮어쓸 수 있다. 그러면 알 위에 옛 개체가 되살아나고
     /// (#135 와 같은 증상), 실패한 로드가 `loadedID` 만 남기면 다음에 그 종이 다시 활성일 때
-    /// "이미 로드됨"으로 판단해 🥚 글리프가 고정된다.
+    /// "이미 로드됨"으로 판단해 박스 도트가 고정된다.
     /// (nil 로 돌려주는 이유: 같은 값을 되쓰면 @State 무효화가 한 번 더 돌아 항상 떠 있는 펫에 불필요한 재렌더가 생긴다.)
     func applyingLoad(_ image: NSImage?, for id: Int, cancelled: Bool,
                       shiny: Bool = false, back: Bool = false) -> SpriteSubject? {
@@ -63,10 +62,6 @@ struct SpriteSubject: Equatable {
                                         loadedBack: back)
     }
 
-    /// 로드된 알 스프라이트를 반영한 결과(같은 이유로 취소면 nil). 알은 종이 없으므로 loadedID 는 그대로.
-    func applyingEgg(_ image: NSImage?, cancelled: Bool) -> SpriteSubject? {
-        cancelled ? nil : SpriteSubject(image: image, loadedID: loadedID)
-    }
 }
 
 /// Distance from a `SpriteView` box top to the sprite's visible top; emitted only on request.
@@ -75,7 +70,7 @@ struct SpriteVisibleTopKey: PreferenceKey {
     static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) { value = nextValue() ?? value }
 }
 
-/// 스프라이트 1개(런타임 로드 + 캐시). 없으면 알 글리프. bob 으로 가벼운 상하 움직임.
+/// 스프라이트 1개(런타임 로드 + 캐시). 없으면 박스 도트. bob 으로 가벼운 상하 움직임.
 /// animated=true 면 Gen-V GIF 프레임을 순환(미지원/오프라인이면 정적+bob 으로 폴백).
 @MainActor
 struct SpriteView: View {
@@ -120,8 +115,7 @@ struct SpriteView: View {
         self.shiny = shiny
         self.minFrameDelay = minFrameDelay
         // 캐시에 있으면 즉시(동기) 표시 — 재렌더 플래시 방지 + 정적 스냅샷에서도 보임.
-        // speciesID==nil(알 상태)이면 알 스프라이트를 시드(없으면 body 가 🥚 폴백).
-        let cached = speciesID.map { SpriteLoader.cachedImage(speciesID: $0, shiny: shiny, directory: spriteStore.directory, back: back) } ?? SpriteLoader.cachedEggImage()
+        let cached = speciesID.map { SpriteLoader.cachedImage(speciesID: $0, shiny: shiny, directory: spriteStore.directory, back: back) } ?? WorkshopArt.box.image
         let cachedFrames = animated ? speciesID.map {
             SpriteLoader.cachedFrames(speciesID: $0, shiny: shiny, directory: spriteStore.directory, back: back)
         } ?? [] : []
@@ -208,7 +202,7 @@ struct SpriteView: View {
             } else if let img = subject.image {
                 fitted(animated && speciesID != nil ? SpriteLoader.animationPlaceholder(img) : img)
             } else {
-                Text("📦").font(.system(size: size * 0.62)).frame(width: size, height: size)
+                WorkshopIcon(.box, size: size)
             }
         }
         // GIF 재생 중엔 bob 정지(프레임 자체가 움직임) — 폴백/정적일 때만 상하 움직임
@@ -226,14 +220,7 @@ struct SpriteView: View {
                 floor: minFrameDelay) : []
             frameIndex = 0
             guard let id = speciesID else {
-                // 알 상태 — 정적 알 스프라이트 로드(애니메이션 알은 없음). 실패/오프라인이면 body 가 🥚 폴백.
-                // 종 → 알(졸업·새 알)이면 이전 개체 이미지를 버려야 한다 — img 는 뷰 identity 가 살아있는 동안
-                // 유지되고 플로팅 펫 패널은 졸업 때 재생성되지 않아, 안 버리면 옛 포켓몬이 계속 떠 있다.
-                apply(subject.becomingEgg(cachedEgg: SpriteLoader.cachedEggImage()))
-                if subject.image == nil {
-                    let egg = await SpriteLoader.eggImage()
-                    if let next = subject.applyingEgg(egg, cancelled: Task.isCancelled) { apply(next) }
-                }
+                apply(subject.becomingEgg(cachedEgg: WorkshopArt.box.image))
                 return
             }
             // Drop the previous sprite before any await; cached pixels and metadata change atomically.
@@ -672,7 +659,7 @@ struct CompanionHeader: View {
                     .overlay(RoundedRectangle(cornerRadius: 12).fill(.white).opacity(flashOpacity))
                     .overlay(alignment: .topTrailing) {
                         if shinyBurst {
-                            Text("✨").font(.system(size: 22))
+                            WorkshopIcon(.customMark, size: 22)
                                 .transition(.scale.combined(with: .opacity))
                                 .offset(x: 6, y: -6)
                         }
@@ -696,7 +683,7 @@ struct CompanionHeader: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Text(store.displayName).font(.callout.weight(.semibold))
-                        if store.currentIsShiny { Text("✨").font(.system(size: 11)) }
+                        if store.currentIsShiny { WorkshopIcon(.customMark, size: 11, label: store.l.dexShinyLabel) }
                         if let r = store.rarity {
                             Badge(store.l.rarityLabel(r).uppercased(), tint: .rarity(r))
                         }
@@ -720,6 +707,7 @@ struct CompanionHeader: View {
                     } else {
                         // 알 인큐베이션 — 부화까지 진행 (임박 시 문구·색 전환)
                         HStack(spacing: 6) {
+                            if !eggImminent { WorkshopIcon(.box, size: 13) }
                             Text(eggImminent ? store.l.eggImminent : store.l.eggIncubating)
                                 .font(.caption2)
                                 .foregroundStyle(eggImminent ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
@@ -733,10 +721,13 @@ struct CompanionHeader: View {
                                            label: Self.progressDetail(used: store.state.eggUsage,
                                                                       total: store.eggHatchThreshold))
                         if store.isEgg, store.isHatchRetryDelayed {
-                            Text(store.l.eggHatchDelayed)
-                                .font(.caption2)
-                                .foregroundStyle(.orange)
-                                .fixedSize(horizontal: false, vertical: true)
+                            HStack(alignment: .top, spacing: 4) {
+                                WorkshopIcon(.hourglass, size: 12)
+                                Text(store.l.eggHatchDelayed)
+                                    .font(.caption2)
+                                    .foregroundStyle(.orange)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
                         } else {
                             Text(store.l.eggToHatch(TokenFormatter.compact(store.eggTokensToHatch)))
                                 .font(.caption2).foregroundStyle(.tertiary)
@@ -774,7 +765,7 @@ struct CompanionHeader: View {
         .onChange(of: eggImminent) { syncEggWiggle() }
     }
 
-    /// 부화/진화 연출 1회 재생 — 흰 플래시 페이드아웃 + 스프링 팝. shiny 부화는 ✨ 버스트 추가.
+    /// 부화/진화 연출 1회 재생 — 흰 플래시 페이드아웃 + 스프링 팝. shiny 부화는 전용기 도트 추가.
     private func playCelebrationIfNeeded() {
         guard let c = store.celebration, store.celebrationSeq != seenSeq else { return }
         seenSeq = store.celebrationSeq
@@ -859,7 +850,7 @@ struct RarityTally: View {
     }
 }
 
-/// 작품별 격납고 진행 캡슐 — "제타 3/8"(일반 기체 셀). 일반 기체 완성 시 🏅, 전용기 완성 시 ✨.
+/// 작품별 격납고 진행 캡슐 — "제타 3/8"(일반 기체 셀). 일반 기체 완성 시 작품 메달, 전용기 완성 시 전용기 메달.
 /// 희귀도 캡슐(RarityTally)과 같은 시각 언어를 쓰되 색 대신 완성 상태로 강조한다.
 @MainActor
 struct SeriesTally: View {
@@ -874,8 +865,8 @@ struct SeriesTally: View {
     }
     var body: some View {
         HStack(spacing: 3) {
-            if isComplete { Text("🏅").font(.system(size: 10)) }
-            if completion?.isVariantComplete == true { Text("✨").font(.system(size: 10)) }
+            if isComplete { WorkshopIcon(.seriesMedal, size: 12) }
+            if completion?.isVariantComplete == true { WorkshopIcon(.customMedal, size: 12) }
             Text(label).font(.system(size: 11, weight: isSelected ? .semibold : .medium))
             if let completion {
                 Text("\(completion.ownedCells)/\(completion.totalCells)")
@@ -896,14 +887,13 @@ struct SeriesTally: View {
     }
 }
 
-/// 헤더의 완성 메달 — 격납고 전체·전용기 전체 등 획득한 배지를 이모지 캡슐로 보여준다(순수 장식).
+/// 헤더의 완성 메달 — 격납고 전체·전용기 전체 등 획득한 배지를 도트 메달로 보여준다(순수 장식).
 @MainActor
 struct DexBadgeMedal: View {
-    let emoji: String
+    let art: WorkshopArt
     let help: String
     var body: some View {
-        Text(emoji)
-            .font(.system(size: 12))
+        WorkshopIcon(art, size: 14, label: help)
             .padding(.horizontal, 5).padding(.vertical, 2)
             .background(Color.yellow.opacity(0.14))
             .clipShape(Capsule())
@@ -1556,17 +1546,9 @@ private struct DexGridView: View {
         if !badges.isEmpty {
             HStack(spacing: 3) {
                 ForEach(badges, id: \.notificationKey) { badge in
-                    DexBadgeMedal(emoji: medalEmoji(badge), help: store.dexBadgeLabel(badge))
+                    DexBadgeMedal(art: WorkshopArt(badge: badge), help: store.dexBadgeLabel(badge))
                 }
             }
-        }
-    }
-
-    private func medalEmoji(_ badge: DexBadge) -> String {
-        switch badge {
-        case .series: return "🏅"
-        case .seriesVariant, .allVariant: return "✨"
-        case .all: return "🏆"
         }
     }
 
@@ -1755,7 +1737,12 @@ struct PokemonDetailView: View {
                     Text(store.l.rarityLabel(species.rarity))
                         .font(.callout.weight(.semibold)).foregroundStyle(.secondary)
                 }
-                if displayedShiny { Text("✨ \(store.l.dexShinyLabel)").font(.callout) }
+                if displayedShiny {
+                    HStack(spacing: 3) {
+                        WorkshopIcon(.customMark, size: 12)
+                        Text(store.l.dexShinyLabel).font(.callout)
+                    }
+                }
                 if let individual, store.isActiveDexEntry(individual) { Text(store.l.dexRaising).font(.callout).foregroundStyle(Color.accentColor) }
                 let isRepresentative = store.isRepresentative(species)
                 RepresentativeFooterButton(localization: store.l,
@@ -1771,7 +1758,7 @@ struct PokemonDetailView: View {
         Picker(store.l.dexAppearance, selection: Binding(
             get: { displayedShiny }, set: { selectedShiny = $0; selectedInstanceID = "" })) {
             Text(store.l.dexNormalLabel).tag(false)
-            Text("✨ \(store.l.dexShinyLabel)").tag(true)
+            Text(store.l.dexShinyLabel).tag(true)
         }
         .pickerStyle(.segmented)
     }
@@ -1787,7 +1774,7 @@ struct PokemonDetailView: View {
     }
 
     private func individualLabel(_ entry: DexEntry, index: Int) -> String {
-        let appearance = entry.isShiny ? "✨ \(store.l.dexShinyLabel)" : store.l.dexNormalLabel
+        let appearance = entry.isShiny ? store.l.dexShinyLabel : store.l.dexNormalLabel
         let date = entry.caughtAt.map {
             $0.formatted(Date.FormatStyle(date: .numeric, time: .omitted)
                 .locale(Locale(identifier: store.language.rawValue)))
@@ -1885,13 +1872,11 @@ private struct HangarMachineCell: View {
             .padding(.top, 10)   // room for the model-number tag above the sprite
             .overlay(alignment: .topLeading) { modelTag }
             .overlay(alignment: .topTrailing) {
-                // ✨ = 전용기 칸.
+                // Custom-unit marker.
                 if cell.isVariant {
-                    Text("✨")
-                        .font(.system(size: 10))
+                    WorkshopIcon(.customMark, size: 12, label: store.l.hangarVariantLabel)
                         .padding(.horizontal, 2)
                         .background(.regularMaterial, in: Capsule())
-                        .accessibilityLabel(store.l.hangarVariantLabel)
                 }
             }
             .padding(2)
@@ -2009,9 +1994,7 @@ private struct DexEntryRow: View {
                     Badge(store.l.dexReleased.uppercased(), tint: .secondary, style: .tinted, size: 10)
                 }
                 if entry.isShiny {
-                    // 이모지는 스크린리더가 일관되게 읽지 못해 명사 라벨을 붙인다(도감 칸과 동일 규칙).
-                    Text("✨").font(.system(size: 10))
-                        .accessibilityLabel(store.l.dexShinyLabel)
+                    WorkshopIcon(.customMark, size: 12, label: store.l.dexShinyLabel)
                 }
                 Spacer()
             }

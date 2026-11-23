@@ -1080,13 +1080,13 @@ struct L {
     var finalForm: String { t("최종 등급", "Final grade", "最終グレード") }
     func stage(_ i: Int, _ k: Int) -> String { t("등급 \(i) / \(k)", "Grade \(i) / \(k)", "グレード \(i) / \(k)") }
     var unknownNextEvolution: String { t("알 수 없는 다음 등급", "Unknown next grade", "次のグレードは不明") }
-    var eggIncubating: String { t("📦 개봉 준비 중", "📦 Getting ready to unbox", "📦 開封の準備中") }
+    var eggIncubating: String { t("개봉 준비 중", "Getting ready to unbox", "開封の準備中") }
     func eggToHatch(_ amount: String) -> String { t("개봉까지 \(amount)", "\(amount) to unbox", "開封まで \(amount)") }
     /// 알 부화 임계 도달 후 외부 데이터 요청이 실패한 동안의 다음 새로고침 안내.
     var eggHatchDelayed: String {
-        t("⏳ 개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
-          "⏳ Unboxing is delayed — retrying on the next refresh",
-          "⏳ 開封が遅れています。次回の更新時に再試行します")
+        t("개봉이 지연되고 있어요. 다음 새로고침에서 다시 시도해요",
+          "Unboxing is delayed — retrying on the next refresh",
+          "開封が遅れています。次回の更新時に再試行します")
     }
     func toNextEvolution(_ amount: String) -> String { t("다음 등급 업까지 \(amount)", "\(amount) to next grade up", "次のグレードアップまで \(amount)") }
     func toGraduation(_ amount: String) -> String { t("완성까지 \(amount)", "\(amount) to completion", "完成まで \(amount)") }
@@ -1119,7 +1119,7 @@ struct L {
     var dexFilterHint: String { t("탭하면 이 희귀도만 보기 · 다시 탭하면 전체", "Tap to show only this rarity · tap again to clear", "タップでこの希少度のみ表示・再タップで全体", "Toca para ver solo esta rareza · toca de nuevo para ver todo", "Touche pour n'afficher que cette rareté · touche à nouveau pour tout afficher", "Toque para ver só esta raridade · toque de novo para ver tudo", "Tippe, um nur diese Seltenheit zu sehen · tippe erneut für alle", "Нажмите — только эта редкость · ещё раз — сброс") }
     /// 스프라이트 클릭 → 그 종의 도감 상세. 툴팁·접근성 라벨 공용.
     var dexOpenEntryHint: String { t("격납고에서 기체 보기", "View in Hangar", "格納庫で機体を見る") }
-    /// 도감 칸의 ✨ 를 읽어주는 명사 — 이모지는 스크린리더가 일관되게 읽지 못한다.
+    /// 도감 칸의 전용기 표시를 읽어주는 명사.
     var dexShinyLabel: String { t("전용기", "Custom", "専用機") }
     var dexSearchPlaceholder: String { t("이름 또는 형식번호 검색…", "Search name or model number…", "名前または型式番号で検索…") }
     var sortTitle: String { t("정렬", "Sort", "並び替え", "Ordenar", "Trier", "Ordenar", "Sortieren", "Сортировка") }
@@ -1180,9 +1180,9 @@ struct L {
     var statusGrew: String { t("성장했어요!", "It grew!", "成長しました！", "¡Ha crecido!", "Il a grandi !", "Cresceu!", "Ist gewachsen!", "Подрос!") }
 
     // MARK: companion 이벤트 시스템 알림
-    var notifHatchTitle: String { t("📦 개봉!", "📦 Unboxed!", "📦 開封！") }
+    var notifHatchTitle: String { t("개봉!", "Unboxed!", "開封！") }
     func notifHatchBody(_ name: String) -> String { t("박스에서 \(KoreanParticle.subject.attach(to: name)) 나왔어요!", "\(name) came out of the box!", "ボックスから \(name) が登場しました！") }
-    var notifShinyHatchTitle: String { t("✨ 전용기!", "✨ Custom Mobile Suit!", "✨ 専用機！") }
+    var notifShinyHatchTitle: String { t("전용기!", "Custom Mobile Suit!", "専用機！") }
     /// 실제 판정에 쓴 분모를 받는다 — 도색 공구를 보유하면 32 가 아니다.
     func notifShinyHatchBody(_ name: String, odds: UInt64) -> String { t("전용기 \(KoreanParticle.subject.attach(to: name)) 나왔어요! (1/\(odds))", "A Custom \(name) came out! (1 in \(odds))", "専用機の \(name) が登場しました！(1/\(odds))") }
     // MARK: 기도하기 (알 위약 버튼)
@@ -1248,10 +1248,10 @@ struct L {
           "Grows from your local AI coding usage. Your Kit Box unboxes after ~\(amount) tokens.",
           "ローカルの AI コーディング使用量で育ちます。約\(amount)トークンでキットボックスを開封します。")
     }
-    var notifEvolveTitle: String { t("✨ 등급 업!", "✨ Grade Up!", "✨ グレードアップ！") }
+    var notifEvolveTitle: String { t("등급 업!", "Grade Up!", "グレードアップ！") }
     /// Both names, so the notification and the floating pet's hover line say who evolved into what.
     func notifEvolveBody(from old: String, to new: String) -> String { t("\(KoreanParticle.subject.attach(to: old)) \(KoreanParticle.direction.attach(to: new)) 등급 업했어요!", "\(old) graded up to \(new)!", "\(old) が \(new) にグレードアップしました！") }
-    var notifGraduateTitle: String { t("🏁 완성!", "🏁 Complete!", "🏁 完成！") }
+    var notifGraduateTitle: String { t("완성!", "Complete!", "完成！") }
     func notifGraduateBody(_ name: String) -> String { t("\(name) — 격납고에 보존! 새 건프라 박스가 도착했어요.", "\(name) — saved to your Hangar! A new Kit Box has arrived.", "\(name) — 格納庫に保存！新しいキットボックスが届きました。") }
 
     // MARK: 격납고 — 작품 칩·완성 배지·완성 알림
@@ -1302,10 +1302,10 @@ struct L {
 
     func notifHangarCompleteTitle(_ badge: DexBadge, seriesName s: String) -> String {
         switch badge {
-        case .series: return t("🏅 \(s) 완성!", "🏅 \(s) complete!", "🏅 \(s) コンプリート！")
-        case .seriesVariant: return t("✨ \(s) 전용기 완성!", "✨ \(s) Customs complete!", "✨ \(s) 専用機コンプリート！")
-        case .all: return t("🏆 격납고 완성!", "🏆 Hangar complete!", "🏆 格納庫コンプリート！")
-        case .allVariant: return t("✨ 전용기 전체 완성!", "✨ Every Custom complete!", "✨ 専用機すべてコンプリート！")
+        case .series: return t("\(s) 완성!", "\(s) complete!", "\(s) コンプリート！")
+        case .seriesVariant: return t("\(s) 전용기 완성!", "\(s) Customs complete!", "\(s) 専用機コンプリート！")
+        case .all: return t("격납고 완성!", "Hangar complete!", "格納庫コンプリート！")
+        case .allVariant: return t("전용기 전체 완성!", "Every Custom complete!", "専用機すべてコンプリート！")
         }
     }
 
@@ -1533,14 +1533,14 @@ struct L {
 
     // MARK: 업데이트 알림
     func updateAvailable(_ version: String, current: String) -> String {
-        t("🆕 v\(version) 사용 가능 (현재 \(current))",
-          "🆕 v\(version) available (you have \(current))",
-          "🆕 v\(version) が利用可能（現在 \(current)）",
-          "🆕 v\(version) disponible (tienes \(current))",
-          "🆕 v\(version) disponible (tu as \(current))",
-          "🆕 v\(version) disponível (você tem \(current))",
-          "🆕 v\(version) verfügbar (installiert: \(current))",
-          "🆕 Доступна v\(version) (у вас \(current))")
+        t("v\(version) 사용 가능 (현재 \(current))",
+          "v\(version) available (you have \(current))",
+          "v\(version) が利用可能（現在 \(current)）",
+          "v\(version) disponible (tienes \(current))",
+          "v\(version) disponible (tu as \(current))",
+          "v\(version) disponível (você tem \(current))",
+          "v\(version) verfügbar (installiert: \(current))",
+          "Доступна v\(version) (у вас \(current))")
     }
     var updateButton: String { t("업데이트", "Update", "更新", "Actualizar", "Mettre à jour", "Instalar", "Aktualisieren", "Обновить") }
     var skipThisVersion: String { t("이 버전 건너뛰기", "Skip this version", "このバージョンをスキップ", "Omitir esta versión", "Ignorer cette version", "Ignorar esta versão", "Diese Version überspringen", "Пропустить эту версию") }
@@ -1691,16 +1691,16 @@ struct L {
           "Send off \(monName) for the \(eggName)?",
           "\(monName) を手放して \(eggName) にしますか？")
     }
-    var freshEggShinyWarning: String { t("⚠️ 전용기예요! 정말 놓아줄까요?", "⚠️ This one is a Custom unit! Really send it off?", "⚠️ 専用機です！本当に手放しますか？") }
-    var freshEggLegendaryWarning: String { t("⚠️ 전설 등급 기체예요! 정말 놓아줄까요?", "⚠️ This is a Legendary Mobile Suit! Really send it off?", "⚠️ 伝説級の機体です！本当に手放しますか？") }
+    var freshEggShinyWarning: String { t("전용기예요! 정말 놓아줄까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
+    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 놓아줄까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
     var freshEggDiscardShiny: String { t("전용기 놓아주기", "Send Custom off", "専用機を手放す") }
     var freshEggDiscardValuable: String { t("놓아주기", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
 
     // MARK: 사탕 획득 알림 ("왜 받는지" = 토큰 한도를 다 채운 수고에 대한 보상)
     func notifCandyTitle(item: String, count: Int) -> String {
-        t("🧽 \(item) \(count)개를 받았어요!",
-          "🧽 You got \(count)× \(item)!",
-          "🧽 \(item)を\(count)個もらいました！")
+        t("\(item) \(count)개를 받았어요!",
+          "You got \(count)× \(item)!",
+          "\(item)を\(count)個もらいました！")
     }
     func notifCandyBody(window: String) -> String {
         t("\(window) 토큰 한도를 다 채웠어요. 열심히 쓴 만큼 스펀지 사포를 드려요 — 기체에 써서 성장시켜 보세요!",

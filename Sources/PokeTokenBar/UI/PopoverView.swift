@@ -124,9 +124,12 @@ struct PopoverView: View {
     private var updateBanner: some View {
         if let update = updater.available, store.updateNotificationsEnabled {
             VStack(alignment: .leading, spacing: 6) {
-                Text(l.updateAvailable(update.version, current: updater.currentVersion))
-                    .font(.caption)
-                    .fixedSize(horizontal: false, vertical: true)
+                HStack(alignment: .top, spacing: 4) {
+                    WorkshopIcon(.update, size: 14)
+                    Text(l.updateAvailable(update.version, current: updater.currentVersion))
+                        .font(.caption)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 HStack(spacing: 8) {
                     Spacer()
                     if updater.isUpdating {

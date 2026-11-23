@@ -166,18 +166,19 @@ final class GunplaCopyTests: XCTestCase {
         XCTAssertEqual([L(.ko).catchLogTitle, L(.en).catchLogTitle, L(.ja).catchLogTitle], ["제작 기록", "Build Log", "製作記録"])
         XCTAssertEqual([L(.ko).dexShinyLabel, L(.en).dexShinyLabel, L(.ja).dexShinyLabel], ["전용기", "Custom", "専用機"])
         XCTAssertEqual([L(.ko).notifHatchTitle, L(.en).notifHatchTitle, L(.ja).notifHatchTitle],
-                       ["📦 개봉!", "📦 Unboxed!", "📦 開封！"])
+                       ["개봉!", "Unboxed!", "開封！"])
         XCTAssertEqual([L(.ko).notifEvolveTitle, L(.en).notifEvolveTitle, L(.ja).notifEvolveTitle],
-                       ["✨ 등급 업!", "✨ Grade Up!", "✨ グレードアップ！"])
+                       ["등급 업!", "Grade Up!", "グレードアップ！"])
         XCTAssertEqual([L(.ko).notifGraduateTitle, L(.en).notifGraduateTitle, L(.ja).notifGraduateTitle],
-                       ["🏁 완성!", "🏁 Complete!", "🏁 完成！"])
+                       ["완성!", "Complete!", "完成！"])
     }
 
     func test_rareCandyGrantNotificationUsesTheSpongeItem() {
         for lang in AppLanguage.allCases {
             let l = L(lang)
             let title = l.notifCandyTitle(item: l.itemName(.rareCandy), count: 3)
-            XCTAssertTrue(title.contains("🧽"), title)
+            XCTAssertTrue(title.contains(l.itemName(.rareCandy)), title)
+            XCTAssertTrue(title.contains("3"), title)
             XCTAssertFalse(title.contains("🍬"), title)
         }
         XCTAssertTrue(L(.ko).notifCandyBody(window: "5시간").contains("스펀지 사포"))

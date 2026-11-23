@@ -545,17 +545,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         return img
     }
 
-    /// 스프라이트가 아직 없을 때(부화 전/로딩 중) 메뉴바에 표시하는 알 글리프.
+    /// The same kit box is visible before unboxing and while a machine image is loading.
     private static func eggImage(up: Bool) -> NSImage {
-        let h: CGFloat = 22
-        let img = NSImage(size: NSSize(width: h, height: h))
-        img.lockFocus()
-        let off: CGFloat = up ? 1 : 0
-        let s = "📦" as NSString
-        s.draw(in: NSRect(x: 2, y: off, width: h - 2, height: h - 2),
-               withAttributes: [.font: NSFont.systemFont(ofSize: 15)])
-        img.unlockFocus()
-        return img
+        guard let box = WorkshopArt.box.image else { return NSImage(size: NSSize(width: 22, height: 22)) }
+        return menuBarImage(from: box, up: up)
     }
 
     /// 팝오버 콘텐츠(SwiftUI 호스팅) 생성. .transient 팝오버는 contentViewController 를 평생 보유해 닫혀도

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 가방(인벤토리) — 소유 아이템 카드 + 사용. 빈 상태는 움직이는 잠만보(컬렉션의 피카츄 패턴).
+/// 가방(인벤토리) — 소유 아이템 카드 + 사용. 빈 상태에는 공용 키트 박스를 표시한다.
 @MainActor
 struct BagView: View {
     let store: CompanionStore
@@ -23,10 +23,10 @@ struct BagView: View {
         }
     }
 
-    /// 빈 가방 — 움직이는 잠만보(143) + 안내(특정 아이템명 미언급, 확장 대비).
+    /// 빈 가방 — 키트 박스 + 안내(특정 아이템명 미언급, 확장 대비).
     private var emptyState: some View {
         VStack(spacing: 10) {
-            SpriteView(speciesID: 143, size: 96, animated: true)   // 잠만보(움직임)
+            WorkshopIcon(.box, size: 96)
             Text(store.l.bagEmptyTitle)
                 .font(.callout.weight(.semibold))
             Button(store.l.shop) { nav.tab = .shop }
