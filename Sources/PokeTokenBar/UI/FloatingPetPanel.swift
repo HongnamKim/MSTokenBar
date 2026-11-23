@@ -512,13 +512,9 @@ final class FloatingPetController: NSObject, NSWindowDelegate {
         onOpenPopover?()
     }
 
-    /// Panel size for a given pet size and bubble visibility. Pure — tested without AppKit layout.
     static func panelSize(petSize: CGFloat, showingBubble: Bool) -> NSSize {
-        if showingBubble {
-            return NSSize(width: max(petSize, bubbleMinWidth),
-                          height: petSize + bubbleHeadroom)
-        }
-        return NSSize(width: petSize, height: petSize)
+        return NSSize(width: showingBubble ? max(petSize, bubbleMinWidth) : petSize,
+                      height: petSize + (showingBubble ? bubbleHeadroom : 0))
     }
 
     static func panelOrigin(petOrigin: NSPoint, petSize: CGFloat, panelSize: NSSize) -> NSPoint {
@@ -1020,6 +1016,7 @@ struct FloatingPetView: View {
     var body: some View {
         let size = CGFloat(store.floatingPetSize)
         let subject = companion.representativeSubject
+        let grade = subject.speciesID.flatMap(GunplaID.decode)?.grade
         let bubble = FloatingPetController.bubble(limitAlert: store.currentBubbleAlert, agent: agent.summary)
         VStack(spacing: 8) {
             if let bubble {
@@ -1031,7 +1028,7 @@ struct FloatingPetView: View {
             SpriteView(speciesID: subject.speciesID, size: size, animated: animated,
                        shiny: subject.isShiny,
                        minFrameDelay: store.animationQuality.frameFloor, spriteStore: spriteStore,
-                       back: companion.facesBack, reportsVisibleTop: true)
+                       back: companion.facesBack, reportsVisibleTop: true, showsGradeBadge: false)
                 // One-shot wobble per prayer; keyframes run once per trigger change, never in a loop.
                 .keyframeAnimator(initialValue: 0.0, trigger: burst.wobbleCount) { sprite, angle in
                     sprite.rotationEffect(.degrees(angle))
@@ -1063,6 +1060,11 @@ struct FloatingPetView: View {
                 }
                 // Keep the attached heart and prayer particles aligned with the bobbing sprite.
                 .modifier(AgentBob(active: agent.bobs))
+                .overlay(alignment: .bottomTrailing) {
+                    if let grade {
+                        GunplaGradeBadge(grade: grade, spriteSize: size, isFloatingMark: true)
+                    }
+                }
                 .zIndex(0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)

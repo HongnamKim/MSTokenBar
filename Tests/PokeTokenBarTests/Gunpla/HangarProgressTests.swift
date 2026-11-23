@@ -17,10 +17,10 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesCompletionCountsReleasedCellsOnly() throws {
-        // The first-series HG roster adds nine base cells and two variant cells to the sample catalog.
+        // Includes the original TV roster and the catalog's existing Johnny Ridden MG variant.
         let empty = try XCTUnwrap(completion("first", []))
-        XCTAssertEqual(empty.totalCells, 23)
-        XCTAssertEqual(empty.variantTotalCells, 7)
+        XCTAssertEqual(empty.totalCells, 41)
+        XCTAssertEqual(empty.variantTotalCells, 13)
         XCTAssertEqual(empty.ownedCells, 0)
         XCTAssertEqual(empty.variantOwnedCells, 0)
 

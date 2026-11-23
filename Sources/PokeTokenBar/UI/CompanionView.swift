@@ -95,6 +95,7 @@ struct SpriteView: View {
     var back: Bool = false
     /// Emit `SpriteVisibleTopKey` so an overlay can sit on the visible sprite instead of its box.
     var reportsVisibleTop = false
+    private let showsGradeBadge: Bool
     private let spriteStore: SpriteStore
     @State private var subject: SpriteSubject
     @State private var up = false
@@ -104,7 +105,8 @@ struct SpriteView: View {
     init(speciesID: Int?, size: CGFloat = 84, bob: Bool = false, animated: Bool = false,
          shiny: Bool = false, minFrameDelay: TimeInterval = 0, spriteStore: SpriteStore = .shared,
          back: Bool = false,
-         reportsVisibleTop: Bool = false) {
+         reportsVisibleTop: Bool = false, showsGradeBadge: Bool = true) {
+        self.showsGradeBadge = showsGradeBadge
         self.reportsVisibleTop = reportsVisibleTop
         self.speciesID = speciesID
         self.spriteStore = spriteStore
@@ -184,19 +186,6 @@ struct SpriteView: View {
             .frame(width: size, height: size)
     }
 
-    /// Grade capsule at the sprite's bottom-right; too small to read below ~24pt, so hidden there.
-    @ViewBuilder
-    private var gradeBadge: some View {
-        if size >= 24, let grade = speciesID.flatMap(GunplaID.decode)?.grade {
-            Text(grade.label)
-                .font(.system(size: max(7, size * 0.14), weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 3)
-                .background(Capsule().fill(Color.black.opacity(0.65)))
-                .frame(width: size, height: size, alignment: .bottomTrailing)
-        }
-    }
-
     /// One anchor for the whole animation (see `SpriteVisibleTop.anchorFraction`), so it does not jitter per frame.
     private var visibleTop: CGFloat? {
         guard reportsVisibleTop else { return nil }
@@ -220,7 +209,11 @@ struct SpriteView: View {
         }
         // GIF 재생 중엔 bob 정지(프레임 자체가 움직임) — 폴백/정적일 때만 상하 움직임
         .offset(y: bob && frames.isEmpty && up ? -3 : 0)
-        .overlay { gradeBadge }
+        .overlay(alignment: .bottomTrailing) {
+            if showsGradeBadge, size >= 24, let grade = speciesID.flatMap(GunplaID.decode)?.grade {
+                GunplaGradeBadge(grade: grade, spriteSize: size)
+            }
+        }
         .task(id: Self.frameTaskID(speciesID: speciesID, shiny: shiny, floor: minFrameDelay,
                                   animated: animated, back: back)) {
             // animated 프레임은 id/shiny 변경 시 항상 초기화(이전 개체 프레임 잔상 방지)
