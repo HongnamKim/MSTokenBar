@@ -2,11 +2,17 @@ import AppKit
 import Observation
 
 /// GitHub 릴리스 최신 버전을 확인해 새 버전이 있으면 팝오버에 알린다.
-/// 실제 설치는 brew 사용자면 `brew upgrade`, 그 외엔 릴리스 페이지 열기(저위험·인프라 0).
+/// 실제 설치는 brew 사용자면 `brew upgrade`, 그 외엔 릴리스 zip 을 받아 직접 교체(`SelfUpdater`)하고,
+/// 그것도 안 되면 릴리스 페이지를 연다.
 @MainActor
 @Observable
 final class UpdateChecker {
-    struct Available: Equatable { let version: String; let url: String }
+    struct Available: Equatable {
+        let version: String
+        let url: String
+        /// `MSTokenBar.zip` asset of that release, when it has one.
+        var zipURL: String? = nil
+    }
 
     /// What Settings should say after a check. A skipped release is not "up to date".
     enum SettingsNotice: Equatable {
@@ -19,6 +25,7 @@ final class UpdateChecker {
     struct LatestRelease: Equatable, Sendable {
         let tag: String
         let url: String
+        var zipURL: String? = nil
     }
 
     private(set) var available: Available?
@@ -69,7 +76,7 @@ final class UpdateChecker {
               Self.isTrustedReleaseURL(release.url),
               let version = Self.normalizedReleaseVersion(release.tag) else { return }
         lastChecked = clock()
-        consider(latest: version, url: release.url)
+        consider(latest: version, url: release.url, zipURL: release.zipURL)
     }
 
     /// NSWorkspace.open 으로 가는 릴리스 URL — https + github.com 만 허용(스킴 하이재킹 방지).
@@ -103,11 +110,11 @@ final class UpdateChecker {
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let tag = json["tag_name"] as? String,
               let html = json["html_url"] as? String else { return nil }
-        return LatestRelease(tag: tag, url: html)
+        return LatestRelease(tag: tag, url: html, zipURL: SelfUpdater.zipURL(fromAssets: json["assets"]))
     }
 
     /// Apply one fetched release. `latest` may be a tag (`v2.5.4`) or a bare version.
-    func consider(latest tag: String, url: String) {
+    func consider(latest tag: String, url: String, zipURL: String? = nil) {
         let latest = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
         let skippedVersion = defaults.string(forKey: Self.skippedVersionKey)
         guard Self.isNewer(latest, than: currentVersion) else {
@@ -115,7 +122,8 @@ final class UpdateChecker {
             skipped = nil
             return
         }
-        let release = Available(version: latest, url: url)
+        let release = Available(version: latest, url: url,
+                                zipURL: zipURL.flatMap { SelfUpdater.isTrustedAssetURL($0) ? $0 : nil })
         if latest == skippedVersion {
             available = nil
             skipped = release
@@ -142,22 +150,31 @@ final class UpdateChecker {
         }
     }
 
-    /// 업데이트 적용: brew cask 설치본이면 `brew upgrade` 후 재시작, 아니면 릴리스 페이지.
+    /// 업데이트 적용: brew cask 설치본이면 `brew upgrade` 후 재시작. 아니면 릴리스 zip 을 받아 검증한 뒤
+    /// 앱 종료 후 교체·재실행한다. 어느 쪽도 못 하면 릴리스 페이지를 연다.
     func applyUpdate() {
         guard let update = updateTarget, !isUpdating else { return }
         isUpdating = true
         Task { @MainActor in
             // brew cask 설치본이면 분리(detached) 스크립트가 앱 종료 후 tap 갱신→업그레이드→재오픈.
-            // 그 외(brew 미설치/비-cask 설치)면 릴리스 페이지를 연다.
             let brew = await Task.detached { Self.brewCaskPath() }.value
             if let brew, let cask = Self.brewCask {
                 Self.launchDetachedUpgrade(brew: brew, cask: cask)
                 NSApp.terminate(nil)
-            } else {
-                isUpdating = false
-                AppLog.write("update: brew cask 아님/brew 미설치 → 릴리스 페이지 열기")
-                if let u = URL(string: update.url) { NSWorkspace.shared.open(u) }
+                return
             }
+            if let zipURL = update.zipURL, SelfUpdater.canReplace() {
+                let version = update.version
+                let app = await Task.detached { await SelfUpdater.prepare(zipURL: zipURL, expectedVersion: version) }.value
+                if let app, SelfUpdater.launchDetachedReplace(newApp: app) != nil {
+                    AppLog.write("update: v\(version) 검증 완료 → 종료 후 교체·재실행")
+                    NSApp.terminate(nil)
+                    return
+                }
+            }
+            isUpdating = false
+            AppLog.write("update: 직접 교체 불가 → 릴리스 페이지 열기")
+            if let u = URL(string: update.url) { NSWorkspace.shared.open(u) }
         }
     }
 

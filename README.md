@@ -29,7 +29,7 @@ macOS 14 or later.
 2. Unzip it and move `MSTokenBar.app` to Applications.
 3. The app is not notarized by Apple. On first launch, right-click it and choose **Open**.
 
-When a new version is out, the app shows an update banner. Download the new zip and replace the app.
+When a new version is out, the app shows an update banner. Click **Update** and the app downloads the release, checks its signature, replaces itself and restarts. Versions 0.1.1 and earlier open the release page instead, so download the zip once by hand.
 
 ## Versioning
 
