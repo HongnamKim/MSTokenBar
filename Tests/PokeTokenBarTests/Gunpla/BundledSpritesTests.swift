@@ -25,7 +25,7 @@ final class BundledSpritesTests: XCTestCase {
         return try MachineCatalog(machines: [machine], series: [series])
     }
 
-    func test_firstSeriesHGArtLoadsForStaticAndAnimatedViews() throws {
+    func test_firstSeriesGradeArtLoadsForStaticAndAnimatedViews() throws {
         let expected = [
             "RX-78-2": "rx-78-2", "RX-77-2": "guncannon", "RX-75": "guntank", "RGM-79": "gm",
             "MS-05B": "zaku-i", "MS-06F": "zaku-ii", "MS-06S": "chars-zaku-ii", "MS-07B": "gouf",
@@ -36,15 +36,18 @@ final class BundledSpritesTests: XCTestCase {
         for (model, art) in expected {
             let machine = try XCTUnwrap(first.first { $0.modelNumber == model }, model)
             XCTAssertTrue(machine.grades.contains(.hg), model)
-            let id = GunplaID.encode(machineID: machine.id, grade: .hg)
-            XCTAssertEqual(BundledSprites.resourceName(speciesID: id), "\(art)-hg", model)
-            for animated in [false, true] {
-                let data = try XCTUnwrap(SpriteStore.bundledGunplaData(speciesID: id, animated: animated), model)
-                let source = try XCTUnwrap(CGImageSourceCreateWithData(data as CFData, nil), model)
-                XCTAssertEqual(CGImageSourceGetCount(source), animated ? 2 : 1, model)
-                let frame = try XCTUnwrap(CGImageSourceCreateImageAtIndex(source, 0, nil), model)
-                XCTAssertEqual(frame.width, 128, model)
-                XCTAssertEqual(frame.height, 128, model)
+            for grade in machine.grades {
+                XCTAssertNotNil(machine.gradeSources?[grade.rawValue], model)
+                let id = GunplaID.encode(machineID: machine.id, grade: grade)
+                XCTAssertEqual(BundledSprites.resourceName(speciesID: id), "\(art)-\(grade.rawValue)", model)
+                for animated in [false, true] {
+                    let data = try XCTUnwrap(SpriteStore.bundledGunplaData(speciesID: id, animated: animated), model)
+                    let source = try XCTUnwrap(CGImageSourceCreateWithData(data as CFData, nil), model)
+                    XCTAssertEqual(CGImageSourceGetCount(source), animated ? 2 : 1, model)
+                    let frame = try XCTUnwrap(CGImageSourceCreateImageAtIndex(source, 0, nil), model)
+                    XCTAssertEqual(frame.width, 128, model)
+                    XCTAssertEqual(frame.height, 128, model)
+                }
             }
         }
     }
