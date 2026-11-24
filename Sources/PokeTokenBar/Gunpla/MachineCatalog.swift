@@ -13,6 +13,9 @@ struct MachineRecord: Codable, Sendable {
     /// Keys: grade rawValues for per-grade art, plus "sdBody" / "realBody" for body-type art shared across grades.
     let sprites: [String: String]?
 
+    /// Modes earn their own grades but share one physical suit in the hangar.
+    var hangarGroupID: Int? = nil
+    var hangarID: Int { hangarGroupID ?? id }
     var isVariant: Bool { variantOf != nil }
 }
 
@@ -29,6 +32,7 @@ enum CatalogError: Error, Equatable {
     case unknownSeries(Int, String)
     case unknownVariantBase(Int, Int)
     case variantOfVariant(Int)
+    case invalidHangarGroup(Int)
     case idOutOfRange(Int)
     case missingName(Int, String)
 }
@@ -54,6 +58,12 @@ struct MachineCatalog: Sendable {
             guard seriesIDs.contains(m.series) else { throw CatalogError.unknownSeries(m.id, m.series) }
             for lang in ["ko", "en", "ja"] where (m.names[lang] ?? "").isEmpty {
                 throw CatalogError.missingName(m.id, lang)
+            }
+            if let id = m.hangarGroupID {
+                guard let parent = byID[id], parent.hangarGroupID == nil, parent.id != m.id,
+                      parent.series == m.series, parent.rarity == m.rarity, parent.variantOf == m.variantOf else {
+                    throw CatalogError.invalidHangarGroup(m.id)
+                }
             }
             if let base = m.variantOf {
                 guard let baseRecord = byID[base] else { throw CatalogError.unknownVariantBase(m.id, base) }
@@ -93,7 +103,9 @@ struct MachineCatalog: Sendable {
         let ready = Set(machines.filter { machine in
             machine.grades.allSatisfy { BundledSprites.artName(sprites: machine.sprites, grade: $0, bundle: bundle) != nil }
         }.map(\.id))
-        let kept = machines.filter { ready.contains($0.id) && $0.variantOf.map(ready.contains) ?? true }
+        let kept = machines.filter { machine in
+            ready.contains(machine.id) && ready.contains(machine.hangarID) && (machine.variantOf.map(ready.contains) ?? true)
+        }
         let keptSeries = Set(kept.map(\.series))
         return try MachineCatalog(machines: kept, series: series.filter { keptSeries.contains($0.id) })
     }

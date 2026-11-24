@@ -85,7 +85,7 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 98)
+        XCTAssertEqual(c.machines.count, 113)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
@@ -99,10 +99,10 @@ final class MachineCatalogTests: XCTestCase {
                                         "www.bandaispirits.co.jp", "p-bandai.jp"]
         let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
-                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2]
+                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 13]
         for (series, count) in counts {
             let machines = catalog.machines.filter { $0.series == series }
-            XCTAssertEqual(machines.count, count, series)
+            XCTAssertEqual(Set(machines.map(\.hangarID)).count, count, series)
             for machine in machines {
                 let grades = Set(machine.grades.map(\.rawValue))
                 let sources = machine.gradeSources ?? [:]

@@ -324,9 +324,9 @@
       "id": 11,
       "modelNumber": "RX-0",
       "names": {
-        "ko": "유니콘 건담",
-        "en": "Unicorn Gundam",
-        "ja": "ユニコーンガンダム"
+        "ko": "유니콘 건담 1호기 (유니콘 모드)",
+        "en": "Unicorn Gundam Unit 1 (Unicorn Mode)",
+        "ja": "ユニコーンガンダム1号機 (ユニコーンモード)"
       },
       "series": "uc",
       "faction": "londo_bell",
@@ -336,8 +336,28 @@
         "hg",
         "rg",
         "mg",
+        "verka",
+        "mgex",
         "pg"
-      ]
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112619457000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/922",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/674",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/573",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/551",
+        "mgex": "https://manual.bandai-hobby.net/menus/detail/639",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1057"
+      },
+      "sprites": {
+        "sd": "unicorn-gundam-unicorn-sd",
+        "hg": "unicorn-gundam-unicorn-hg",
+        "rg": "unicorn-gundam-unicorn-rg",
+        "mg": "unicorn-gundam-unicorn-mg",
+        "verka": "unicorn-gundam-unicorn-verka",
+        "mgex": "unicorn-gundam-unicorn-mgex",
+        "pg": "unicorn-gundam-unicorn-pg"
+      }
     },
     {
       "id": 13,
@@ -2431,6 +2451,424 @@
       "sprites": {
         "hg": "surface-zaku-danan-hg"
       }
+    },
+    {
+      "id": 100,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "유니콘 건담 1호기 (디스트로이 모드)",
+        "en": "Unicorn Gundam Unit 1 (Destroy Mode)",
+        "ja": "ユニコーンガンダム1号機 (デストロイモード)"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka",
+        "mgex",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102576910000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/919",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/674",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/573",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/551",
+        "mgex": "https://manual.bandai-hobby.net/menus/detail/639",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1057"
+      },
+      "sprites": {
+        "sd": "unicorn-gundam-destroy-sd",
+        "hg": "unicorn-gundam-destroy-hg",
+        "rg": "unicorn-gundam-destroy-rg",
+        "mg": "unicorn-gundam-destroy-mg",
+        "verka": "unicorn-gundam-destroy-verka",
+        "mgex": "unicorn-gundam-destroy-mgex",
+        "pg": "unicorn-gundam-destroy-pg"
+      },
+      "hangarGroupID": 11
+    },
+    {
+      "id": 101,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "밴시 (유니콘 모드)",
+        "en": "Banshee (Unicorn Mode)",
+        "ja": "バンシィ (ユニコーンモード)"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112813442000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/938",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/675",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/595",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/631",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1058"
+      },
+      "sprites": {
+        "sd": "banshee-unicorn-sd",
+        "hg": "banshee-unicorn-hg",
+        "rg": "banshee-unicorn-rg",
+        "mg": "banshee-unicorn-mg",
+        "verka": "banshee-unicorn-verka",
+        "pg": "banshee-unicorn-pg"
+      }
+    },
+    {
+      "id": 102,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "밴시 (디스트로이 모드)",
+        "en": "Banshee (Destroy Mode)",
+        "ja": "バンシィ (デストロイモード)"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102621597000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/441",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/675",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/595",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/631",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1058"
+      },
+      "sprites": {
+        "sd": "banshee-destroy-sd",
+        "hg": "banshee-destroy-hg",
+        "rg": "banshee-destroy-rg",
+        "mg": "banshee-destroy-mg",
+        "verka": "banshee-destroy-verka",
+        "pg": "banshee-destroy-pg"
+      },
+      "hangarGroupID": 101
+    },
+    {
+      "id": 103,
+      "modelNumber": "MSN-06S",
+      "names": {
+        "ko": "시난주",
+        "en": "Sinanju",
+        "ja": "シナンジュ"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660105060000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/420",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/670",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/610",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/564"
+      },
+      "sprites": {
+        "sd": "sinanju-sd",
+        "hg": "sinanju-hg",
+        "rg": "sinanju-rg",
+        "mg": "sinanju-mg",
+        "verka": "sinanju-verka"
+      }
+    },
+    {
+      "id": 104,
+      "modelNumber": "NZ-666",
+      "names": {
+        "ko": "크샤트리아",
+        "en": "Kshatriya",
+        "ja": "クシャトリヤ"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "mgsd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112709639000&grp_id=5325",
+        "mgsd": "https://manual.bandai-hobby.net/menus/detail/5149",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/412"
+      },
+      "sprites": {
+        "sd": "kshatriya-sd",
+        "mgsd": "kshatriya-mgsd",
+        "hg": "kshatriya-hg"
+      }
+    },
+    {
+      "id": 105,
+      "modelNumber": "RGZ-95",
+      "names": {
+        "ko": "리젤",
+        "en": "ReZEL",
+        "ja": "リゼル"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "common",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/414",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/584"
+      },
+      "sprites": {
+        "hg": "rezel-hg",
+        "mg": "rezel-mg"
+      }
+    },
+    {
+      "id": 106,
+      "modelNumber": "MSN-001A1",
+      "names": {
+        "ko": "델타 플러스",
+        "en": "Delta Plus",
+        "ja": "デルタプラス"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112813435000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/418",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/591"
+      },
+      "sprites": {
+        "sd": "delta-plus-sd",
+        "hg": "delta-plus-hg",
+        "mg": "delta-plus-mg"
+      }
+    },
+    {
+      "id": 107,
+      "modelNumber": "RGM-96X",
+      "names": {
+        "ko": "제스타",
+        "en": "Jesta",
+        "ja": "ジェスタ"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/936",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/609"
+      },
+      "sprites": {
+        "hg": "jesta-hg",
+        "mg": "jesta-mg"
+      }
+    },
+    {
+      "id": 108,
+      "modelNumber": "D-50C",
+      "names": {
+        "ko": "로토",
+        "en": "Loto",
+        "ja": "ロト"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/927"
+      },
+      "sprites": {
+        "hg": "loto-hg"
+      }
+    },
+    {
+      "id": 109,
+      "modelNumber": "AMS-129",
+      "names": {
+        "ko": "기라 줄루",
+        "en": "Geara Zulu",
+        "ja": "ギラ・ズール"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/920"
+      },
+      "sprites": {
+        "hg": "geara-zulu-hg"
+      }
+    },
+    {
+      "id": 110,
+      "modelNumber": "AMS-129",
+      "names": {
+        "ko": "안젤로 전용 기라 줄루",
+        "en": "Geara Zulu (Angelo Sauper)",
+        "ja": "ギラ・ズール（アンジェロ専用機）"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/934"
+      },
+      "sprites": {
+        "hg": "geara-zulu-angelo-hg"
+      },
+      "variantOf": 109
+    },
+    {
+      "id": 111,
+      "modelNumber": "AMS-129M",
+      "names": {
+        "ko": "제 줄루",
+        "en": "Zee Zulu",
+        "ja": "ゼー・ズール"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/946"
+      },
+      "sprites": {
+        "hg": "zee-zulu-hg"
+      }
+    },
+    {
+      "id": 112,
+      "modelNumber": "RX-160S",
+      "names": {
+        "ko": "바이아란 커스텀",
+        "en": "Byarlant Custom",
+        "ja": "バイアラン・カスタム"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/375"
+      },
+      "sprites": {
+        "hg": "byarlant-custom-hg"
+      }
+    },
+    {
+      "id": 113,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "유니콘 건담 퍼펙티빌리티 (유니콘 모드)",
+        "en": "Unicorn Gundam Perfectibility (Unicorn Mode)",
+        "ja": "ユニコーンガンダム ペルフェクティビリティ (ユニコーンモード)"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://manual.bandai-hobby.net/menus/detail/4410",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/4475",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/4407",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2359"
+      },
+      "sprites": {
+        "sd": "unicorn-perfectibility-unicorn-sd",
+        "rg": "unicorn-perfectibility-unicorn-rg",
+        "mg": "unicorn-perfectibility-unicorn-mg",
+        "pg": "unicorn-perfectibility-unicorn-pg"
+      }
+    },
+    {
+      "id": 114,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "유니콘 건담 퍼펙티빌리티 (디스트로이 모드)",
+        "en": "Unicorn Gundam Perfectibility (Destroy Mode)",
+        "ja": "ユニコーンガンダム ペルフェクティビリティ (デストロイモード)"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://manual.bandai-hobby.net/menus/detail/4410",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/4390",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/4475",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/4407",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2359"
+      },
+      "sprites": {
+        "sd": "unicorn-perfectibility-destroy-sd",
+        "hg": "unicorn-perfectibility-destroy-hg",
+        "rg": "unicorn-perfectibility-destroy-rg",
+        "mg": "unicorn-perfectibility-destroy-mg",
+        "pg": "unicorn-perfectibility-destroy-pg"
+      },
+      "hangarGroupID": 113
     }
   ]
 }

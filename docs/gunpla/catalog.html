@@ -471,7 +471,7 @@
       );
       el("summary").textContent = [
         groups.size + "개 작품",
-        new Set(suits.map((i) => i.machine)).size + "기",
+        new Set(suits.map((i) => i.hangarGroup ?? i.machine)).size + "기",
         suits.length + "종의 등급별 스프라이트",
       ].join("  ·  ");
       for (const name of [

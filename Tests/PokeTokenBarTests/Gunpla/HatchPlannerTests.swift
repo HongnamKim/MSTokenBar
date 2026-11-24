@@ -137,6 +137,17 @@ final class HatchPlannerTests: XCTestCase {
         XCTAssertEqual(machineID(choose(snapshot(), sequence: [1, 12])), 2)
     }
 
+    func test_twoModesShareOneSuitWeightAndOnlyUnfinishedModesCanDrop() {
+        // Unit 1 has weight 3 and Sinanju has weight 12.
+        let bothModes = snapshot(graduated: allIDs.subtracting([11, 100, 103]))
+        XCTAssertEqual(machineID(choose(bothModes, sequence: [1, 2, 0])), 11)
+        XCTAssertEqual(machineID(choose(bothModes, sequence: [1, 2, 1])), 100)
+        XCTAssertEqual(machineID(choose(bothModes, sequence: [1, 3, 0])), 103)
+
+        let onlyDestroy = snapshot(graduated: allIDs.subtracting([100]))
+        XCTAssertEqual(machineID(choose(onlyDestroy, sequence: [1, 0])), 100)
+    }
+
     func test_hasCandidatesReflectsTierAndGraduation() {
         XCTAssertTrue(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(), tier: nil))
         let rarePlus = Set(catalog.machines.filter { $0.rarity.sortRank >= Rarity.rare.sortRank }.map(\.id))

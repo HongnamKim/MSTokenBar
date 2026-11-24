@@ -40,6 +40,18 @@ final class HangarProgressTests: XCTestCase {
                         "zeta", "zz", "cca", "beltorchika-children", "uc"])
     }
 
+    func test_unicornModesShareOneHangarEntryAndKeepIndependentGrades() throws {
+        let owned = [cell(11, [.hg, .rg]), cell(100, [.hg])]
+        let entries = HangarEntry.grouped(owned, catalog: catalog)
+        XCTAssertEqual(entries.map(\.id), [11])
+        let entry = try XCTUnwrap(entries.first)
+        XCTAssertEqual(entry.displayed(preferredID: 100).ownedGrades, [.hg])
+        XCTAssertEqual(entry.displayed(preferredID: 11).ownedGrades, [.hg, .rg])
+        XCTAssertEqual(completion("uc", owned)?.ownedCells, 3)
+        XCTAssertEqual(HangarEntry.grouped([cell(11, []), cell(100, [.mg])], catalog: catalog)
+            .first?.displayed(preferredID: nil).machineID, 100)
+    }
+
     func test_seriesBadgeWhenAllBaseCellsOwned() throws {
         let base = catalog.machines.filter { $0.series == "first" && !$0.isVariant }.map { cell($0.id) }
         let first = try XCTUnwrap(completion("first", base))
@@ -79,7 +91,7 @@ final class HangarProgressTests: XCTestCase {
         XCTAssertEqual(badges, [.series("first"), .seriesVariant("first"), .series("08th-ms-team"),
                                 .series("0080"), .series("0083"), .series("the-origin"), .seriesVariant("the-origin"),
                                 .series("thunderbolt"), .series("cucuruz-doans-island"), .series("zeta"), .series("zz"), .seriesVariant("zz"),
-                                .series("cca"), .seriesVariant("cca"), .series("beltorchika-children"), .series("uc"), .all, .allVariant])
+                                .series("cca"), .seriesVariant("cca"), .series("beltorchika-children"), .series("uc"), .seriesVariant("uc"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))
