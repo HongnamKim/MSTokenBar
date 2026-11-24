@@ -9,10 +9,10 @@ A macOS menu-bar app that turns the AI coding tokens you already spend (Claude C
 ## How it works
 
 - **Unbox**: spend AI coding tokens and your Kit Box opens. A mobile suit comes out.
-- **Grade up**: keep spending and the suit climbs through the kit grades actually released for it: SD → MGSD → HG → RG → MG → PG. Grades that were never released are skipped.
+- **Grade up**: keep spending and the suit climbs through the kit grades actually released for it: SD → MGSD → HG → RG → MG → Ver.Ka → MGEX → PG. Grades that were never released are skipped, and when a kit grade is added to the catalog later, a completed suit comes back to build it.
 - **Complete**: at its final grade the suit is complete. It is saved to your Hangar and a new Kit Box arrives. A completed suit does not come out again until you have completed every suit.
 - **Customs**: commander and ace customs, such as Char's Zaku II, are rare variants of their base suit. Paint tools from the shop (Masking Tape → Panel Line Pen → Paint Set → Airbrush) raise the chance for good.
-- **Hangar**: one cell per suit records every grade you have built. Filter by series and earn a badge for completing each one.
+- **Hangar**: one cell per suit records every grade you have built. Suits you have not built yet appear as silhouettes with only their model number as a clue. Filter by series and earn a badge for completing each one.
 - **Items**: a Sanding Sponge gives instant progress, and Uncommon or Rare Boxes guarantee a rarity tier.
 
 | Hangar | Suit detail |
