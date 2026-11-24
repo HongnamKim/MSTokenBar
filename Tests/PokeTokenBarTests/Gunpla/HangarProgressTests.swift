@@ -17,9 +17,9 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesCompletionCountsReleasedCellsOnly() throws {
-        // 13 base machines with 41 released grades; 3 variants (Char's Zaku II, Gelgoog, Z'Gok) with 12.
+        // 13 base machines with 42 released grades (RX-78-2 has Ver.Ka); 3 variants (Char's Zaku II, Gelgoog, Z'Gok) with 12.
         let empty = try XCTUnwrap(completion("first", []))
-        XCTAssertEqual(empty.totalCells, 41)
+        XCTAssertEqual(empty.totalCells, 42)
         XCTAssertEqual(empty.variantTotalCells, 12)
         XCTAssertEqual(empty.ownedCells, 0)
         XCTAssertEqual(empty.variantOwnedCells, 0)
@@ -36,7 +36,7 @@ final class HangarProgressTests: XCTestCase {
 
     func test_completionsFollowCatalogSeriesOrder() {
         XCTAssertEqual(HangarProgress.completions(owned: [], catalog: catalog).map(\.seriesID),
-                       ["first", "08th-ms-team", "0080", "0083", "zeta", "zz", "cca", "uc"])
+                       ["first", "08th-ms-team", "0080", "0083", "zeta", "zz", "cca", "beltorchika-children", "uc"])
     }
 
     func test_seriesBadgeWhenAllBaseCellsOwned() throws {
@@ -77,7 +77,7 @@ final class HangarProgressTests: XCTestCase {
         let badges = HangarProgress.earnedBadges(HangarProgress.completions(owned: everything, catalog: catalog))
         XCTAssertEqual(badges, [.series("first"), .seriesVariant("first"), .series("08th-ms-team"),
                                 .series("0080"), .series("0083"), .series("zeta"), .series("zz"), .seriesVariant("zz"),
-                                .series("cca"), .seriesVariant("cca"), .series("uc"), .all, .allVariant])
+                                .series("cca"), .seriesVariant("cca"), .series("beltorchika-children"), .series("uc"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))

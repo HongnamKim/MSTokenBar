@@ -348,6 +348,37 @@ read_when:
   **회귀 가드:** `PokemonProfileLogicTests.testShedinjaAlwaysHasOneHP` — Lv1/50/100 모두 1, 다른 스탯은 일반 공식,
   base HP 1 인 다른 종은 일반 공식. 수정 전 3건 실패 확인.
 
+- **A persisted code must not double as an ordering.** `GunplaID` wrote a grade into species ids as
+  its position in `GunplaGrade.allCases`, and the same position was the growth order. Adding Ver.Ka and
+  MGEX between MG and PG would have moved PG from 5 to 7, so every saved PG would have read as Ver.Ka.
+  Found while designing the grade addition, before any release carried it. No test could have caught
+  it: `test_encodeDecodeRoundTrip` encodes and decodes through the same enum, so it passes under any
+  numbering. A grade now has an explicit `saveCode` (0–5 as shipped in 0.1.0, Ver.Ka 6, MGEX 7) apart
+  from its `growthRank`, and `GunplaGrade` compares by rank. Class sweep: two sorts ran on raw ids
+  (`collectedDexSpecies`, the catch log's number order) and now use `GunplaID.orderKey`; every other
+  ranking already went through `Comparable` (`ownedGrades.max()`, the catalog's sorted-grades check,
+  `HatchPlanner`). `test_saveCodesAreFixedAndIndependentOfGrowthOrder` and
+  `test_speciesIDsWrittenBeforeVerKaStillDecodeToTheSameGrades` pin literal ids; restoring the
+  position-based code fails both, and comparing by save code fails eight tests. A new grade takes the
+  next free code wherever it sits in the growth order. Only 8 and 9 are left in the one decimal digit;
+  an eleventh grade needs a new id scheme with a migration.
+
+- **Load every save under a catalog that changed after it was written.** Two rules held only while a
+  machine's released grades never changed. `normalizedEvolutionState` accepted a reached path only as
+  an exact parent→child chain of the current line, so a machine raised to MG lost MG and fell back to
+  HG once RG was inserted between them. Graduation meant "has a finished record", so a graduated
+  machine could never fill a grade released later and its series badge stayed unearned. Every test
+  wrote and loaded its save with the same catalog, which is why both passed. `LateGradeTests` writes a
+  save under one catalog and loads it under another. The reached path is now kept when each id is a
+  descendant of the one before; graduated means a finished run plus every released grade owned; a
+  machine with an empty cell comes back from the owned grade just below the first empty cell and
+  stops at the last one (`HatchPlanner.runGrades`), so a plan may end before the top grade and
+  `applyUsage` graduates at the end of the plan. A stage is priced by its own grade's position, since
+  a run can skip a grade. Fifteen injected faults (demoting chain match, graduation without the
+  ownership check, no stop at the last empty cell, restart re-planning to the top, and others) each
+  fail at least one test. Completeness is `finished && every cell owned`, so each half is tested with
+  the other one true: finished with a gap, and every cell owned but never finished.
+
 ## 외부 로그·사용량 소스
 
 - **토큰 파일 파서는 외부 도구의 실제 직렬화 구조체(중첩 객체)를 반영해야 한다.** `jetski-standalone-oauth-token`
@@ -888,6 +919,24 @@ read_when:
   (< 0.9), and prints the marker column's brightness on failure; forcing 1x still passes and
   restoring the fixed 6pt track still fails. When a test measures lengths in pixels, pin the scale
   and keep the threshold well away from the measured colour; keep CI enabled on the fork.
+
+- **OCR in tests must read a fixed-scale render, not the window's scale.** `testSeriesChipFiltersMountedCollectionAndTogglesBack`
+  failed in about half of the CI runs with `No glyph bounds for Harbor`. `words(in:)` captured the window at
+  its backing scale, 1x on the display-less runner, where Vision misreads the 11pt chip labels: the fork's
+  pixel completion medal (#10) before a finished series' name read as "8" (`All V 8 Harbor 1/1`), "Harbor"
+  became "Barbor" or "(arbor", and a missed "Willow" made the test think its click failed, so it clicked
+  again and toggled the filter back off. A first fix that only removed the medal from the fixture still
+  failed in CI on "(arbor" — the medal was a confound, the scale was the cause. On a Retina Mac the same
+  capture is 2x and never failed. `words(in:)` now renders at a fixed 2x (Vision boxes are normalized, so
+  clicks are unchanged), and the fixture keeps each series at 1/2 so no medal sits in the label. The same
+  backing-scale capture remains in `DexColorRenderingTests` and `SessionKeySettingsRenderingTests`, which
+  have not failed in CI; pin their scale too if they ever do. Same lesson as the pace-marker entry above.
+  With the 2x OCR in place, CI read `Harbor 1/2` correctly and still failed: five synthetic clicks at the
+  chip's glyph box never selected it. The chip is the file's only control pressed by synthetic mouse
+  events (Back is an `NSButton` and takes `performClick`), and it sits in a horizontal `ScrollView` inside
+  a borderless, non-key window. Click delivery there is unreliable on the GitHub runner (Xcode 16 build)
+  and reliable locally (Xcode 26). The test is skipped when `GITHUB_ACTIONS` is set and still runs locally
+  and in `release.sh`'s gate. Open: drive the chip without synthetic events, then remove the skip.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.

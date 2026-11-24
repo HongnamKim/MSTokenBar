@@ -144,7 +144,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         let entry = try XCTUnwrap(s.state.dex.last)
         XCTAssertEqual(entry.chainOrder, [hg], "only reached grades that are still released")
         XCTAssertNotNil(entry.releasedAt)
-        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).highestReachedGrade[1], .hg)
+        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).ownedGrades[1], [.hg])
     }
 
     func test_variantHatchIsShiny() async throws {
@@ -210,12 +210,12 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertEqual(s.state.active?.currentID, GunplaID.encode(machineID: 1, grade: .hg))
 
         XCTAssertTrue(s.buyEgg(nil))
-        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).highestReachedGrade[1], .hg)
+        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).ownedGrades[1], [.sd, .hg])
         await openBox(s)
         let active = try XCTUnwrap(s.state.active)
         XCTAssertEqual(active.baseID, GunplaID.encode(machineID: 1, grade: .hg))
         XCTAssertEqual(active.stageIndex, 0)
-        XCTAssertEqual(active.totalForms, 4)   // hg → rg → mg → pg
+        XCTAssertEqual(active.totalForms, 5)   // hg → rg → mg → Ver.Ka → pg
         XCTAssertFalse(active.hasGrowthBoost)
     }
 
@@ -225,7 +225,8 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         var seeded = CompanionState()
         seeded.installBaselineSet = true
         seeded.dex = catalog.machines.filter { $0.id != 1 }.map { gradeEntry($0.id, $0.grades) }
-        seeded.dex.append(gradeEntry(1, [.hg, .rg, .mg, .pg]))
+        seeded.dex.append(gradeEntry(1, [.sd, .hg], released: true))
+        seeded.dex.append(gradeEntry(1, [.hg, .rg, .mg, .verka, .pg]))
         let hg = GunplaID.encode(machineID: 1, grade: .hg), pg = GunplaID.encode(machineID: 1, grade: .pg)
         seeded.collectedFinals = ["\(hg):\(pg)"]
         let url = tempURL()
@@ -252,28 +253,30 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         return costs
     }
 
+    /// A rare machine with five grades and no Ver.Ka: RX-178 Gundam Mk-II (sd · hg · rg · mg · pg).
+    private let fiveGradeRare = 6
+
     private func fullPathStage(_ i: Int) -> Int {
-        // Machine 1 (rare): sd · hg · rg · mg · pg.
         PokemonBalance.phaseThreshold(rarity: .rare, totalForms: 5, stageIndex: i)
     }
 
     func test_resumedAtFinalGradeCostsOnlyThatStage() async throws {
         let s = store()
-        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .pg))
+        await s.hatch(baseID: GunplaID.encode(machineID: fiveGradeRare, grade: .pg))
         XCTAssertEqual(remainingStageCosts(s), [fullPathStage(4)])
         XCTAssertEqual(fullPathStage(4), 1_000_000_000)
     }
 
     func test_resumedAtHGCostsTheRemainingStagesOfTheFullPath() async throws {
         let s = store()
-        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .hg))
+        await s.hatch(baseID: GunplaID.encode(machineID: fiveGradeRare, grade: .hg))
         XCTAssertEqual(remainingStageCosts(s), (1...4).map(fullPathStage))
         XCTAssertEqual(remainingStageCosts(s).reduce(0, +), 0)   // graduated
     }
 
     func test_freshRunPricingIsUnchanged() async throws {
         let s = store()
-        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .sd))
+        await s.hatch(baseID: GunplaID.encode(machineID: fiveGradeRare, grade: .sd))
         let costs = remainingStageCosts(s)
         XCTAssertEqual(costs, (0...4).map(fullPathStage))
         XCTAssertEqual(costs.reduce(0, +), PokemonBalance.graduationTotal(.rare))
@@ -283,11 +286,11 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         var seeded = CompanionState()
         seeded.installBaselineSet = true
         seeded.inventory[ItemKind.rareCandy.rawValue] = 50
-        seeded.dex = [gradeEntry(1, [.sd, .hg, .rg, .mg, .pg])]   // graduated before → repeat-growth boost
+        seeded.dex = [gradeEntry(fiveGradeRare, [.sd, .hg, .rg, .mg, .pg])]   // graduated before → repeat-growth boost
         let url = tempURL()
         try JSONEncoder().encode(seeded).write(to: url)
         let s = store(fileURL: url)
-        await s.hatch(baseID: GunplaID.encode(machineID: 1, grade: .pg))
+        await s.hatch(baseID: GunplaID.encode(machineID: fiveGradeRare, grade: .pg))
         XCTAssertEqual(s.state.active?.hasGrowthBoost, true)
         // PG stage 1.0B, halved by the boost → 500M at 100M per candy.
         XCTAssertEqual(s.threshold, PokemonBalance.phaseThreshold(rarity: .rare, totalForms: 5, stageIndex: 4,
@@ -323,9 +326,9 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertEqual(s.state.usedSinceInstall, 12345)
         XCTAssertEqual(s.state.inventory["mint"], 2)
         XCTAssertEqual(s.state.dex.count, 1)
-        // Legacy Pokémon dex entries are not catalog machines: nothing graduated, nothing reached but the active.
+        // Legacy Pokémon dex entries are not catalog machines: nothing graduated, nothing owned but the active.
         let snapshot = s.state.collectionSnapshot(catalog: catalog)
         XCTAssertTrue(snapshot.graduatedMachineIDs.isEmpty)
-        XCTAssertEqual(snapshot.highestReachedGrade, [2: .sd])
+        XCTAssertEqual(snapshot.ownedGrades, [2: [.sd]])
     }
 }

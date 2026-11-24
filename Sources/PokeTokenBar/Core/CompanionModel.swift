@@ -321,6 +321,13 @@ struct EvoNode: Codable, Sendable {
     var finalIDs: [Int] {
         children.isEmpty ? [speciesID] : children.flatMap(\.finalIDs)
     }
+    /// 이 노드 아래의 모든 단계 id (자신 제외)
+    var descendantIDs: [Int] { children.flatMap { [$0.speciesID] + $0.descendantIDs } }
+    /// 이 노드 아래에서 찾은 단계 (자신 제외)
+    func descendant(withID id: Int) -> EvoNode? {
+        for c in children { if let f = c.node(withID: id) { return f } }
+        return nil
+    }
 
     /// 서비스에 GIF 에셋이 있는 종만 남긴 진화 트리. 지원하지 않는 종부터 그 하위 체인도 제외한다.
     func keepingAnimatedSprites() -> EvoNode? {
@@ -394,6 +401,8 @@ struct MonState: Codable, Sendable {
     var displaysShiny: Bool { isShiny }
     // pathIDs 가 비면(손상된 상태 파일) baseID 로 폴백 — 렌더마다 읽히므로 out-of-bounds 크래시 방지.
     var currentID: Int { pathIDs.isEmpty ? baseID : pathIDs[min(stageIndex, pathIDs.count - 1)] }
+    /// 이번 육성 계획의 마지막 단계에 와 있는가. 계획은 최종 등급 전에 끝날 수 있다(빈 등급 칸만 채우는 재등장).
+    var isAtPlanEnd: Bool { stageIndex >= plannedPathIDs.count - 1 }
     /// Base (difficulty-free) cost of the current stage. A Gunpla machine is priced on its FULL
     /// released-grade path — k = `machine.grades.count`, stage = the current grade's position there — so
     /// resuming at grade G costs exactly the remaining stages of an original run. Ids the catalog does not
@@ -405,7 +414,10 @@ struct MonState: Codable, Sendable {
            let machine = catalog.machine(id: decoded.machineID),
            let start = machine.grades.firstIndex(of: decoded.grade) {
             k = machine.grades.count
-            stage = min(start + stageIndex, k - 1)
+            // The stage's own grade where the plan names it: a run can skip a grade released after it passed.
+            let planned = plannedPathIDs.indices.contains(stageIndex)
+                ? GunplaID.decode(plannedPathIDs[stageIndex])?.grade : nil
+            stage = planned.flatMap(machine.grades.firstIndex(of:)) ?? min(start + stageIndex, k - 1)
         }
         return PokemonBalance.phaseThreshold(
             rarity: rarity,

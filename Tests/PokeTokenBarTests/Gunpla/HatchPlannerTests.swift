@@ -7,8 +7,12 @@ final class HatchPlannerTests: XCTestCase {
     private var variantIDs: Set<Int> { Set(catalog.machines.filter(\.isVariant).map(\.id)) }
     private var allBaseIDs: Set<Int> { allIDs.subtracting(variantIDs) }
 
-    private func snapshot(graduated: Set<Int> = [], reached: [Int: GunplaGrade] = [:]) -> CollectionSnapshot {
-        CollectionSnapshot(graduatedMachineIDs: graduated, highestReachedGrade: reached)
+    /// `graduated` machines finished a run and hold every released grade; `owned` adds the grades of
+    /// machines let go midway.
+    private func snapshot(graduated: Set<Int> = [], owned: [Int: Set<GunplaGrade>] = [:]) -> CollectionSnapshot {
+        var grades = owned
+        for id in graduated { grades[id] = Set(catalog.machine(id: id)!.grades) }
+        return CollectionSnapshot(graduatedMachineIDs: graduated, ownedGrades: grades)
     }
 
     private func choose(_ snapshot: CollectionSnapshot, tier: Rarity? = nil, toolLevel: Int = 0,
@@ -86,7 +90,7 @@ final class HatchPlannerTests: XCTestCase {
     }
 
     func test_resumesFromHighestReachedGrade() {
-        let snap = snapshot(graduated: allIDs.subtracting([1]), reached: [1: .hg])
+        let snap = snapshot(graduated: allIDs.subtracting([1]), owned: [1: [.sd, .hg]])
         for sequence: [UInt64] in [[1, 0], [0, 0], [5, 77]] {
             let choice = choose(snap, sequence: sequence)
             XCTAssertEqual(choice?.startSpeciesID, GunplaID.encode(machineID: 1, grade: .hg))
@@ -95,7 +99,7 @@ final class HatchPlannerTests: XCTestCase {
     }
 
     func test_resumeAtFinalGradeGivesSingleStageLine() async throws {
-        let snap = snapshot(graduated: allIDs.subtracting([1]), reached: [1: .pg])
+        let snap = snapshot(graduated: allIDs.subtracting([1]), owned: [1: [.sd, .hg, .rg, .mg, .verka, .pg]])
         let choice = try XCTUnwrap(choose(snap, sequence: [1, 0]))
         XCTAssertEqual(choice.startSpeciesID, GunplaID.encode(machineID: 1, grade: .pg))
         let line = try await catalog.line(baseSpeciesID: choice.startSpeciesID)
@@ -141,16 +145,16 @@ final class HatchPlannerTests: XCTestCase {
         XCTAssertFalse(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snapshot(graduated: allIDs), tier: nil))
     }
 
-    func test_collectionSnapshotSplitsGraduatedFromReached() {
+    func test_collectionSnapshotCollectsOwnedGradesAndFinishedMachines() {
         var state = CompanionState()
         let id = { GunplaID.encode(machineID: $0, grade: $1) }
-        // 2 graduated at PG, and also released once earlier at HG — graduated wins, no reached entry.
+        // 2 graduated at PG after being released once earlier at HG — both records count as owned grades.
         state.dex.append(DexEntry(baseID: id(2, .sd), finalID: id(2, .hg), chainOrder: [id(2, .sd), id(2, .hg)],
                                   rarity: .common, caughtAt: nil, releasedAt: Date()))
         state.dex.append(DexEntry(baseID: id(2, .hg), finalID: id(2, .pg),
                                   chainOrder: [.hg, .rg, .mg, .pg].map { id(2, $0) },
                                   rarity: .common, caughtAt: nil))
-        // 1 released twice — highest reached grade is kept.
+        // 1 released twice — never finished, every reached grade is owned.
         state.dex.append(DexEntry(baseID: id(1, .sd), finalID: id(1, .rg), chainOrder: [.sd, .hg, .rg].map { id(1, $0) },
                                   rarity: .rare, caughtAt: nil, releasedAt: Date()))
         state.dex.append(DexEntry(baseID: id(1, .sd), finalID: id(1, .hg), chainOrder: [id(1, .sd), id(1, .hg)],
@@ -161,6 +165,59 @@ final class HatchPlannerTests: XCTestCase {
 
         let snap = state.collectionSnapshot(catalog: catalog)
         XCTAssertEqual(snap.graduatedMachineIDs, [2])
-        XCTAssertEqual(snap.highestReachedGrade, [1: .rg, 4: .mg])
+        XCTAssertEqual(snap.ownedGrades, [2: [.sd, .hg, .rg, .mg, .pg], 1: [.sd, .hg, .rg], 4: [.hg, .mg]])
+        XCTAssertTrue(snap.isComplete(catalog.machine(id: 2)!))
+        XCTAssertFalse(snap.isComplete(catalog.machine(id: 1)!))
+    }
+
+    // MARK: the grades one run raises through
+
+    private func run(_ grades: [GunplaGrade], owned: Set<GunplaGrade>, graduated: Bool) -> [GunplaGrade] {
+        let machine = MachineRecord(id: 1, modelNumber: "X-1", names: [:], series: "first", faction: "efsf",
+                                    rarity: .common, grades: grades, gradeSources: nil, variantOf: nil, sprites: nil)
+        return HatchPlanner.runGrades(machine, snapshot: CollectionSnapshot(
+            graduatedMachineIDs: graduated ? [1] : [], ownedGrades: [1: owned]))
+    }
+
+    func test_runCoversEveryGradeOfAMachineNeverOpened() {
+        XCTAssertEqual(run([.sd, .hg, .mg], owned: [], graduated: false), [.sd, .hg, .mg])
+    }
+
+    func test_runResumesFromTheGradeReachedLastTime() {
+        XCTAssertEqual(run([.sd, .hg, .rg, .mg, .pg], owned: [.sd, .hg], graduated: false), [.hg, .rg, .mg, .pg])
+        // A reached grade the catalog dropped since is simply not a cell any more.
+        XCTAssertEqual(run([.sd, .hg, .mg, .pg], owned: [.sd, .hg, .rg], graduated: false), [.hg, .mg, .pg])
+    }
+
+    func test_runOfAMachineLetGoAtItsTopGradeIsThatGradeAlone() {
+        XCTAssertEqual(run([.sd, .hg, .mg], owned: [.sd, .hg, .mg], graduated: false), [.mg])
+    }
+
+    func test_runOfACompleteMachineIsTheWholePathAgain() {
+        XCTAssertEqual(run([.sd, .hg, .mg], owned: [.sd, .hg, .mg], graduated: true), [.sd, .hg, .mg])
+    }
+
+    /// Trigger branch: graduated (a finished run exists) AND a released grade is not owned.
+    func test_runOfAGraduatedMachineFillsOnlyTheEmptyCells() {
+        let owned: Set<GunplaGrade> = [.sd, .hg, .mg, .pg]
+        XCTAssertEqual(run([.sd, .hg, .rg, .mg, .pg], owned: owned, graduated: true), [.hg, .rg], "one gap")
+        XCTAssertEqual(run([.sd, .mgsd, .hg, .rg, .mg, .pg], owned: owned, graduated: true),
+                       [.sd, .mgsd, .hg, .rg], "two gaps: through the owned grade between them")
+        XCTAssertEqual(run([.sd, .hg, .mg, .pg], owned: [.sd, .hg, .mg], graduated: true), [.mg, .pg], "new top grade")
+        XCTAssertEqual(run([.sd, .hg, .mg], owned: [.hg, .mg], graduated: true), [.sd], "new lowest grade")
+    }
+
+    func test_graduatedMachineWithAnEmptyCellIsPickedAgainFromJustBelowIt() {
+        // Machine 4 (GM) is released in HG and MG; the player finished it when only HG counted.
+        let snap = CollectionSnapshot(graduatedMachineIDs: allIDs,
+                                      ownedGrades: snapshot(graduated: allIDs.subtracting([4])).ownedGrades
+                                          .merging([4: [.hg]]) { $1 })
+        XCTAssertTrue(HatchPlanner.hasCandidates(catalog: catalog, snapshot: snap, tier: nil))
+        var rng: any RandomNumberGenerator = SeededRNG(seed: 5)
+        for _ in 0..<200 {
+            let choice = choose(snap, rng: &rng)
+            XCTAssertEqual(choice?.startSpeciesID, GunplaID.encode(machineID: 4, grade: .hg))
+            XCTAssertEqual(choice?.isDuplicatePhase, false)
+        }
     }
 }

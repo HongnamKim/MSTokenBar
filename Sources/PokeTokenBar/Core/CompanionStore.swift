@@ -246,9 +246,11 @@ final class CompanionStore {
         return line.localizedName(a.currentID, state.language)
     }
     var currentSpeciesID: Int? { state.active?.currentID }
+    /// 이번 육성의 마지막 단계인가 — 계획의 끝이면 트리에 다음 단계가 남아 있어도 마지막이다
+    /// (빈 등급 칸만 채우는 재등장은 그 칸에서 끝난다).
     var isFinalStage: Bool {
         guard let a = state.active, let line = currentLine else { return false }
-        return line.tree.node(withID: a.currentID)?.children.isEmpty ?? true
+        return a.isAtPlanEnd || (line.tree.node(withID: a.currentID)?.children.isEmpty ?? true)
     }
     var stageText: String {
         guard let a = state.active else { return "" }
@@ -280,14 +282,16 @@ final class CompanionStore {
         guard let a = state.active, let line = currentLine else { return [] }
         var out = Self.realizedLineItems(pathIDs: a.pathIDs, stageIndex: a.stageIndex)
         if let current = line.tree.node(withID: a.currentID) {
+            // 계획이 끝나는 곳 너머는 이번 육성에서 가지 않는 단계라 미리 보여 주지 않는다.
+            let remaining = max(0, a.plannedPathIDs.count - (a.stageIndex + 1))
             var node = current
             var guaranteedPrefix: [EvoNode] = []
-            while node.children.count == 1, let child = node.children.first {
+            while node.children.count == 1, let child = node.children.first, guaranteedPrefix.count < remaining {
                 guaranteedPrefix.append(child)
                 node = child
             }
 
-            if node.children.count > 1 {
+            if node.children.count > 1, guaranteedPrefix.count < remaining {
                 out += guaranteedPrefix.map { EvoLineItem(.species($0.speciesID), .future) }
                 out.append(EvoLineItem(.mystery, .future))
             } else {
@@ -427,7 +431,7 @@ final class CompanionStore {
         var hasNormal = false
     }
 
-    /// 도감 목록 — 보유 종만, 도감 번호 오름차순.
+    /// 도감 목록 — 보유 종만, 기체 번호순·같은 기체 안에서는 등급 성장순(`GunplaID.orderKey`).
     ///
     /// 포함 종 = 졸업분 `chainOrder` ∪ 현재 개체의 **도달분** `pathIDs[0...stageIndex]`.
     /// `plannedPathIDs`(사전 선택된 전체 경로)는 미도달 단계를 포함하므로 절대 쓰지 않는다 — 쓰면
@@ -500,7 +504,7 @@ final class CompanionStore {
                 acc[id] = a
             }
         }
-        return acc.sorted { $0.key < $1.key }.map { id, a in
+        return acc.sorted { GunplaID.orderKey($0.key) < GunplaID.orderKey($1.key) }.map { id, a in
             let name = a.names.flatMap { state.language.resolveName($0) } ?? "#\(id)"
             return DexSpecies(
                 id: id,
@@ -611,7 +615,7 @@ final class CompanionStore {
                 guard let machine = catalog.machine(speciesID: entry.finalID) else {
                     return (.max, entry.finalID, entry.finalID)   // not in the catalog: last, by id
                 }
-                return (seriesOrder[machine.series] ?? .max, machine.id, entry.finalID)
+                return (seriesOrder[machine.series] ?? .max, machine.id, GunplaID.orderKey(entry.finalID))
             }
             let ascending = sort == .numberAsc
             return entries.sorted {
@@ -871,7 +875,7 @@ final class CompanionStore {
             let thr = stageThreshold(for: a)
             guard a.usedAtStage >= thr else { break }
             guard let node = line.tree.node(withID: a.currentID) else { break }
-            if node.children.isEmpty {
+            if node.children.isEmpty || a.isAtPlanEnd {
                 graduate(); break
             } else {
                 let nextIndex = a.stageIndex + 1
@@ -931,33 +935,52 @@ final class CompanionStore {
         return prefix + fallbackRoute.dropFirst()
     }
 
-    /// 루트부터 실제로 이어지는 가장 긴 ID 경로와 마지막 유효 노드. 첫 ID가 루트와 다르면 루트로 복구한다.
-    private func longestValidPath(_ ids: [Int], from root: EvoNode) -> (path: [Int], lastNode: EvoNode) {
+    /// 루트부터 저장된 순서대로 이어지는 가장 긴 도달 경로와 마지막 노드. 첫 ID가 루트와 다르면 루트로 복구한다.
+    /// 다음 ID가 자식이 아니라 후손이어도 잇는다 — 도달한 뒤에 사이 단계가 새로 생겼다고(나중에 출시된 등급)
+    /// 이미 도달한 형태를 되돌리지 않는다.
+    private func longestReachedPath(_ ids: [Int], from root: EvoNode) -> (path: [Int], lastNode: EvoNode) {
         var path = [root.speciesID]
         var node = root
         guard ids.first == root.speciesID else { return (path, node) }
         for id in ids.dropFirst() {
-            guard let child = node.children.first(where: { $0.speciesID == id }) else { break }
+            guard let next = node.descendant(withID: id) else { break }
             path.append(id)
-            node = child
+            node = next
         }
         return (path, node)
     }
 
-    /// 저장된 실제 경로와 계획을 현재 에셋 트리에 맞춘다. 완전한 계획만 재사용해 재시작 시 RNG를 소비하지 않는다.
+    /// 저장된 실제 경로와 계획을 현재 에셋 트리에 맞춘다. 유효한 계획은 그대로 재사용해 재시작 시 RNG를 소비하지 않는다.
+    ///
+    /// 계획은 트리 끝이 아닌 곳에서 끝날 수 있다(빈 등급 칸만 채우는 재등장). 그래서 끝이 잎이 아니라는 이유로
+    /// 다시 짜지 않고, 계획 끝 너머에 아직 보유하지 않은 단계가 있을 때만 마지막 미보유 단계까지 잇는다.
     private func normalizedEvolutionState(_ saved: MonState, from root: EvoNode) -> MonState {
         var normalized = saved
-        let realized = longestValidPath(saved.pathIDs, from: root)
-        let candidate = longestValidPath(saved.plannedPathIDs, from: root)
-        let canReusePlan = candidate.path == saved.plannedPathIDs
-            && candidate.path.starts(with: realized.path)
-            && candidate.lastNode.children.isEmpty
-        let plan: [Int]
+        let realized = longestReachedPath(saved.pathIDs, from: root)
+        var plan = realized.path
+        var end = realized.lastNode
+        var canReusePlan = saved.plannedPathIDs.starts(with: realized.path)
         if canReusePlan {
-            plan = candidate.path
-        } else {
-            let suffix = makeEvolutionPlan(from: realized.lastNode, baseID: saved.baseID)
-            plan = realized.path + suffix.dropFirst()
+            for id in saved.plannedPathIDs.dropFirst(realized.path.count) {
+                guard let child = end.children.first(where: { $0.speciesID == id }) else {
+                    canReusePlan = false
+                    break
+                }
+                plan.append(id)
+                end = child
+            }
+        }
+        if !canReusePlan {
+            plan = realized.path
+            end = realized.lastNode
+        }
+        if !end.children.isEmpty {
+            let owned = Set(state.dex.flatMap(\.chainOrder)).union(realized.path)
+            if !canReusePlan || end.descendantIDs.contains(where: { !owned.contains($0) }) {
+                let beyond = Array(makeEvolutionPlan(from: end, baseID: saved.baseID).dropFirst())
+                let lastUnowned = beyond.lastIndex { !owned.contains($0) }
+                plan += lastUnowned.map { Array(beyond[...$0]) } ?? beyond
+            }
         }
         normalized.pathIDs = realized.path
         normalized.plannedPathIDs = plan
@@ -1551,12 +1574,16 @@ final class CompanionStore {
         let shinyOdds = shinyDenominator
         let machine = catalog.machine(speciesID: line.baseID)
         let isShiny = machine?.variantOf != nil
-        let evolutionPlan = makeEvolutionPlan(from: line.tree, baseID: line.baseID)
+        var evolutionPlan = makeEvolutionPlan(from: line.tree, baseID: line.baseID)
+        let snapshot = state.collectionSnapshot(catalog: catalog)
+        // 빈 등급 칸을 채우러 다시 나온 기체는 마지막 빈 칸에서 끝난다 — 그 위 등급을 다시 키우지 않는다.
+        if let machine, let goal = HatchPlanner.runGrades(machine, snapshot: snapshot).last,
+           let end = evolutionPlan.firstIndex(of: GunplaID.encode(machineID: machine.id, grade: goal)) {
+            evolutionPlan = Array(evolutionPlan[...end])
+        }
         // 반복 성장 부스트 = 이 **기체**를 졸업한 적이 있는가. 시작 등급(재개)과 무관해야 하므로
         // collectedFinals 의 "base:final" 키가 아니라 졸업 기체 id 로 판정한다.
-        let hasGrowthBoost = machine.map {
-            state.collectionSnapshot(catalog: catalog).graduatedMachineIDs.contains($0.id)
-        } ?? false
+        let hasGrowthBoost = machine.map { snapshot.graduatedMachineIDs.contains($0.id) } ?? false
         activeGeneration += 1
         state.active = MonState(baseID: line.baseID, pathIDs: [line.baseID], plannedPathIDs: evolutionPlan,
                                 stageIndex: 0, usedAtStage: 0, rarity: line.rarity, totalForms: evolutionPlan.count,
@@ -1639,7 +1666,7 @@ final class CompanionStore {
         Task { await self.ensureEggPrefetch() }
     }
 
-    /// 부화 기체 선정 — 전용기 여부 먼저 롤 → 졸업 안 한 후보에서 레어도 가중 1롤 → 지난번 도달 등급부터 시작.
+    /// 부화 기체 선정 — 전용기 여부 먼저 롤 → 빈 등급 칸이 남은 후보에서 레어도 가중 1롤 → 첫 빈 칸 바로 아래 등급부터 시작.
     /// 규칙 본체는 `HatchPlanner`(순수). 전용기 여부는 고른 시작 종 id 에서 다시 유도되므로
     /// `pendingHatchID` 하나만 영속해도 된다. 카탈로그가 비어 있을 때만 nil → 알 유지.
     private func chooseBase() -> Int? {
