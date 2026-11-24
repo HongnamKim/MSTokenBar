@@ -37,13 +37,40 @@
       "order": 3
     },
     {
+      "id": "the-origin",
+      "names": {
+        "ko": "디 오리진",
+        "en": "Mobile Suit Gundam THE ORIGIN",
+        "ja": "機動戦士ガンダム THE ORIGIN"
+      },
+      "order": 4
+    },
+    {
+      "id": "thunderbolt",
+      "names": {
+        "ko": "썬더볼트",
+        "en": "Mobile Suit Gundam Thunderbolt",
+        "ja": "機動戦士ガンダム サンダーボルト"
+      },
+      "order": 5
+    },
+    {
+      "id": "cucuruz-doans-island",
+      "names": {
+        "ko": "쿠쿠루스 도안의 섬",
+        "en": "Cucuruz Doan’s Island",
+        "ja": "機動戦士ガンダム ククルス・ドアンの島"
+      },
+      "order": 6
+    },
+    {
       "id": "zeta",
       "names": {
         "ko": "Z건담",
         "en": "Mobile Suit Zeta Gundam",
         "ja": "機動戦士Ζガンダム"
       },
-      "order": 4
+      "order": 7
     },
     {
       "id": "zz",
@@ -52,7 +79,7 @@
         "en": "Mobile Suit Gundam ZZ",
         "ja": "機動戦士ガンダムΖΖ"
       },
-      "order": 5
+      "order": 8
     },
     {
       "id": "cca",
@@ -61,7 +88,7 @@
         "en": "Char's Counterattack",
         "ja": "逆襲のシャア"
       },
-      "order": 6
+      "order": 9
     },
     {
       "id": "beltorchika-children",
@@ -70,7 +97,7 @@
         "en": "Beltorchika's Children",
         "ja": "ベルトーチカ・チルドレン"
       },
-      "order": 7
+      "order": 10
     },
     {
       "id": "uc",
@@ -79,7 +106,7 @@
         "en": "Unicorn",
         "ja": "ユニコーン"
       },
-      "order": 8
+      "order": 11
     }
   ]
 }

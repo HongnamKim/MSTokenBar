@@ -1997,6 +1997,440 @@
         "sd": "nightingale-sd",
         "hg": "nightingale-hg"
       }
+    },
+    {
+      "id": 80,
+      "modelNumber": "MS-04",
+      "names": {
+        "ko": "람바 랄 전용 부그",
+        "en": "Bugu (Ramba Ral)",
+        "ja": "ブグ（ランバ・ラル機）"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1013"
+      },
+      "sprites": {
+        "hg": "bugu-ral-hg"
+      }
+    },
+    {
+      "id": 81,
+      "modelNumber": "RCX-76-02",
+      "names": {
+        "ko": "건캐논 최초기형",
+        "en": "Guncannon First Type",
+        "ja": "ガンキャノン最初期型"
+      },
+      "series": "the-origin",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1012"
+      },
+      "sprites": {
+        "hg": "guncannon-first-type-hg"
+      }
+    },
+    {
+      "id": 82,
+      "modelNumber": "MS-05",
+      "names": {
+        "ko": "자쿠 I(데님·슬렌더 사양)",
+        "en": "Zaku I (Denim/Slender)",
+        "ja": "ザクⅠ（デニム／スレンダー機）"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1011"
+      },
+      "sprites": {
+        "hg": "origin-zaku-i-hg"
+      }
+    },
+    {
+      "id": 83,
+      "modelNumber": "MS-05S",
+      "names": {
+        "ko": "샤아 전용 자쿠 I",
+        "en": "Char's Zaku I",
+        "ja": "シャア専用ザクⅠ"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/46"
+      },
+      "sprites": {
+        "hg": "origin-chars-zaku-i-hg"
+      },
+      "variantOf": 82
+    },
+    {
+      "id": 84,
+      "modelNumber": "MS-06C",
+      "names": {
+        "ko": "자쿠 II C형",
+        "en": "Zaku II Type C",
+        "ja": "ザクII C型"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/48"
+      },
+      "sprites": {
+        "hg": "origin-zaku-ii-c-hg"
+      }
+    },
+    {
+      "id": 85,
+      "modelNumber": "MS-06S",
+      "names": {
+        "ko": "샤아 전용 자쿠 II(오리진판)",
+        "en": "Char's Zaku II (The Origin)",
+        "ja": "シャア専用ザクII（THE ORIGIN版）"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/68"
+      },
+      "sprites": {
+        "hg": "origin-chars-zaku-ii-hg"
+      },
+      "variantOf": 84
+    },
+    {
+      "id": 86,
+      "modelNumber": "MS-06R-1A",
+      "names": {
+        "ko": "오르테가 전용 고기동형 자쿠 II",
+        "en": "High Mobility Type Zaku II (Ortega)",
+        "ja": "高機動型ザクII（オルテガ専用機）"
+      },
+      "series": "the-origin",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/40"
+      },
+      "sprites": {
+        "hg": "ortegas-zaku-ii-hg"
+      }
+    },
+    {
+      "id": 87,
+      "modelNumber": "FA-78",
+      "names": {
+        "ko": "풀아머 건담(썬더볼트판)",
+        "en": "Full Armor Gundam (Thunderbolt)",
+        "ja": "フルアーマー・ガンダム（サンダーボルト版）"
+      },
+      "series": "thunderbolt",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/970",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2688",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/855"
+      },
+      "sprites": {
+        "hg": "tb-full-armor-gundam-hg",
+        "mg": "tb-full-armor-gundam-mg",
+        "verka": "tb-full-armor-gundam-verka"
+      }
+    },
+    {
+      "id": 88,
+      "modelNumber": "MS-06R",
+      "names": {
+        "ko": "사이코 자쿠",
+        "en": "Psycho Zaku",
+        "ja": "高機動型ザク サイコ・ザク"
+      },
+      "series": "thunderbolt",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/972",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2685",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/856"
+      },
+      "sprites": {
+        "hg": "psycho-zaku-hg",
+        "mg": "psycho-zaku-mg",
+        "verka": "psycho-zaku-verka"
+      }
+    },
+    {
+      "id": 89,
+      "modelNumber": "RX-78AL",
+      "names": {
+        "ko": "아틀라스 건담",
+        "en": "Atlas Gundam",
+        "ja": "アトラスガンダム"
+      },
+      "series": "thunderbolt",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/47"
+      },
+      "sprites": {
+        "hg": "atlas-gundam-hg"
+      }
+    },
+    {
+      "id": 90,
+      "modelNumber": "RGM-79",
+      "names": {
+        "ko": "짐(썬더볼트판)",
+        "en": "GM (Thunderbolt)",
+        "ja": "ジム（サンダーボルト版）"
+      },
+      "series": "thunderbolt",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/973"
+      },
+      "sprites": {
+        "hg": "tb-gm-hg"
+      }
+    },
+    {
+      "id": 91,
+      "modelNumber": "MS-06",
+      "names": {
+        "ko": "자쿠 II(썬더볼트판)",
+        "en": "Zaku II (Thunderbolt)",
+        "ja": "量産型ザク（サンダーボルト版）"
+      },
+      "series": "thunderbolt",
+      "faction": "zeon",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112865335000&grp_id=5325"
+      },
+      "sprites": {
+        "hg": "tb-zaku-ii-hg"
+      }
+    },
+    {
+      "id": 92,
+      "modelNumber": "RX-79[GS]",
+      "names": {
+        "ko": "육전형 건담 S형",
+        "en": "Gundam Ground Type-S",
+        "ja": "陸戦型ガンダムS型"
+      },
+      "series": "thunderbolt",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/975"
+      },
+      "sprites": {
+        "hg": "gundam-ground-type-s-hg"
+      }
+    },
+    {
+      "id": 93,
+      "modelNumber": "MS-06F",
+      "names": {
+        "ko": "도안 전용 자쿠",
+        "en": "Doan's Zaku",
+        "ja": "ドアン専用ザク"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "independent",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102639233000&grp_id=5325"
+      },
+      "sprites": {
+        "hg": "doans-zaku-hg"
+      }
+    },
+    {
+      "id": 94,
+      "modelNumber": "RX-77-02",
+      "names": {
+        "ko": "건캐논(도안판)",
+        "en": "Guncannon (Cucuruz Doan's Island)",
+        "ja": "ガンキャノン（ククルス・ドアンの島版）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1392"
+      },
+      "sprites": {
+        "hg": "doan-guncannon-hg"
+      }
+    },
+    {
+      "id": 95,
+      "modelNumber": "MS-06GD",
+      "names": {
+        "ko": "고기동형 자쿠 지상용(에그바기)",
+        "en": "Zaku High Mobility Surface Type (Egba)",
+        "ja": "高機動型ザク 地上用（エグバ機）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102649027000&grp_id=5325"
+      },
+      "sprites": {
+        "hg": "surface-zaku-egba-hg"
+      }
+    },
+    {
+      "id": 96,
+      "modelNumber": "MS-06GD",
+      "names": {
+        "ko": "고기동형 자쿠 지상용(왈드기)",
+        "en": "Zaku High Mobility Surface Type (Wald)",
+        "ja": "高機動型ザク 地上用（ウォルド機）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2487"
+      },
+      "sprites": {
+        "hg": "surface-zaku-wald-hg"
+      }
+    },
+    {
+      "id": 97,
+      "modelNumber": "MS-06GD",
+      "names": {
+        "ko": "고기동형 자쿠 지상용(상호기)",
+        "en": "Zaku High Mobility Surface Type (Sangho)",
+        "ja": "高機動型ザク 地上用（サンホ機）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2489"
+      },
+      "sprites": {
+        "hg": "surface-zaku-sangho-hg"
+      }
+    },
+    {
+      "id": 98,
+      "modelNumber": "MS-06GD",
+      "names": {
+        "ko": "고기동형 자쿠 지상용(셀마기)",
+        "en": "Zaku High Mobility Surface Type (Selma)",
+        "ja": "高機動型ザク 地上用（セルマ機）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2491"
+      },
+      "sprites": {
+        "hg": "surface-zaku-selma-hg"
+      }
+    },
+    {
+      "id": 99,
+      "modelNumber": "MS-06GD",
+      "names": {
+        "ko": "고기동형 자쿠 지상용(다난기)",
+        "en": "Zaku High Mobility Surface Type (Danan)",
+        "ja": "高機動型ザク 地上用（ダナン機）"
+      },
+      "series": "cucuruz-doans-island",
+      "faction": "zeon",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2490"
+      },
+      "sprites": {
+        "hg": "surface-zaku-danan-hg"
+      }
     }
   ]
 }
