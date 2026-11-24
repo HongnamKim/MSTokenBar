@@ -6,14 +6,19 @@
 - **화면 배치** — 한 기체의 격납고 등급 칸을 모두 채우면 그 기체를 화면에 따로 꺼내 놓을 수 있다. 다른 기체를 키우는 동안에도 완성한 기체를 함께 전시할 수 있다.
 - **전투 장면** — 화면에 배치할 수 있는 라이벌 두 기를 서로 마주 보게 놓아 작품 속 대결을 재현한다. 예를 들어 GP03 덴드로비움과 노이에 질, 또는 뉴 건담과 사자비를 한 쌍으로 놓는다.
 
-## 추가 장갑·무장 사양
+## 실물 건프라로 발매된 확장 사양
 
-현재 기체 명단의 스프라이트 제작을 마친 뒤, 같은 기체에 추가 장갑과 무장을 장착한 모습을 후속 후보로 검토한다.
+기존 기체에 장갑·무장·지원기를 더해 외형이 달라지는 사양을 후속 스프라이트 후보로 모은다. 완성형 키트, 기본 키트에 동봉된 선택 장비, 별매 확장 세트 모두 대상이다. 후보를 추가할 때는 어떤 기체에 어떤 제품을 조합하는지 적고 실제 발매를 확인할 수 있는 상품 페이지나 설명서를 연결한다. 현재 제작 범위는 [첫 공개판 기체 명단](initial-roster.md)을 따른다.
 
-- **건담 NT-1 알렉스 초밤 아머** — 가슴과 팔다리를 덮는 초밤 아머 장착 모습.
-- **풀아머 더블제타 건담** — 추가 장갑을 장착한 더블제타 건담.
-- **뉴 건담 HWS** — 뉴 건담에 HWS(Heavy Weapon System)를 장착한 모습.
-- **하이뉴 건담 HWS** — 하이뉴 건담 전용 HWS를 장착한 모습.
+| 기본 기체 | 확장 사양 후보 | 실제 키트 |
+|---|---|---|
+| 건담 NT-1 알렉스 | 초밤 아머 장착형 | [MG 알렉스 Ver.2.0 동봉 장갑](https://manual.bandai-hobby.net/menus/detail/634) |
+| 더블제타 건담 | 풀아머 더블제타 건담 | [MG 풀아머 ZZ 건담 Ver.Ka](https://manual.bandai-hobby.net/menus/detail/4556) |
+| 뉴 건담 | HWS(Heavy Weapon System) 장착형 | [MG 뉴 건담 Ver.Ka용 HWS 확장 세트](https://manual.bandai-hobby.net/menus/detail/2389) |
+| 하이뉴 건담 | 하이뉴 전용 HWS 장착형 | [MG 하이뉴 건담 Ver.Ka용 HWS 확장 세트](https://manual.bandai-hobby.net/menus/detail/2212) |
+| 건담 Mk-II(에우고) | G 디펜서와 합체한 슈퍼 건담 | [HGUC 슈퍼 건담](https://manual.bandai-hobby.net/menus/detail/233) |
+| RX-78-2 건담 | G 파이터와 합체한 G 아머 | [HGUC G 아머](https://manual.bandai-hobby.net/menus/detail/244) |
+| 백식 | 메가 바주카 런처 운용 사양 | [HGUC 백식＋메가 바주카 런처](https://manual.bandai-hobby.net/menus/detail/821) |
 
 ## 클라우드 사용량 집계
 
