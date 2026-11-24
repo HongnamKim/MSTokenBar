@@ -1,0 +1,88 @@
+name: Gunpla catalog
+
+on:
+  pull_request:
+    branches: [main]
+    paths: &catalog-inputs
+      - 'assets/sprites/**'
+      - 'assets/icon.png'
+      - 'Sources/PokeTokenBar/Resources/Gunpla/**'
+      - 'docs/gunpla/catalog.html'
+      - 'docs/gunpla/catalog-data.js'
+      - 'scripts/build-gunpla-catalog.py'
+      - '.github/workflows/gunpla-catalog.yml'
+  push:
+    branches: [main]
+    paths: *catalog-inputs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gunpla-catalog-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Generate the downloadable catalog and verify the checked-in index
+        run: |
+          python3 scripts/build-gunpla-catalog.py --standalone "$RUNNER_TEMP/index.html"
+          git diff --exit-code -- docs/gunpla/catalog-data.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gunpla-catalog
+          path: ${{ runner.temp }}/index.html
+          if-no-files-found: error
+
+  publish:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # A retry must publish the latest merged artwork.
+          ref: main
+          path: source
+          persist-credentials: false
+
+      - uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          path: site
+
+      - name: Build the public catalog from main
+        working-directory: source
+        run: |
+          mkdir -p ../site/catalog
+          python3 scripts/build-gunpla-catalog.py --standalone ../site/catalog/index.html
+          git diff --exit-code -- docs/gunpla/catalog-data.js
+
+      - name: Update the catalog on the landing page branch
+        working-directory: site
+        run: |
+          git add -- catalog/index.html
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'landing: update the Gunpla sprite catalog'
+            git pull --rebase origin gh-pages
+            git push origin HEAD:gh-pages
+          fi
+
+      # Branch-based Pages does not automatically build pushes made with GITHUB_TOKEN.
+      - name: Rebuild GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent

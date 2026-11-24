@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>건프라 도트 카탈로그 · MSTokenBar</title>
+    <style>
+      :root {
+        --paper: #f6f5ef;
+        --ink: #20281f;
+        --soft: #576353;
+        --line: #cdd1c3;
+        --accent: #365d3b;
+        --tile: #e7ebdf;
+        font:
+          16px/1.5 "Inter",
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1420px;
+        margin: auto;
+        padding: 0 clamp(18px, 5vw, 80px);
+      }
+      header {
+        padding-top: 28px;
+      }
+      header p {
+        margin: 0;
+      }
+      .brand {
+        font:
+          700 12px/1.4 ui-monospace,
+          monospace;
+        letter-spacing: 0.12em;
+        color: var(--soft);
+        border-bottom: 1px solid var(--ink);
+        padding-bottom: 12px;
+      }
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 180px;
+      }
+      .hero h1 {
+        font-size: clamp(31px, 4.8vw, 66px);
+        line-height: 1.07;
+        letter-spacing: -0.075em;
+        margin: 16px 0;
+      }
+      .hero p {
+        color: var(--soft);
+        font-variant-numeric: tabular-nums;
+      }
+      .lineup {
+        display: flex;
+        align-items: end;
+        gap: 2px;
+        align-self: stretch;
+        padding-bottom: 24px;
+      }
+      .lineup img {
+        width: clamp(65px, 8vw, 116px);
+        height: auto;
+        image-rendering: pixelated;
+      }
+      .filters {
+        border-block: 1px solid var(--line);
+        padding: 14px 0;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      button,
+      input,
+      select,
+      .download {
+        font: inherit;
+        color: inherit;
+      }
+      button,
+      select,
+      .download {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      a:focus-visible {
+        outline: 3px solid #bb592d;
+        outline-offset: 2px;
+      }
+      .tabs {
+        display: flex;
+        gap: 3px;
+        margin-right: auto;
+      }
+      .tabs button {
+        padding: 7px 12px;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+      }
+      .tabs button[aria-pressed="true"] {
+        background: var(--ink);
+        color: white;
+      }
+      .fields {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      input,
+      select {
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fcfcf8;
+        padding: 8px;
+        min-width: 0;
+      }
+      input {
+        width: 190px;
+      }
+      label {
+        font-size: 0.84rem;
+      }
+      select {
+        max-width: 205px;
+      }
+      #count {
+        font:
+          600 12px/1.5 ui-monospace,
+          monospace;
+        color: var(--soft);
+        margin: 22px 0 0;
+      }
+      section {
+        margin: 26px 0 40px;
+      }
+      .section-title {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 12px;
+      }
+      .section-title h2 {
+        margin: 0;
+        font-size: 1.34rem;
+        letter-spacing: -0.04em;
+      }
+      .section-title small {
+        color: var(--soft);
+        font:
+          500 12px ui-monospace,
+          monospace;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(146px, 1fr));
+        gap: 10px;
+      }
+      .card {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        padding: 0;
+        background: #fafbf6;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .card:hover {
+        border-color: var(--accent);
+      }
+      .stage {
+        display: grid;
+        place-items: center;
+        position: relative;
+        width: 100%;
+        height: 141px;
+        background: var(--tile);
+      }
+      .stage img {
+        width: 128px;
+        height: 128px;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+      .grade {
+        position: absolute;
+        left: 7px;
+        top: 7px;
+        padding: 2px 5px;
+        border: 1px solid #b7c1ac;
+        border-radius: 2px;
+        background: #f3f6ed;
+        color: #314936;
+        font:
+          bold 10px ui-monospace,
+          monospace;
+      }
+      .caption {
+        padding: 9px 10px 11px;
+        font-size: 0.85rem;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+      }
+      .caption small {
+        display: block;
+        color: var(--soft);
+        font:
+          11px/1.7 ui-monospace,
+          monospace;
+      }
+      .empty {
+        padding: 35px 0;
+        color: var(--soft);
+      }
+      footer {
+        color: var(--soft);
+        padding-block: 12px 40px;
+        font-size: 0.8rem;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0;
+        background: var(--paper);
+        color: var(--ink);
+        width: min(720px, 94vw);
+        max-height: 90vh;
+      }
+      dialog::backdrop {
+        background: #19231bd1;
+      }
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        color: var(--soft);
+        font-size: 0.8rem;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        padding: 18px;
+        align-items: center;
+      }
+      .zoom {
+        background: var(--tile);
+        height: 270px;
+        display: grid;
+        place-items: center;
+        border-radius: 4px;
+      }
+      .zoom img {
+        width: 100%;
+        height: 100%;
+        max-height: 270px;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+      .modal-body h2 {
+        font-size: 1.55rem;
+        line-height: 1.25;
+        margin: 7px 0;
+      }
+      .modal-body p {
+        font-size: 0.86rem;
+        overflow-wrap: anywhere;
+        color: var(--soft);
+      }
+      .modal-body p:empty {
+        display: none;
+      }
+      .links,
+      .grades {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin: 12px 0;
+      }
+      .links a {
+        font-size: 0.8rem;
+        color: var(--accent);
+      }
+      .tool,
+      .download,
+      .grades button {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fcfcf8;
+        text-decoration: none;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+      .download,
+      .grades button[aria-pressed="true"] {
+        background: var(--ink);
+        color: white;
+      }
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 800px) {
+        .hero {
+          min-height: 135px;
+        }
+        .lineup img:nth-child(n + 3) {
+          display: none;
+        }
+        .filters {
+          align-items: start;
+        }
+        .fields {
+          width: 100%;
+        }
+        .fields label:first-child {
+          flex: 1;
+          min-width: 120px;
+        }
+        input {
+          width: 100%;
+        }
+        .grid {
+          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        }
+      }
+      @media (max-width: 510px) {
+        .lineup {
+          display: none;
+        }
+        .hero {
+          min-height: 125px;
+        }
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .stage {
+          height: 126px;
+        }
+        .stage img {
+          width: 114px;
+          height: 114px;
+        }
+        select {
+          max-width: 135px;
+        }
+        .fields label:first-child {
+          min-width: 100%;
+        }
+        .modal-body {
+          grid-template-columns: 1fr;
+        }
+        .zoom,
+        .zoom img {
+          height: 200px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="brand" lang="en">MSTokenBar</p>
+      <div class="hero">
+        <div>
+          <h1>건프라 도트 카탈로그</h1>
+          <p id="summary"></p>
+        </div>
+        <div class="lineup" id="lineup" aria-hidden="true"></div>
+      </div>
+    </header>
+    <main>
+      <div class="filters">
+        <nav class="tabs" aria-label="이미지 종류" id="tabs"></nav>
+        <div class="fields">
+          <label
+            ><span class="sr">이미지 검색</span
+            ><input
+              id="search"
+              type="search"
+              placeholder="기체명 · 형식번호 검색"
+          /></label>
+          <label
+            ><span class="sr">작품</span
+            ><select id="series">
+              <option value="">모든 작품</option>
+            </select></label
+          >
+          <label
+            ><span class="sr">등급</span
+            ><select id="grade">
+              <option value="">모든 등급</option>
+            </select></label
+          >
+        </div>
+      </div>
+      <p id="count" aria-live="polite"></p>
+      <div id="gallery"></div>
+    </main>
+    <footer>MSTokenBar · Gunpla</footer>
+    <dialog id="detail" aria-labelledby="detailTitle">
+      <div class="modal-head">
+        <span id="detailGroup"></span
+        ><button class="tool" id="close" type="button">닫기</button>
+      </div>
+      <div class="modal-body">
+        <div class="zoom"><img id="large" alt="" /></div>
+        <div>
+          <p id="model"></p>
+          <h2 id="detailTitle"></h2>
+          <div class="grades" id="siblings"></div>
+          <p id="kit"></p>
+          <div class="links" id="sources"></div>
+          <a class="download" id="download">PNG 다운로드</a>
+        </div>
+      </div>
+    </dialog>
+    <script src="catalog-data.js"></script>
+    <script>
+      "use strict";
+      const el = (id) => document.getElementById(id);
+      const make = (tag, text, cls) => {
+        const node = document.createElement(tag);
+        if (text) node.textContent = text;
+        if (cls) node.className = cls;
+        return node;
+      };
+      const suits = catalogItems.filter((item) => item.kind === "기체");
+      const groups = new Set(suits.map((item) => item.group));
+      const grades = ["SD", "MGSD", "HG", "RG", "MG", "Ver.Ka", "MGEX", "PG"];
+      const kinds = ["전체", "기체", "공용 도트"];
+      let kind = "전체";
+      function choices(id, values) {
+        for (const value of values) el(id).add(new Option(value, value));
+      }
+      choices("series", groups);
+      choices(
+        "grade",
+        grades.filter((grade) =>
+          catalogItems.some((item) => item.grade === grade),
+        ),
+      );
+      el("summary").textContent = [
+        groups.size + "개 작품",
+        new Set(suits.map((i) => i.machine)).size + "기",
+        suits.length + "종의 등급별 스프라이트",
+      ].join("  ·  ");
+      for (const name of [
+        "chars-zaku-ii-hg.png",
+        "tb-full-armor-gundam-hg.png",
+        "surface-zaku-egba-hg.png",
+        "nu-gundam-mg-ver-ka.png",
+      ]) {
+        const item = suits.find((i) => i.file === name);
+        if (item) {
+          const image = new Image();
+          image.src = item.image;
+          image.alt = "";
+          el("lineup").append(image);
+        }
+      }
+      for (const name of kinds) {
+        const button = make("button", name);
+        button.addEventListener("click", () => {
+          kind = name;
+          el("series").value = "";
+          el("grade").value = "";
+          render();
+        });
+        el("tabs").append(button);
+      }
+      function inspect(item) {
+        el("large").src = item.image;
+        el("large").alt = [item.title, item.grade].filter(Boolean).join(" ");
+        el("detailGroup").textContent = item.group;
+        el("detailTitle").textContent = item.title;
+        el("model").textContent = [item.model, item.grade]
+          .filter(Boolean)
+          .join("  ·  ");
+        el("kit").textContent = item.kit || "";
+        el("siblings").replaceChildren();
+        el("sources").replaceChildren();
+        const related = item.machine
+          ? suits.filter((i) => i.machine === item.machine)
+          : [];
+        if (related.length > 1)
+          for (const other of related) {
+            const b = make("button", other.grade);
+            b.setAttribute("aria-pressed", String(item === other));
+            b.addEventListener("click", () => inspect(other));
+            el("siblings").append(b);
+          }
+        for (const [text, url] of [
+          ["공식 키트", item.official],
+          ["조립 사진", item.front],
+          ["장착 사진", item.rear],
+        ]) {
+          if (url) {
+            const a = make("a", text);
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            el("sources").append(a);
+          }
+        }
+        el("download").href = item.image;
+        el("download").download = item.file;
+        if (!el("detail").open) el("detail").showModal();
+      }
+      function card(item) {
+        const b = make("button", "", "card"),
+          stage = make("span", "", "stage"),
+          image = new Image();
+        image.src = item.image;
+        image.alt = "";
+        image.loading = "lazy";
+        stage.append(image);
+        if (item.grade) stage.append(make("span", item.grade, "grade"));
+        const cap = make("span", item.title, "caption");
+        if (item.model) cap.append(make("small", item.model));
+        b.append(stage, cap);
+        b.addEventListener("click", () => inspect(item));
+        return b;
+      }
+      const normalize = (text) =>
+        text
+          .toLowerCase()
+          .normalize("NFKC")
+          .replace(/[\s·._()'-]/g, "");
+      function render() {
+        for (const b of el("tabs").children)
+          b.setAttribute("aria-pressed", String(b.textContent === kind));
+        el("series").disabled = kind === "공용 도트";
+        const terms = el("search")
+          .value.trim()
+          .split(/\s+/)
+          .map(normalize)
+          .filter(Boolean);
+        const sections = new Map();
+        let total = 0;
+        for (const item of catalogItems) {
+          if (
+            (kind !== "전체" && item.kind !== kind) ||
+            (el("series").value && item.group !== el("series").value) ||
+            (el("grade").value && item.grade !== el("grade").value)
+          )
+            continue;
+          const text = normalize(
+            [
+              item.title,
+              item.model,
+              item.group,
+              item.grade,
+              item.file,
+              item.kit,
+              ...(item.aliases || []),
+            ]
+              .filter(Boolean)
+              .join(" "),
+          );
+          if (!terms.every((term) => text.includes(term))) continue;
+          if (!sections.has(item.group)) sections.set(item.group, []);
+          sections.get(item.group).push(item);
+          total++;
+        }
+        el("count").textContent =
+          "이미지 " + total.toLocaleString("ko-KR") + "장";
+        el("gallery").replaceChildren();
+        for (const [group, items] of sections) {
+          const section = make("section"),
+            heading = make("div", "", "section-title"),
+            grid = make("div", "", "grid");
+          heading.append(make("h2", group), make("small", items.length + "장"));
+          for (const item of items) grid.append(card(item));
+          section.append(heading, grid);
+          el("gallery").append(section);
+        }
+        if (!total)
+          el("gallery").append(
+            make(
+              "p",
+              "검색 결과가 없습니다. 다른 이름이나 등급을 선택해 보세요.",
+              "empty",
+            ),
+          );
+      }
+      el("search").addEventListener("input", render);
+      for (const id of ["series", "grade"])
+        el(id).addEventListener("change", render);
+      el("close").addEventListener("click", () => el("detail").close());
+      el("detail").addEventListener("click", (e) => {
+        if (e.target === el("detail")) {
+          const r = el("detail").getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            el("detail").close();
+        }
+      });
+      render();
+    </script>
+  </body>
+</html>

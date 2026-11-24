@@ -1286,6 +1286,7 @@ struct L {
     func factionName(_ key: String) -> String {
         switch key {
         case "efsf": return t("지구연방군", "Earth Federation", "地球連邦軍")
+        case "independent": return t("무소속", "Independent", "無所属")
         case "zeon": return t("지온공국군", "Principality of Zeon", "ジオン公国軍")
         case "delaz": return t("데라즈 플리트", "Delaz Fleet", "デラーズ・フリート")
         case "cima": return t("시마 함대", "Cima Fleet", "シーマ艦隊")
