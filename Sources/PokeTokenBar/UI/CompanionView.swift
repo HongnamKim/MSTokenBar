@@ -1939,18 +1939,27 @@ struct HangarMachineCell: View {
     }
 
     /// 출시 등급을 순서대로 — 보유 등급은 굵게, 미보유는 흐리게.
+    /// The released grades, at the largest size where the whole row fits. Each label used to shrink on its
+    /// own, so a six-grade row cut the longest one short ("Ver.Ka" read "Ve…").
     private var gradeLabels: some View {
+        ViewThatFits(in: .horizontal) {
+            gradeRow(size: 8)
+            gradeRow(size: 7)
+            gradeRow(size: 6)
+        }
+    }
+
+    private func gradeRow(size: CGFloat) -> some View {
         HStack(spacing: 2) {
             ForEach(cell.releasedGrades, id: \.self) { grade in
                 let owned = cell.ownedGrades.contains(grade)
                 Text(grade.label)
-                    .font(.system(size: 8, weight: owned ? .heavy : .regular, design: .rounded))
+                    .font(.system(size: size, weight: owned ? .heavy : .regular, design: .rounded))
                     .foregroundStyle(owned ? Color.primary : Color.secondary)
                     .opacity(owned ? 1 : 0.45)
+                    .fixedSize()
             }
         }
-        .lineLimit(1)
-        .minimumScaleFactor(0.6)
     }
 
     /// material 판 — 어두운 스프라이트 위에서도 읽히게. 글자색 = 희귀도.
