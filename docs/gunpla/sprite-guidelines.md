@@ -2,7 +2,7 @@
 
 2026-11-23 초안 · 이미지를 대량으로 만들 에이전트용
 
-『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [디 오리진](../../assets/sprites/the-origin/), [썬더볼트](../../assets/sprites/thunderbolt/), [쿠쿠루스 도안의 섬](../../assets/sprites/cucuruz-doans-island/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/), [벨토치카 칠드런](../../assets/sprites/beltorchika-children/) 폴더에 있다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
+『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [디 오리진](../../assets/sprites/the-origin/), [썬더볼트](../../assets/sprites/thunderbolt/), [쿠쿠루스 도안의 섬](../../assets/sprites/cucuruz-doans-island/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/), [벨토치카 칠드런](../../assets/sprites/beltorchika-children/) 폴더에 있다. [건담 UC](../../assets/sprites/uc/)는 1호기·밴시·퍼펙티빌리티의 모드를 구분한다. 같은 키트가 변형되면 해당 모드로 조립한 앞·뒤 사진을 각각 확인한다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
 MG와 Ver.Ka가 둘 다 나온 기체는 키트별로 실물 앞·뒤 사진을 따로 대조한다. [MG Ver.Ka 5종](../../assets/sprites/mg-ver-ka/)과 [하이뉴 건담](../../assets/sprites/beltorchika-children/)의 Ver.Ka 그림은 MG와 별개인 Ver.Ka 등급의 그림이다. 원본 PNG는 `<기체>-mg-ver-ka.png`, 앱에 들어가는 GIF는 다른 등급과 같은 규칙으로 `<기체>-verka.gif`다.
 SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../../assets/sprites/first-series-grades/rx-78-2-sd.png)을 참고한다.
 
@@ -20,11 +20,16 @@ SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../
 - **구도 [결정]**: 모든 등급이 같은 3/4 구도.
   - 기체가 화면 왼쪽을 향해 살짝 돌아서 있다. 얼굴이 머리의 왼쪽으로 치우치고, 머리·가슴·허리의 화면 오른쪽에 기체의 왼쪽 옆면이 보인다.
   - 기체의 왼팔은 화면 오른쪽에서 보는 이와 가깝고, 오른팔은 화면 왼쪽에서 더 멀다.
-  - 직립 자세. 좌우 반전·정면 대칭으로 그리지 않는다.
+  - 같은 기체의 베이스 스프라이트는 모드나 등급을 바꿔도 시선과 몸통 방향, 팔을 내린 위치, 두 발이 바닥을 딛는 자세를 맞춘다. 무장을 든 손은 장비의 형태에 맞춰 조정한다.
+  - 유니콘 1호기 디스트로이와 각성은 빔 매그넘을 들면 총구를 아래로 향하게 하고, 실드를 장착하면 왼팔에 붙인다. MGEX는 두 모드 모두 같은 직립 자세에서 왼팔을 비우고 실드 판넬 3기를 몸 주변에 전개한다. 48픽셀에서도 실드 세 장이 각각 보이도록 기체와 실드 사이에 틈을 둔다. [디스트로이 적색 발광](https://www.dalong.net/reviews/mg/mgex01/p/mgex01_104.jpg) · [디스트로이 뒷면](https://www.dalong.net/reviews/mg/mgex01/p/mgex01_105.jpg) · [각성 뒷면](https://www.dalong.net/reviews/mg/mgex01/p/mgex01_111.jpg) · [실드 판넬 전개 사진](https://www.dalong.net/reviews/mg/mgex01/p/mgex01_140.jpg)
+  - 유니콘 1호기 PG는 일반판의 적색 디스트로이와 최종결전판의 녹색 각성 모두 언체인드 모드로 그린다. 양손을 내리고, 양쪽 무릎 옆의 흰 장갑판을 바깥쪽 아래로 펼쳐 그 사이에 각 모드의 사이코프레임 색이 보이게 한다. 어깨 끝 장갑도 살짝 들어 올린다. [일반판 앞면](https://www.dalong.net/reviews/pg/p14/p/p14_70.jpg) · [뒷면](https://www.dalong.net/reviews/pg/p14/p/p14_71.jpg) · [최종결전판 앞면](https://www.dalong.net/reviews/cg/cgp04/p/cgp04_26.jpg) · [뒷면](https://www.dalong.net/reviews/cg/cgp04/p/cgp04_27.jpg)
+  - 좌우 반전·정면 대칭으로 그리지 않는다.
 - **장비 위치**는 기체 설정을 따른다. RX-78-2의 방패는 왼팔에 들고, 자쿠 II의 실드는 오른쪽 어깨에 고정한다. 이 구도에서 장비 일부가 몸에 가려져도 원래 위치를 유지한다.
 - **그리지 않는 것**: 뒷모습, 배경, 바닥 그림자, 이펙트, 글자, 등급 배지(배지는 앱이 그린다).
 - **등급 배지**는 [공용 PNG 8종](../../Sources/PokeTokenBar/Resources/Gunpla/GradeBadges/)을 사용한다. Ver.Ka와 MGEX 배지는 2026-11-24에 박스 참고 사진 없이 그린 초안이다. 플로팅 펫은 같은 펫 크기에서 기본 배지의 가로와 세로를 각각 50%로 줄여 표시 영역 우측 하단에 겹쳐 그린다. 도안을 수정할 때는 각 등급의 박스 표기를 참고하고, 최소 펫 크기인 48pt에서도 색과 윤곽으로 등급 변화를 알아볼 수 있는지 확인한다. [SD](https://www.dalong.net/reviews/sd/e01/p/e01.jpg) · [MGSD](https://www.dalong.net/reviews/sd/mgsd01/p/mgsd01.jpg) · [HG](https://www.dalong.net/reviews/hg/h191/p/h191.jpg) · [RG](https://www.dalong.net/reviews/rg/rg40/p/rg40.jpg) · [MG](https://www.dalong.net/reviews/mg/m172/p/m172.jpg) · [PG](https://www.dalong.net/reviews/pg/p01/p/p01.jpg)
 - **금지**: 공식 일러스트·박스아트·게임 스프라이트를 따거나 트레이싱하기 (설계 문서 §2 반목표).
+
+RX-0 1호기와 풀아머 유니콘은 장비와 사이코프레임 상태를 함께 확인한다. 닫힌 뿔과 바이저는 유니콘 모드, 전개한 V핀과 적색 프레임은 디스트로이, 전개한 V핀과 녹색 프레임은 각성으로 기록한다. BB전사 390은 유니콘 모드에서도 팔다리의 녹색 부품 일부가 보인다. 풀아머 각성은 백팩에 부스터와 중무장을 장착한 사진을 기준으로 그린다.
 
 ### 무장 장착과 가림 순서 [결정]
 

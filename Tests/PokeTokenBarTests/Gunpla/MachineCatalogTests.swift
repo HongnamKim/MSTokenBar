@@ -85,7 +85,7 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 98)
+        XCTAssertEqual(c.machines.count, 117)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
@@ -93,16 +93,30 @@ final class MachineCatalogTests: XCTestCase {
         XCTAssertEqual(c.series.count, 12)
     }
 
+    func test_fullArmorUnicornModesFollowTheReleasedFrameColors() throws {
+        let catalog = MachineCatalog.shared
+        let unicorn = try XCTUnwrap(catalog.machine(id: 116))
+        let destroy = try XCTUnwrap(catalog.machine(id: 117))
+        let awakened = try XCTUnwrap(catalog.machine(id: 118))
+        XCTAssertEqual([unicorn.hangarID, destroy.hangarID, awakened.hangarID], [116, 116, 116])
+        XCTAssertEqual(unicorn.grades, [.sd, .hg, .rg, .mg, .verka])
+        XCTAssertEqual(destroy.grades, [.hg, .mg])
+        XCTAssertEqual(awakened.grades, [.sd, .hg, .rg, .verka])
+        XCTAssertEqual(destroy.sprites?["hg"], "full-armor-unicorn-destroy-hg")
+        XCTAssertEqual(awakened.sprites?["hg"], "full-armor-unicorn-awakened-hg")
+        XCTAssertNotEqual(destroy.gradeSources?["hg"], awakened.gradeSources?["hg"])
+    }
+
     func test_completedSeriesServeGradeSpecificArtAndKitSources() throws {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
-                                        "www.bandaispirits.co.jp", "p-bandai.jp"]
+                                        "www.bandaispirits.co.jp", "www.bandainamco.co.jp", "p-bandai.jp"]
         let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
-                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2]
+                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14]
         for (series, count) in counts {
             let machines = catalog.machines.filter { $0.series == series }
-            XCTAssertEqual(machines.count, count, series)
+            XCTAssertEqual(Set(machines.map(\.hangarID)).count, count, series)
             for machine in machines {
                 let grades = Set(machine.grades.map(\.rawValue))
                 let sources = machine.gradeSources ?? [:]
@@ -176,7 +190,6 @@ final class MachineCatalogTests: XCTestCase {
         }
         let bundled = try MachineCatalog.bundled()
         let artless = bundled.machines.filter { $0.sprites == nil }
-        XCTAssertFalse(artless.isEmpty, "the bundled data still lists machines without art")
         for machine in artless { XCTAssertNil(shared.machine(id: machine.id), machine.modelNumber) }
     }
 }

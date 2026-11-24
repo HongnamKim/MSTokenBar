@@ -14,6 +14,30 @@ struct HangarCell: Identifiable, Sendable {
     var isBuilt: Bool { !ownedGrades.isEmpty }
 }
 
+/// The grid groups independent growth tracks after applying its search and sort order.
+struct HangarEntry: Identifiable {
+    let id: Int
+    let cells: [HangarCell]
+
+    func displayed(preferredID: Int?) -> HangarCell {
+        cells.first { $0.isBuilt && $0.machineID == preferredID }
+            ?? cells.first(where: \.isRaising)
+            ?? cells.first(where: \.isBuilt)
+            ?? cells[0]
+    }
+
+    static func grouped(_ cells: [HangarCell], catalog: MachineCatalog) -> [HangarEntry] {
+        func groupID(_ cell: HangarCell) -> Int { catalog.machine(id: cell.machineID)?.hangarID ?? cell.machineID }
+        let groups = Dictionary(grouping: cells, by: groupID)
+        var seen: Set<Int> = []
+        return cells.compactMap { cell in
+            let id = groupID(cell)
+            guard seen.insert(id).inserted, let members = groups[id] else { return nil }
+            return HangarEntry(id: id, cells: members)
+        }
+    }
+}
+
 /// Owned/total progress for one series. A cell is a (machine, released grade) pair; base machines and
 /// variants (전용기) are counted separately so each has its own badge.
 struct SeriesCompletion: Identifiable, Sendable, Equatable {

@@ -59,7 +59,12 @@ enum HatchPlanner {
         let pool = preferred(isDuplicatePhase ? eligible : fresh, variant: wantVariant)
         guard !pool.isEmpty else { return nil }
 
-        let pick = weightedPick(pool, rng: &rng)
+        // Roll once per suit so adding a second mode does not double its drop rate.
+        var seen: Set<Int> = []
+        let suits = pool.filter { seen.insert($0.hangarID).inserted }
+        let suit = weightedPick(suits, rng: &rng)
+        let modes = pool.filter { $0.hangarID == suit.hangarID }
+        let pick = modes.count == 1 ? suit : modes[Int(rng.next() % UInt64(modes.count))]
         let start = runGrades(pick, snapshot: snapshot)[0]
         return HatchChoice(startSpeciesID: GunplaID.encode(machineID: pick.id, grade: start),
                            isVariant: pick.variantOf != nil,

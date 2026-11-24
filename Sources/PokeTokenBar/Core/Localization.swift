@@ -1263,6 +1263,7 @@ struct L {
 
     // MARK: 격납고 — 작품 칩·완성 배지·완성 알림
     var hangarTitle: String { t("격납고", "Hangar", "格納庫") }
+    var hangarModes: String { t("수집한 모드", "Collected modes", "収集したモード") }
     func hangarMachineTotal(_ n: Int) -> String { t("\(n)기", n == 1 ? "1 suit" : "\(n) suits", "\(n)機") }
     /// The series filter chip that clears the filter.
     var hangarSeriesAll: String { t("전체", "All", "すべて") }

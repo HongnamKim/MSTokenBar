@@ -120,6 +120,39 @@ final class SaveTransferTests: XCTestCase {
         XCTAssertEqual(names, [1: "#1", 2: "#2"])
     }
 
+    func testFullArmorSplitPreservesTheReachedColorsWithoutUnlockingGreenHG() throws {
+        let legacy = [GunplaGrade.sd, .hg, .rg, .mg, .verka].map { GunplaID.encode(machineID: 117, grade: $0) }
+        let greenSD = GunplaID.encode(machineID: 118, grade: .sd)
+        let greenRG = GunplaID.encode(machineID: 118, grade: .rg)
+        let greenKa = GunplaID.encode(machineID: 118, grade: .verka)
+        var state = CompanionState()
+        state.active = MonState(baseID: legacy[0], pathIDs: Array(legacy.prefix(3)), plannedPathIDs: legacy,
+                                stageIndex: 2, usedAtStage: 38, rarity: .legendary, totalForms: 5)
+        state.representativeSpeciesID = legacy[0]
+        let updated = SaveTransfer.sanitized(state)
+        XCTAssertEqual(updated.active?.currentID, greenRG)
+        XCTAssertEqual(updated.active?.plannedPathIDs, [greenRG, greenKa])
+        XCTAssertEqual(updated.active?.usedAtStage, 38)
+        XCTAssertEqual(updated.representativeSpeciesID, greenSD)
+        let owned = updated.collectionSnapshot(catalog: .shared).ownedGrades
+        XCTAssertEqual(owned[117], [.hg])
+        XCTAssertEqual(owned[118], [.sd, .rg])
+        XCTAssertEqual(SaveTransfer.sanitized(updated).dex.map(\.id), updated.dex.map(\.id))
+
+        var finished = CompanionState()
+        finished.pendingHatchID = legacy[0]
+        finished.dex = [DexEntry(baseID: legacy[0], finalID: legacy[4], chainOrder: legacy,
+                                 rarity: .legendary, caughtAt: transferNow)]
+        finished.collectedFinals = ["\(legacy[0]):\(legacy[4])"]
+        let migrated = SaveTransfer.sanitized(finished)
+        XCTAssertEqual(migrated.pendingHatchID, greenSD)
+        XCTAssertEqual(migrated.collectedFinals, ["\(greenSD):\(greenKa)"])
+        let entry = try XCTUnwrap(migrated.dex.first)
+        XCTAssertEqual(entry.id, finished.dex[0].id)
+        XCTAssertEqual(entry.chainOrder, [greenSD, legacy[1], greenRG, legacy[3], greenKa])
+        XCTAssertEqual(entry.names?[greenKa]?["ko"], "Ver.Ka 풀아머 유니콘 건담 (각성)")
+    }
+
     func testRoundTripPreservesActiveRepeatGrowthBoost() throws {
         var original = CompanionState()
         original.active = MonState(

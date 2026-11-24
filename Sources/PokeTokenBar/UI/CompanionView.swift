@@ -1420,14 +1420,9 @@ private struct DexGridView: View {
         _returnAnchor = State(initialValue: returnAnchor)
     }
 
-    /// The machine whose grade page `anchor` names, as the grid's page key.
-    static func anchorCellID(_ anchor: String?) -> String? {
-        anchor.flatMap(Int.init).flatMap(GunplaID.decode).map { String($0.machineID) }
-    }
-
     var body: some View {
         let all = store.hangarCells
-        let visible = store.filteredHangarCells(
+        let filtered = store.filteredHangarCells(
             query: searchText,
             rarity: selectedRarity,
             variantOnly: shinyOnly,
@@ -1435,24 +1430,27 @@ private struct DexGridView: View {
             sort: sortOption,
             includeUnbuilt: true
         )
+        let visible = HangarEntry.grouped(filtered, catalog: store.catalog)
+        let anchorMachine = returnAnchor.flatMap(Int.init).flatMap { store.catalog.machine(speciesID: $0) }
+        let preferredID = selectedID ?? anchorMachine?.id
         let pageCount = max(1, (visible.count + Self.pageSize - 1) / Self.pageSize)
-        let current = min(page ?? DexScrollPager.page(containing: Self.anchorCellID(returnAnchor),
-                                                      in: visible.map { String($0.machineID) },
+        let current = min(page ?? DexScrollPager.page(containing: anchorMachine.map { String($0.hangarID) },
+                                                      in: visible.map { String($0.id) },
                                                       pageSize: Self.pageSize),
                           pageCount - 1)
         let slice = Array(visible.dropFirst(current * Self.pageSize).prefix(Self.pageSize))
 
         VStack(alignment: .leading, spacing: 6) {
-            header(all)
+            header(HangarEntry.grouped(all, catalog: store.catalog).map { $0.displayed(preferredID: preferredID) })
             if visible.isEmpty {
                 emptySearchResults
             } else {
-                grid(slice)
+                grid(slice, preferredID: preferredID)
                     .background(ScrollWheelPager { step in
                         let next = DexScrollPager.pageAfterScroll(current: current, pageCount: pageCount, step: step)
                         if next != current { page = next; selectedID = nil }
                     })
-                footer(slice, current: current, pageCount: pageCount)
+                footer(slice.map { $0.displayed(preferredID: preferredID) }, current: current, pageCount: pageCount)
             }
         }
         .onChange(of: searchText) { page = 0; selectedID = nil }
@@ -1571,19 +1569,38 @@ private struct DexGridView: View {
         }
     }
 
-    private func grid(_ slice: [HangarCell]) -> some View {
+    private func grid(_ slice: [HangarEntry], preferredID: Int?) -> some View {
         VStack(spacing: Self.spacing) {
             ForEach(0..<Self.rows, id: \.self) { row in
                 HStack(spacing: Self.spacing) {
                     ForEach(0..<Self.columns, id: \.self) { col in
                         let i = row * Self.columns + col
                         if i < slice.count {
-                            let cell = slice[i]
+                            let entry = slice[i]
+                            let cell = entry.displayed(preferredID: preferredID)
                             HangarMachineCell(store: store, cell: cell,
                                               isSelected: selectedID == cell.machineID,
                                               isRepresentative: store.isRepresentative(cell)) {
                                 selectedID = cell.machineID
                                 if cell.isBuilt { onSelectCell(cell) }
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                let built = entry.cells.filter(\.isBuilt)
+                                if built.count > 1 {
+                                    Menu {
+                                        ForEach(built) { mode in
+                                            Button(store.machineName(mode.machineID)) {
+                                                selectedID = mode.machineID
+                                                onSelectCell(mode)
+                                            }
+                                        }
+                                    } label: {
+                                        Image(systemName: "square.stack")
+                                    }
+                                    .menuStyle(.borderlessButton)
+                                    .fixedSize()
+                                    .accessibilityLabel(store.l.hangarModes)
+                                }
                             }
                             .frame(maxWidth: .infinity)
                         } else {

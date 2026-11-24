@@ -185,6 +185,7 @@ enum SaveTransfer {
         for index in s.dex.indices {
             s.dex[index].chainOrder = deduped(s.dex[index].chainOrder)
         }
+        FullArmorUnicornMigration.apply(to: &s)
         s.reconcileRepresentativeSelection()
         return s
     }

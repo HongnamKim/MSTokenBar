@@ -59,6 +59,8 @@ def catalog(embed):
                                   aliases=list(machine["names"].values()) + list(work["names"].values()),
                                   kit=kit, official=machine["gradeSources"][grade], front=front, rear=rear,
                                   file=path.name, image=picture(path, embed)))
+                if "hangarGroupID" in machine:
+                    cards[-1]["hangarGroup"] = machine["hangarGroupID"]
     if references:
         raise ValueError(f"Unregistered artwork: {', '.join(references)}")
     for group, folder in [("등급 배지", "GradeBadges"), ("작업실", "Workshop")]:
