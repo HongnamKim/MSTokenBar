@@ -30,7 +30,8 @@ final class BundledSpritesTests: XCTestCase {
     func testVerKaIsItsOwnGradeWithDistinctBundledArt() throws {
         let catalog = MachineCatalog.shared
         let machines = catalog.machines.filter { $0.grades.contains(.verka) }
-        XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2"])
+        XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2",
+                                                                   "FA-78", "MS-06R"])
 
         for machine in machines {
             let model = machine.modelNumber
