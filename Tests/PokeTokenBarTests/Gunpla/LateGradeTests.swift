@@ -315,7 +315,8 @@ final class LateGradeTests: XCTestCase {
     // MARK: unchanged rules
 
     /// A save written by 0.3.0, ids as literals: RX-78-2 finished through PG, Zaku II let go at RG.
-    /// Nothing about it may read differently now that two grades were added.
+    /// Every id reads as the same grade now that two grades were added; RX-78-2 gained a Ver.Ka kit, so it
+    /// reopens for that one cell, as any late-added grade does.
     func test_saveWrittenBeforeVerKaReadsTheSame() throws {
         let json = """
         {"installBaselineSet":true,
@@ -331,7 +332,11 @@ final class LateGradeTests: XCTestCase {
         XCTAssertEqual(s.hangarCell(machineID: 2)?.ownedGrades, [.sd, .hg, .rg])
         let snapshot = s.state.collectionSnapshot(catalog: s.catalog)
         XCTAssertEqual(snapshot.graduatedMachineIDs, [1])
-        XCTAssertTrue(snapshot.isComplete(try XCTUnwrap(s.catalog.machine(id: 1))), "RX-78-2 stays graduated")
+        let rx78 = try XCTUnwrap(s.catalog.machine(id: 1))
+        XCTAssertEqual(rx78.grades, [.sd, .hg, .rg, .mg, .verka, .pg])
+        XCTAssertFalse(snapshot.isComplete(rx78), "the new Ver.Ka cell is empty")
+        XCTAssertEqual(HatchPlanner.runGrades(rx78, snapshot: snapshot), [.mg, .verka],
+                       "RX-78-2 comes back at MG and graduates at Ver.Ka")
         XCTAssertEqual(HatchPlanner.runGrades(try XCTUnwrap(s.catalog.machine(id: 2)), snapshot: snapshot),
                        [.rg, .mg, .pg], "Zaku II still resumes at RG")
     }

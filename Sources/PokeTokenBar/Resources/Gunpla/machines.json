@@ -17,6 +17,7 @@
         "hg",
         "rg",
         "mg",
+        "verka",
         "pg"
       ],
       "sprites": {
@@ -24,6 +25,7 @@
         "hg": "rx-78-2-hg",
         "rg": "rx-78-2-rg",
         "mg": "rx-78-2-mg",
+        "verka": "rx-78-2-verka",
         "pg": "rx-78-2-pg"
       },
       "gradeSources": {
@@ -31,6 +33,7 @@
         "hg": "https://manual.bandai-hobby.net/menus/detail/1004",
         "rg": "https://manual.bandai-hobby.net/menus/detail/1585",
         "mg": "https://manual.bandai-hobby.net/menus/detail/611",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/816",
         "pg": "https://manual.bandai-hobby.net/menus/detail/1066"
       }
     },
@@ -201,13 +204,15 @@
         "hg",
         "rg",
         "mg",
+        "verka",
         "pg"
       ],
       "gradeSources": {
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660303664000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/471",
         "rg": "https://manual.bandai-hobby.net/menus/detail/846",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/647",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/538",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/647",
         "pg": "https://manual.bandai-hobby.net/menus/detail/649"
       },
       "sprites": {
@@ -215,6 +220,7 @@
         "hg": "zeta-gundam-hg",
         "rg": "zeta-gundam-rg",
         "mg": "zeta-gundam-mg",
+        "verka": "zeta-gundam-verka",
         "pg": "zeta-gundam-pg"
       }
     },
@@ -234,13 +240,15 @@
         "hg",
         "rg",
         "mg",
+        "verka",
         "pg"
       ],
       "gradeSources": {
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609281000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/847",
         "rg": "https://manual.bandai-hobby.net/menus/detail/679",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/604",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/868",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/604",
         "pg": "https://manual.bandai-hobby.net/menus/detail/4200"
       },
       "sprites": {
@@ -248,6 +256,7 @@
         "hg": "nu-gundam-hg",
         "rg": "nu-gundam-rg",
         "mg": "nu-gundam-mg",
+        "verka": "nu-gundam-verka",
         "pg": "nu-gundam-pg"
       }
     },
@@ -266,19 +275,22 @@
         "sd",
         "hg",
         "rg",
-        "mg"
+        "mg",
+        "verka"
       ],
       "gradeSources": {
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609298000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/403",
         "rg": "https://manual.bandai-hobby.net/menus/detail/677",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/949"
+        "mg": "https://manual.bandai-hobby.net/menus/detail/867",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/949"
       },
       "sprites": {
         "sd": "sazabi-sd",
         "hg": "sazabi-hg",
         "rg": "sazabi-rg",
-        "mg": "sazabi-mg"
+        "mg": "sazabi-mg",
+        "verka": "sazabi-verka"
       }
     },
     {
@@ -1573,17 +1585,20 @@
       "grades": [
         "sd",
         "hg",
-        "mg"
+        "mg",
+        "verka"
       ],
       "gradeSources": {
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425776286000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/417",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/629"
+        "mg": "https://manual.bandai-hobby.net/menus/detail/431",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/629"
       },
       "sprites": {
         "sd": "zz-gundam-sd",
         "hg": "zz-gundam-hg",
-        "mg": "zz-gundam-mg"
+        "mg": "zz-gundam-mg",
+        "verka": "zz-gundam-verka"
       }
     },
     {
@@ -1924,6 +1939,63 @@
       "sprites": {
         "sd": "jagd-doga-quess-sd",
         "hg": "jagd-doga-quess-hg"
+      }
+    },
+    {
+      "id": 78,
+      "modelNumber": "RX-93-ν2",
+      "names": {
+        "ko": "하이뉴 건담",
+        "en": "Hi-Nu Gundam",
+        "ja": "Hi-νガンダム"
+      },
+      "series": "beltorchika-children",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112836434000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/915",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/683",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/547",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/953"
+      },
+      "sprites": {
+        "sd": "hi-nu-gundam-sd",
+        "hg": "hi-nu-gundam-hg",
+        "rg": "hi-nu-gundam-rg",
+        "mg": "hi-nu-gundam-mg",
+        "verka": "hi-nu-gundam-verka"
+      }
+    },
+    {
+      "id": 79,
+      "modelNumber": "MSN-04II",
+      "names": {
+        "ko": "나이팅게일",
+        "en": "Nightingale",
+        "ja": "ナイチンゲール"
+      },
+      "series": "beltorchika-children",
+      "faction": "neo_zeon",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4549660257646000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/508"
+      },
+      "sprites": {
+        "sd": "nightingale-sd",
+        "hg": "nightingale-hg"
       }
     }
   ]

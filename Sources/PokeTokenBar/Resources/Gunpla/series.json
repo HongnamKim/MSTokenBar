@@ -64,13 +64,22 @@
       "order": 6
     },
     {
+      "id": "beltorchika-children",
+      "names": {
+        "ko": "벨토치카 칠드런",
+        "en": "Beltorchika's Children",
+        "ja": "ベルトーチカ・チルドレン"
+      },
+      "order": 7
+    },
+    {
       "id": "uc",
       "names": {
         "ko": "유니콘",
         "en": "Unicorn",
         "ja": "ユニコーン"
       },
-      "order": 7
+      "order": 8
     }
   ]
 }

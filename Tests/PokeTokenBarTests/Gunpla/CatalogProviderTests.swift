@@ -16,7 +16,7 @@ final class CatalogProviderTests: XCTestCase {
 
     func test_lineFromResumedGradeStartsThere() async throws {
         let line = try await MachineCatalog.allBundled.line(baseSpeciesID: GunplaID.encode(machineID: 1, grade: .rg))
-        XCTAssertEqual(line.totalForms, 3) // rg, mg, pg
+        XCTAssertEqual(line.totalForms, 4) // rg, mg, verka, pg
     }
 
     func test_singleGradeMachineHasOneStage() async throws {

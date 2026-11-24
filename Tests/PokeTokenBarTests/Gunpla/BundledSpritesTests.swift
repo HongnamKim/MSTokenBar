@@ -25,6 +25,29 @@ final class BundledSpritesTests: XCTestCase {
         return try MachineCatalog(machines: [machine], series: [series])
     }
 
+    /// Ver.Ka is its own grade after MG (spec §5.2): each of these machines has a separate MG and Ver.Ka
+    /// kit, with its own Bandai source and its own bundled art.
+    func testVerKaIsItsOwnGradeWithDistinctBundledArt() throws {
+        let catalog = MachineCatalog.shared
+        let machines = catalog.machines.filter { $0.grades.contains(.verka) }
+        XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2"])
+
+        for machine in machines {
+            let model = machine.modelNumber
+            let mgIndex = try XCTUnwrap(machine.grades.firstIndex(of: .mg), model)
+            XCTAssertEqual(machine.grades[mgIndex + 1], .verka, "\(model): Ver.Ka grows right after MG")
+            let mgSource = try XCTUnwrap(machine.gradeSources?["mg"], model)
+            XCTAssertNotEqual(try XCTUnwrap(machine.gradeSources?["verka"], model), mgSource, model)
+
+            let mgID = GunplaID.encode(machineID: machine.id, grade: .mg)
+            let verKaID = GunplaID.encode(machineID: machine.id, grade: .verka)
+            XCTAssertEqual(BundledSprites.resourceName(speciesID: verKaID, catalog: catalog), machine.sprites?["verka"], model)
+            let mg = try XCTUnwrap(BundledSprites.gifData(speciesID: mgID, catalog: catalog), model)
+            let verKa = try XCTUnwrap(BundledSprites.gifData(speciesID: verKaID, catalog: catalog), model)
+            XCTAssertNotEqual(verKa, mg, "\(model): the two kits have their own art")
+        }
+    }
+
     func test_firstSeriesGradeArtLoadsForStaticAndAnimatedViews() throws {
         let expected = [
             "RX-78-2": "rx-78-2", "RX-77-2": "guncannon", "RX-75": "guntank", "RGM-79": "gm",
