@@ -10,6 +10,8 @@ struct HangarCell: Identifiable, Sendable {
     let isRaising: Bool
 
     var id: Int { machineID }
+    /// False for a silhouette cell: a catalog machine the player has not built in any grade yet.
+    var isBuilt: Bool { !ownedGrades.isEmpty }
 }
 
 /// Owned/total progress for one series. A cell is a (machine, released grade) pair; base machines and
@@ -24,6 +26,9 @@ struct SeriesCompletion: Identifiable, Sendable, Equatable {
     var isComplete: Bool { totalCells > 0 && ownedCells >= totalCells }
     /// A series without variants has nothing to complete, so it never earns the variant badge.
     var isVariantComplete: Bool { variantTotalCells > 0 && variantOwnedCells >= variantTotalCells }
+    /// The series' chip has something to show: a built machine, or base-machine silhouettes.
+    /// Unbuilt 전용기 stay hidden, so a series of only those shows nothing until one is built.
+    var hasHangarCells: Bool { ownedCells + variantOwnedCells > 0 || totalCells > 0 }
     var id: String { seriesID }
 }
 

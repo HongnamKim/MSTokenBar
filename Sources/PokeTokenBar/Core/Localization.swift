@@ -1276,6 +1276,8 @@ struct L {
     }
     var hangarVariantLabel: String { t("전용기", "Custom", "専用機") }
     var hangarNotOwned: String { t("미보유", "Not owned", "未所持") }
+    /// A silhouette cell: a machine the player has not built in any grade yet.
+    var hangarNotBuilt: String { t("아직 만들지 않은 기체", "Not built yet", "まだ作っていない機体") }
     var machineModelNumber: String { t("형식번호", "Model number", "型式番号") }
     var machineAffiliation: String { t("소속", "Affiliation", "所属") }
     var machineSeries: String { t("등장 작품", "Series", "登場作品") }
