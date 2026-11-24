@@ -2869,6 +2869,113 @@
         "pg": "unicorn-perfectibility-destroy-pg"
       },
       "hangarGroupID": 113
+    },
+    {
+      "id": 115,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "유니콘 건담 1호기 (각성)",
+        "en": "Unicorn Gundam Unit 1 (Awakened)",
+        "ja": "ユニコーンガンダム1号機（覚醒）"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka",
+        "mgex",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112894762000",
+        "hg": "https://www.bandainamco.co.jp/files/HPE794A8E382ACE383B3E38397E383A9EXPOE382B8E383A3E3.pdf",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/4501",
+        "mg": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4549660150893000",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/592",
+        "mgex": "https://manual.bandai-hobby.net/menus/detail/639",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2289"
+      },
+      "sprites": {
+        "sd": "unicorn-gundam-awakened-sd",
+        "hg": "unicorn-gundam-awakened-hg",
+        "rg": "unicorn-gundam-awakened-rg",
+        "mg": "unicorn-gundam-awakened-mg",
+        "verka": "unicorn-gundam-awakened-verka",
+        "mgex": "unicorn-gundam-awakened-mgex",
+        "pg": "unicorn-gundam-awakened-pg"
+      },
+      "hangarGroupID": 11
+    },
+    {
+      "id": 116,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "풀아머 유니콘 건담 (유니콘 모드)",
+        "en": "Full Armor Unicorn Gundam (Unicorn Mode)",
+        "ja": "フルアーマー・ユニコーンガンダム（ユニコーンモード）"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112894762000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/382",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/861",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2257",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/592"
+      },
+      "sprites": {
+        "sd": "full-armor-unicorn-unicorn-sd",
+        "hg": "full-armor-unicorn-unicorn-hg",
+        "rg": "full-armor-unicorn-unicorn-rg",
+        "mg": "full-armor-unicorn-unicorn-mg",
+        "verka": "full-armor-unicorn-unicorn-verka"
+      }
+    },
+    {
+      "id": 117,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "풀아머 유니콘 건담 (디스트로이 모드)",
+        "en": "Full Armor Unicorn Gundam (Destroy Mode)",
+        "ja": "フルアーマー・ユニコーンガンダム（デストロイモード）"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112894762000",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/469",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/861",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2257",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/592"
+      },
+      "sprites": {
+        "sd": "full-armor-unicorn-destroy-sd",
+        "hg": "full-armor-unicorn-destroy-hg",
+        "rg": "full-armor-unicorn-destroy-rg",
+        "mg": "full-armor-unicorn-destroy-mg",
+        "verka": "full-armor-unicorn-destroy-verka"
+      },
+      "hangarGroupID": 116
     }
   ]
 }
