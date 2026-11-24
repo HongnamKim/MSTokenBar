@@ -348,6 +348,37 @@ read_when:
   **회귀 가드:** `PokemonProfileLogicTests.testShedinjaAlwaysHasOneHP` — Lv1/50/100 모두 1, 다른 스탯은 일반 공식,
   base HP 1 인 다른 종은 일반 공식. 수정 전 3건 실패 확인.
 
+- **A persisted code must not double as an ordering.** `GunplaID` wrote a grade into species ids as
+  its position in `GunplaGrade.allCases`, and the same position was the growth order. Adding Ver.Ka and
+  MGEX between MG and PG would have moved PG from 5 to 7, so every saved PG would have read as Ver.Ka.
+  Found while designing the grade addition, before any release carried it. No test could have caught
+  it: `test_encodeDecodeRoundTrip` encodes and decodes through the same enum, so it passes under any
+  numbering. A grade now has an explicit `saveCode` (0–5 as shipped in 0.1.0, Ver.Ka 6, MGEX 7) apart
+  from its `growthRank`, and `GunplaGrade` compares by rank. Class sweep: two sorts ran on raw ids
+  (`collectedDexSpecies`, the catch log's number order) and now use `GunplaID.orderKey`; every other
+  ranking already went through `Comparable` (`ownedGrades.max()`, the catalog's sorted-grades check,
+  `HatchPlanner`). `test_saveCodesAreFixedAndIndependentOfGrowthOrder` and
+  `test_speciesIDsWrittenBeforeVerKaStillDecodeToTheSameGrades` pin literal ids; restoring the
+  position-based code fails both, and comparing by save code fails eight tests. A new grade takes the
+  next free code wherever it sits in the growth order. Only 8 and 9 are left in the one decimal digit;
+  an eleventh grade needs a new id scheme with a migration.
+
+- **Load every save under a catalog that changed after it was written.** Two rules held only while a
+  machine's released grades never changed. `normalizedEvolutionState` accepted a reached path only as
+  an exact parent→child chain of the current line, so a machine raised to MG lost MG and fell back to
+  HG once RG was inserted between them. Graduation meant "has a finished record", so a graduated
+  machine could never fill a grade released later and its series badge stayed unearned. Every test
+  wrote and loaded its save with the same catalog, which is why both passed. `LateGradeTests` writes a
+  save under one catalog and loads it under another. The reached path is now kept when each id is a
+  descendant of the one before; graduated means a finished run plus every released grade owned; a
+  machine with an empty cell comes back from the owned grade just below the first empty cell and
+  stops at the last one (`HatchPlanner.runGrades`), so a plan may end before the top grade and
+  `applyUsage` graduates at the end of the plan. A stage is priced by its own grade's position, since
+  a run can skip a grade. Fifteen injected faults (demoting chain match, graduation without the
+  ownership check, no stop at the last empty cell, restart re-planning to the top, and others) each
+  fail at least one test. Completeness is `finished && every cell owned`, so each half is tested with
+  the other one true: finished with a gap, and every cell owned but never finished.
+
 ## 외부 로그·사용량 소스
 
 - **토큰 파일 파서는 외부 도구의 실제 직렬화 구조체(중첩 객체)를 반영해야 한다.** `jetski-standalone-oauth-token`

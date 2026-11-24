@@ -2,34 +2,39 @@ import Foundation
 
 /// What the hangar says about each machine, as far as box opening cares.
 struct CollectionSnapshot: Sendable {
-    /// Machines raised to their final grade (graduated). They never come out of a box again
-    /// until everything is graduated.
+    /// Machines with a finished run (a hangar record that was not let go). Drives the repeat-growth boost.
     let graduatedMachineIDs: Set<Int>
-    /// Highest grade reached by machines that were released before graduating. Graduated machines are absent.
-    let highestReachedGrade: [Int: GunplaGrade]
+    /// Grades the player holds per machine: finished runs, runs let go midway, and the one being raised.
+    let ownedGrades: [Int: Set<GunplaGrade>]
+
+    /// Finished and holding every released grade. Such a machine stays out of the box until everything
+    /// is complete; a grade released later reopens it.
+    func isComplete(_ machine: MachineRecord) -> Bool {
+        guard graduatedMachineIDs.contains(machine.id) else { return false }
+        return machine.grades.allSatisfy((ownedGrades[machine.id] ?? []).contains)
+    }
 }
 
 extension CompanionState {
     func collectionSnapshot(catalog: MachineCatalog) -> CollectionSnapshot {
         var graduated = Set<Int>()
-        var highest: [Int: GunplaGrade] = [:]
-        func reach(_ speciesIDs: [Int]) {
+        var owned: [Int: Set<GunplaGrade>] = [:]
+        func own(_ speciesIDs: [Int]) {
             for id in speciesIDs {
                 guard let decoded = GunplaID.decode(id), catalog.machine(id: decoded.machineID) != nil else { continue }
-                highest[decoded.machineID] = max(highest[decoded.machineID] ?? decoded.grade, decoded.grade)
+                owned[decoded.machineID, default: []].insert(decoded.grade)
             }
         }
         for entry in dex {
             if entry.releasedAt == nil, let machine = catalog.machine(speciesID: entry.finalID) {
                 graduated.insert(machine.id)
             }
-            reach(entry.chainOrder)
+            own(entry.chainOrder)
         }
         if let active {
-            reach(Array(active.pathIDs.prefix(active.stageIndex + 1)))
+            own(Array(active.pathIDs.prefix(active.stageIndex + 1)))
         }
-        for id in graduated { highest[id] = nil }
-        return CollectionSnapshot(graduatedMachineIDs: graduated, highestReachedGrade: highest)
+        return CollectionSnapshot(graduatedMachineIDs: graduated, ownedGrades: owned)
     }
 }
 
@@ -39,15 +44,15 @@ struct HatchChoice: Equatable {
     let isDuplicatePhase: Bool
 }
 
-/// Box opening (spec §5.3): roll variant first, then pick an ungraduated machine of that kind by rarity weight,
-/// starting from the grade it reached last time.
+/// Box opening (spec §5.3): roll variant first, then pick an incomplete machine of that kind by rarity weight,
+/// starting just below its first empty grade cell.
 enum HatchPlanner {
     static let rarityWeight: [Rarity: Int] = [.common: 100, .uncommon: 40, .rare: 12, .legendary: 3]
 
     static func choose(catalog: MachineCatalog, snapshot: CollectionSnapshot, tier: Rarity?, toolLevel: Int,
                        rng: inout any RandomNumberGenerator) -> HatchChoice? {
         let eligible = catalog.machines.filter { isEligible($0, tier: tier) }
-        let fresh = eligible.filter { !snapshot.graduatedMachineIDs.contains($0.id) }
+        let fresh = eligible.filter { !snapshot.isComplete($0) }
         let wantVariant = rng.next() % ToolSet.shinyDenominator(toolLevel: toolLevel) == 0
 
         let isDuplicatePhase = fresh.isEmpty
@@ -55,21 +60,33 @@ enum HatchPlanner {
         guard !pool.isEmpty else { return nil }
 
         let pick = weightedPick(pool, rng: &rng)
-        let start: GunplaGrade
-        if !isDuplicatePhase, let reached = snapshot.highestReachedGrade[pick.id] {
-            // A grade dropped from the catalog since it was reached falls back to the nearest released one below.
-            start = pick.grades.last(where: { $0 <= reached }) ?? pick.grades[0]
-        } else {
-            start = pick.grades[0]
-        }
+        let start = runGrades(pick, snapshot: snapshot)[0]
         return HatchChoice(startSpeciesID: GunplaID.encode(machineID: pick.id, grade: start),
                            isVariant: pick.variantOf != nil,
                            isDuplicatePhase: isDuplicatePhase)
     }
 
-    /// Whether a box of this tier still has a machine that has not graduated (the shop disables it otherwise).
+    /// The grades one box run of `machine` raises through, first to last.
+    ///
+    /// A complete machine (only opened in the duplicate phase) runs its whole released path again.
+    /// Any other run starts at the owned grade just below the first empty cell — at that cell when nothing
+    /// below it is owned — and ends at the last empty cell, so a grade released after graduation is filled
+    /// without raising the grades above it again. A machine let go at its top grade owns every cell but
+    /// never finished: it gets that grade alone.
+    static func runGrades(_ machine: MachineRecord, snapshot: CollectionSnapshot) -> [GunplaGrade] {
+        let grades = machine.grades
+        guard !snapshot.isComplete(machine) else { return grades }
+        let owned = snapshot.ownedGrades[machine.id] ?? []
+        guard let firstEmpty = grades.firstIndex(where: { !owned.contains($0) }),
+              let lastEmpty = grades.lastIndex(where: { !owned.contains($0) }) else {
+            return [grades[grades.count - 1]]
+        }
+        return Array(grades[max(0, firstEmpty - 1)...lastEmpty])
+    }
+
+    /// Whether a box of this tier still has an incomplete machine (the shop disables it otherwise).
     static func hasCandidates(catalog: MachineCatalog, snapshot: CollectionSnapshot, tier: Rarity?) -> Bool {
-        catalog.machines.contains { isEligible($0, tier: tier) && !snapshot.graduatedMachineIDs.contains($0.id) }
+        catalog.machines.contains { isEligible($0, tier: tier) && !snapshot.isComplete($0) }
     }
 
     private static func isEligible(_ machine: MachineRecord, tier: Rarity?) -> Bool {

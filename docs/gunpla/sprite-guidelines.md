@@ -22,7 +22,7 @@ SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../
   - 직립 자세. 좌우 반전·정면 대칭으로 그리지 않는다.
 - **장비 위치**는 기체 설정을 따른다. RX-78-2의 방패는 왼팔에 들고, 자쿠 II의 실드는 오른쪽 어깨에 고정한다. 이 구도에서 장비 일부가 몸에 가려져도 원래 위치를 유지한다.
 - **그리지 않는 것**: 뒷모습, 배경, 바닥 그림자, 이펙트, 글자, 등급 배지(배지는 앱이 그린다).
-- **등급 배지**는 [공용 PNG 6종](../../Sources/PokeTokenBar/Resources/Gunpla/GradeBadges/)을 사용한다. 플로팅 펫은 같은 펫 크기에서 기본 배지의 가로와 세로를 각각 50%로 줄여 표시 영역 우측 하단에 겹쳐 그린다. 도안을 수정할 때는 각 등급의 박스 표기를 참고하고, 최소 펫 크기인 48pt에서도 색과 윤곽으로 등급 변화를 알아볼 수 있는지 확인한다. [SD](https://www.dalong.net/reviews/sd/e01/p/e01.jpg) · [MGSD](https://www.dalong.net/reviews/sd/mgsd01/p/mgsd01.jpg) · [HG](https://www.dalong.net/reviews/hg/h191/p/h191.jpg) · [RG](https://www.dalong.net/reviews/rg/rg40/p/rg40.jpg) · [MG](https://www.dalong.net/reviews/mg/m172/p/m172.jpg) · [PG](https://www.dalong.net/reviews/pg/p01/p/p01.jpg)
+- **등급 배지**는 [공용 PNG 8종](../../Sources/PokeTokenBar/Resources/Gunpla/GradeBadges/)을 사용한다. Ver.Ka와 MGEX 배지는 2026-11-24에 박스 참고 사진 없이 그린 초안이다. 플로팅 펫은 같은 펫 크기에서 기본 배지의 가로와 세로를 각각 50%로 줄여 표시 영역 우측 하단에 겹쳐 그린다. 도안을 수정할 때는 각 등급의 박스 표기를 참고하고, 최소 펫 크기인 48pt에서도 색과 윤곽으로 등급 변화를 알아볼 수 있는지 확인한다. [SD](https://www.dalong.net/reviews/sd/e01/p/e01.jpg) · [MGSD](https://www.dalong.net/reviews/sd/mgsd01/p/mgsd01.jpg) · [HG](https://www.dalong.net/reviews/hg/h191/p/h191.jpg) · [RG](https://www.dalong.net/reviews/rg/rg40/p/rg40.jpg) · [MG](https://www.dalong.net/reviews/mg/m172/p/m172.jpg) · [PG](https://www.dalong.net/reviews/pg/p01/p/p01.jpg)
 - **금지**: 공식 일러스트·박스아트·게임 스프라이트를 따거나 트레이싱하기 (설계 문서 §2 반목표).
 
 ### 무장 장착과 가림 순서 [결정]
@@ -43,6 +43,8 @@ SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../
 | HG | 리얼 | 슬림, 리얼 체형의 기본형 | 큰 면에 2~3톤 셰이딩, 패널라인 최소 | 밝은 원색 | 얇고 부분적 |
 | RG | 리얼 | HG와 비슷 | **가장 촘촘** — 흰 면을 회색 패널로 잘게 나눔 | 한 톤 어둡고 차분함 | 얇고 부분적 |
 | MG | 리얼 | HG보다 굵은 어깨·팔다리, 넓은 스탠스 | 관절 사이로 회색 프레임이 보임 (HG < MG < RG) | 밝음과 차분함 사이 | 얇고 부분적 |
+| Ver.Ka **[미정]** | 리얼 | 그림 기준 미정. 첫 Ver.Ka 그림을 그릴 때 MG와의 차이를 정한다 | | | |
+| MGEX **[미정]** | 리얼 | 그림 기준 미정. 첫 MGEX 그림을 그릴 때 정한다 | | | |
 | PG | 리얼 | 가장 육중, 스탠스가 가장 넓음 | 무릎·발목 등에 내부 프레임과 피스톤이 드러남 | MG와 비슷 | 덩어리가 읽히게 다시 굵게 |
 
 - **SD 체형(SD·MGSD)**: 눈동자가 있는 큰 눈은 SD 체형에서만 쓴다. 리얼 등급은 카메라아이·모노아이·바이저. 무기·방패는 작게 줄인다.
