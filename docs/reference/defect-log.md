@@ -889,14 +889,17 @@ read_when:
   restoring the fixed 6pt track still fails. When a test measures lengths in pixels, pin the scale
   and keep the threshold well away from the measured colour; keep CI enabled on the fork.
 
-- **OCR fixtures must not put decoration next to the text they look for.** `testSeriesChipFiltersMountedCollectionAndTogglesBack`
-  failed in about half of the CI runs with `No glyph bounds for Harbor`. Each fixture series held one HG-only
-  machine, so owning it completed the series, and the fork's pixel completion medal (#10, which replaced an
-  emoji) was drawn right before the chip name. At the CI runner's 1x scale Vision read the medal as "8"
-  (`All V 8 Harbor 1/1 8 Meadow 1/1`), which sometimes became "Barbor" or shifted the click box off the chip.
-  At 2x locally the medal was ignored, so the test never failed on a Retina Mac. Rendering the OCR at 1x
-  reproduces the "8"; the fixture now gives each machine HG and MG with only HG owned, so the chips read
-  `Harbor 1/2` with no medal. Upstream passed because its emoji medal was not read as a digit.
+- **OCR in tests must read a fixed-scale render, not the window's scale.** `testSeriesChipFiltersMountedCollectionAndTogglesBack`
+  failed in about half of the CI runs with `No glyph bounds for Harbor`. `words(in:)` captured the window at
+  its backing scale, 1x on the display-less runner, where Vision misreads the 11pt chip labels: the fork's
+  pixel completion medal (#10) before a finished series' name read as "8" (`All V 8 Harbor 1/1`), "Harbor"
+  became "Barbor" or "(arbor", and a missed "Willow" made the test think its click failed, so it clicked
+  again and toggled the filter back off. A first fix that only removed the medal from the fixture still
+  failed in CI on "(arbor" — the medal was a confound, the scale was the cause. On a Retina Mac the same
+  capture is 2x and never failed. `words(in:)` now renders at a fixed 2x (Vision boxes are normalized, so
+  clicks are unchanged), and the fixture keeps each series at 1/2 so no medal sits in the label. The same
+  backing-scale capture remains in `DexColorRenderingTests` and `SessionKeySettingsRenderingTests`, which
+  have not failed in CI; pin their scale too if they ever do. Same lesson as the pace-marker entry above.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.

@@ -101,9 +101,17 @@ final class DexBackNavigationTests: XCTestCase {
         }
     }
 
+    /// Reads the screen at a fixed 2x. The window's own scale is 1x on the display-less CI runner, where
+    /// Vision misread the 11pt chip labels ("Harbor" as "Barbor" or "(arbor", "Willow" missed) and the
+    /// test re-clicked a chip that had already toggled. Boxes are normalized, so clicks are unaffected.
     private func words(in host: NSView) throws -> [Word] {
         host.layoutSubtreeIfNeeded()
-        let bitmap = try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in: host.bounds))
+        let scale = 2.0
+        let bitmap = try XCTUnwrap(NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: Int(host.bounds.width * scale),
+            pixelsHigh: Int(host.bounds.height * scale), bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true,
+            isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0))
+        bitmap.size = host.bounds.size
         host.cacheDisplay(in: host.bounds, to: bitmap)
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
@@ -255,9 +263,8 @@ final class DexBackNavigationTests: XCTestCase {
             DexEntry(baseID: hg(id), finalID: hg(id), chainOrder: [hg(id)], rarity: .common, caughtAt: Date())
         }
         try JSONEncoder().encode(state).write(to: file)
-        // Two grades with only HG owned keeps each series at 1/2. A finished series draws its pixel medal
-        // right before the chip's name, and Vision read that medal as "8", turning "Harbor" into "Barbor"
-        // or shifting the click box off the chip (CI flake). The medal is not what this test checks.
+        // Two grades with only HG owned keeps each series at 1/2, so no pixel completion medal sits right
+        // before the chip's name (read as "8" at 1x). The medal is not what this test checks.
         let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"],
                                                          grades: [.hg, .mg]),
                                    fileURL: file)
