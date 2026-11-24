@@ -29,6 +29,33 @@ final class CatalogProviderTests: XCTestCase {
         XCTAssertEqual(line.totalForms, 1)
     }
 
+    private func catalog(grades: [GunplaGrade]) throws -> MachineCatalog {
+        let series = SeriesRecord(id: "first", names: ["ko": "가", "en": "A", "ja": "あ"], order: 0)
+        let machine = MachineRecord(
+            id: 1, modelNumber: "X-1", names: ["ko": "가", "en": "A", "ja": "あ"], series: "first",
+            faction: "efsf", rarity: .rare, grades: grades, gradeSources: nil, variantOf: nil, sprites: nil)
+        return try MachineCatalog(machines: [machine], series: [series])
+    }
+
+    /// PG's save code (5) is lower than Ver.Ka's (6) and MGEX's (7): the line must follow growth order.
+    func test_lineRunsMGThenVerKaThenMGEXThenPG() async throws {
+        let id = { GunplaID.encode(machineID: 1, grade: $0) }
+        let line = try await catalog(grades: [.hg, .mg, .verka, .mgex, .pg]).line(baseSpeciesID: id(.hg))
+        XCTAssertEqual(pathIDs(line.tree), [.hg, .mg, .verka, .mgex, .pg].map(id))
+        XCTAssertEqual(line.localizedName(id(.verka), .en), "Ver.Ka A")
+        XCTAssertEqual(line.localizedName(id(.mgex), .en), "MGEX A")
+
+        let resumed = try await catalog(grades: [.hg, .mg, .verka, .mgex, .pg]).line(baseSpeciesID: id(.verka))
+        XCTAssertEqual(pathIDs(resumed.tree), [.verka, .mgex, .pg].map(id))
+    }
+
+    /// A machine whose only 1/100 Master Grade kit is a Ver.Ka skips MG.
+    func test_verKaOnlyMachineSkipsMG() async throws {
+        let id = { GunplaID.encode(machineID: 1, grade: $0) }
+        let line = try await catalog(grades: [.hg, .verka]).line(baseSpeciesID: id(.hg))
+        XCTAssertEqual(pathIDs(line.tree), [id(.hg), id(.verka)])
+    }
+
     func test_unreleasedGradeThrows() async {
         do {
             _ = try await MachineCatalog.allBundled.line(baseSpeciesID: GunplaID.encode(machineID: 4, grade: .rg))

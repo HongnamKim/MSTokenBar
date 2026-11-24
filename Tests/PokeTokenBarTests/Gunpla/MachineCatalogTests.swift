@@ -29,7 +29,7 @@ final class MachineCatalogTests: XCTestCase {
         XCTAssertEqual(GunplaID.decode(id)?.machineID, 12)
         XCTAssertEqual(GunplaID.decode(id)?.grade, .hg)
         XCTAssertNil(GunplaID.decode(25))
-        XCTAssertNil(GunplaID.decode(100_126))
+        XCTAssertNil(GunplaID.decode(100_128), "save code 8 belongs to no grade")
         XCTAssertTrue(GunplaID.isGunpla(id))
         XCTAssertFalse(GunplaID.isGunpla(25))
     }
@@ -37,9 +37,50 @@ final class MachineCatalogTests: XCTestCase {
     func test_gradeBodyType() {
         XCTAssertEqual(GunplaGrade.mgsd.bodyType, .sd)
         XCTAssertEqual(GunplaGrade.hg.bodyType, .real)
-        XCTAssertEqual(GunplaGrade.allCases.map(\.label), ["SD", "MGSD", "HG", "RG", "MG", "PG"])
-        XCTAssertEqual(GunplaGrade.allCases.map(\.index), [0, 1, 2, 3, 4, 5])
-        XCTAssertTrue(GunplaGrade.sd < GunplaGrade.pg)
+        XCTAssertEqual(GunplaGrade.verka.bodyType, .real)
+        XCTAssertEqual(GunplaGrade.mgex.bodyType, .real)
+    }
+
+    func test_growthOrderPlacesVerKaAndMGEXBetweenMGAndPG() {
+        XCTAssertEqual(GunplaGrade.allCases.map(\.label), ["SD", "MGSD", "HG", "RG", "MG", "Ver.Ka", "MGEX", "PG"])
+        XCTAssertEqual(GunplaGrade.allCases.map(\.growthRank), Array(0...7))
+        XCTAssertEqual(GunplaGrade.allCases.shuffled().sorted(), GunplaGrade.allCases)
+        XCTAssertTrue(GunplaGrade.mg < .verka && GunplaGrade.verka < .mgex && GunplaGrade.mgex < .pg)
+        XCTAssertEqual(Set<GunplaGrade>([.mg, .verka, .pg]).max(), .pg)
+    }
+
+    /// Species ids are persisted, so a grade's save code can never move. Ver.Ka and MGEX sit between MG and
+    /// PG in growth order but take the next free codes; every number here is a literal on purpose.
+    func test_saveCodesAreFixedAndIndependentOfGrowthOrder() {
+        let codes: [(GunplaGrade, Int)] = [(.sd, 0), (.mgsd, 1), (.hg, 2), (.rg, 3), (.mg, 4), (.pg, 5),
+                                           (.verka, 6), (.mgex, 7)]
+        XCTAssertEqual(Set(codes.map(\.0)), Set(GunplaGrade.allCases), "a new grade needs a code here")
+        for (grade, code) in codes {
+            XCTAssertEqual(grade.saveCode, code, grade.label)
+            XCTAssertEqual(GunplaID.encode(machineID: 12, grade: grade), 100_120 + code, grade.label)
+            XCTAssertEqual(GunplaID.decode(100_120 + code)?.grade, grade, grade.label)
+            XCTAssertEqual(GunplaID.decode(100_120 + code)?.machineID, 12, grade.label)
+        }
+        XCTAssertLessThan(codes.map(\.1).max() ?? 10, 10, "the id leaves one decimal digit for the grade")
+    }
+
+    /// A save written by 0.1.x–0.3.0 holds these ids; they must keep meaning the same grades.
+    func test_speciesIDsWrittenBeforeVerKaStillDecodeToTheSameGrades() {
+        let saved: [(Int, GunplaGrade)] = [(100_010, .sd), (100_011, .mgsd), (100_012, .hg), (100_013, .rg),
+                                           (100_014, .mg), (100_015, .pg)]
+        for (id, grade) in saved {
+            XCTAssertEqual(GunplaID.decode(id)?.grade, grade, "\(id)")
+            XCTAssertEqual(GunplaID.decode(id)?.machineID, 1, "\(id)")
+        }
+    }
+
+    func test_orderKeyFollowsGrowthOrderNotSaveCode() {
+        let key = { GunplaID.orderKey(GunplaID.encode(machineID: $0, grade: $1)) }
+        XCTAssertLessThan(key(1, .mg), key(1, .verka))
+        XCTAssertLessThan(key(1, .verka), key(1, .mgex))
+        XCTAssertLessThan(key(1, .mgex), key(1, .pg))
+        XCTAssertLessThan(key(1, .pg), key(2, .sd), "machines still sort before grades")
+        XCTAssertEqual(GunplaID.orderKey(25), 25, "ids that are not machines keep their own order")
     }
 
     func test_bundledCatalogLoadsAndIsValid() throws {
@@ -80,6 +121,8 @@ final class MachineCatalogTests: XCTestCase {
         assertRejects([m(1), m(1)], .duplicateID(1))
         assertRejects([m(1, grades: [])], .emptyGrades(1))
         assertRejects([m(1, grades: [.mg, .hg])], .unsortedGrades(1))
+        assertRejects([m(1, grades: [.mg, .pg, .verka])], .unsortedGrades(1))   // save-code order is not growth order
+        assertRejects([m(1, grades: [.mgex, .verka])], .unsortedGrades(1))
         assertRejects([m(1, series: "nope")], .unknownSeries(1, "nope"))
         assertRejects([m(1, variantOf: 99)], .unknownVariantBase(1, 99))
         assertRejects([m(1), m(2, variantOf: 1), m(3, variantOf: 2)], .variantOfVariant(3))
@@ -92,6 +135,8 @@ final class MachineCatalogTests: XCTestCase {
         let c = try MachineCatalog(machines: [m(1), m(2, variantOf: 1)], series: [s])
         XCTAssertEqual(c.machine(id: 2)?.variantOf, 1)
         XCTAssertNil(c.machine(id: 5))
+        XCTAssertNoThrow(try MachineCatalog(machines: [m(1, grades: [.hg, .mg, .verka, .mgex, .pg])], series: [s]))
+        XCTAssertNoThrow(try MachineCatalog(machines: [m(1, grades: [.hg, .verka])], series: [s]), "Ver.Ka without an MG")
     }
 
     // MARK: only machines with art appear
