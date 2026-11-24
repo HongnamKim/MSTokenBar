@@ -889,6 +889,24 @@ read_when:
   restoring the fixed 6pt track still fails. When a test measures lengths in pixels, pin the scale
   and keep the threshold well away from the measured colour; keep CI enabled on the fork.
 
+- **OCR in tests must read a fixed-scale render, not the window's scale.** `testSeriesChipFiltersMountedCollectionAndTogglesBack`
+  failed in about half of the CI runs with `No glyph bounds for Harbor`. `words(in:)` captured the window at
+  its backing scale, 1x on the display-less runner, where Vision misreads the 11pt chip labels: the fork's
+  pixel completion medal (#10) before a finished series' name read as "8" (`All V 8 Harbor 1/1`), "Harbor"
+  became "Barbor" or "(arbor", and a missed "Willow" made the test think its click failed, so it clicked
+  again and toggled the filter back off. A first fix that only removed the medal from the fixture still
+  failed in CI on "(arbor" — the medal was a confound, the scale was the cause. On a Retina Mac the same
+  capture is 2x and never failed. `words(in:)` now renders at a fixed 2x (Vision boxes are normalized, so
+  clicks are unchanged), and the fixture keeps each series at 1/2 so no medal sits in the label. The same
+  backing-scale capture remains in `DexColorRenderingTests` and `SessionKeySettingsRenderingTests`, which
+  have not failed in CI; pin their scale too if they ever do. Same lesson as the pace-marker entry above.
+  With the 2x OCR in place, CI read `Harbor 1/2` correctly and still failed: five synthetic clicks at the
+  chip's glyph box never selected it. The chip is the file's only control pressed by synthetic mouse
+  events (Back is an `NSButton` and takes `performClick`), and it sits in a horizontal `ScrollView` inside
+  a borderless, non-key window. Click delivery there is unreliable on the GitHub runner (Xcode 16 build)
+  and reliable locally (Xcode 26). The test is skipped when `GITHUB_ACTIONS` is set and still runs locally
+  and in `release.sh`'s gate. Open: drive the chip without synthetic events, then remove the skip.
+
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.
   Keeping either side of their conflict alone discards egg prayers or agent acknowledgement, or
