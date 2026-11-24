@@ -26,21 +26,27 @@ final class BundledSpritesTests: XCTestCase {
     }
 
     @MainActor
-    func testHiNuMasterGradeEditionsShareOneGradeWithDistinctArt() throws {
+    func testVerKaKitsShareMasterGradeOwnershipWithDistinctBundledArt() throws {
         let catalog = MachineCatalog.shared
-        let hiNu = try XCTUnwrap(catalog.machines.first { $0.modelNumber == "RX-93-ν2" })
-        XCTAssertEqual(hiNu.grades, [.sd, .hg, .rg, .mg])
-        let id = GunplaID.encode(machineID: hiNu.id, grade: .mg)
-        XCTAssertEqual(BundledSprites.resourceName(speciesID: id, catalog: catalog), "hi-nu-gundam-mg")
-        let editions = try XCTUnwrap(hiNu.alternateKits)
-        XCTAssertEqual(editions.map(\.label), ["MG Ver.Ka"])
-        let verKa = try XCTUnwrap(editions.first)
-        XCTAssertEqual(verKa.grade, .mg)
-        XCTAssertNotEqual(verKa.source, hiNu.gradeSources?["mg"])
-        let url = try XCTUnwrap(BundledSprites.gifURL(for: verKa))
-        let regular = try XCTUnwrap(BundledSprites.gifData(speciesID: id, catalog: catalog))
-        XCTAssertNotEqual(try Data(contentsOf: url), regular)
-        XCTAssertNotNil(SpriteLoader.kitPreview(verKa))
+        let machines = catalog.machines.filter { $0.alternateKits?.isEmpty == false }
+        XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2"])
+
+        for machine in machines {
+            let model = machine.modelNumber
+            XCTAssertEqual(machine.grades.filter { $0 == .mg }.count, 1, model)
+            let editions = try XCTUnwrap(machine.alternateKits, model)
+            XCTAssertEqual(editions.map(\.label), ["MG Ver.Ka"], model)
+            let verKa = try XCTUnwrap(editions.first, model)
+            let regularSource = try XCTUnwrap(machine.gradeSources?["mg"], model)
+            XCTAssertNotEqual(verKa.source, regularSource, model)
+
+            let id = GunplaID.encode(machineID: machine.id, grade: .mg)
+            XCTAssertEqual(BundledSprites.resourceName(speciesID: id, catalog: catalog), machine.sprites?["mg"], model)
+            let regular = try XCTUnwrap(BundledSprites.gifData(speciesID: id, catalog: catalog), model)
+            let url = try XCTUnwrap(BundledSprites.gifURL(for: verKa), model)
+            XCTAssertNotEqual(try Data(contentsOf: url), regular, model)
+            XCTAssertNotNil(SpriteLoader.kitPreview(verKa), model)
+        }
     }
 
     func test_firstSeriesGradeArtLoadsForStaticAndAnimatedViews() throws {

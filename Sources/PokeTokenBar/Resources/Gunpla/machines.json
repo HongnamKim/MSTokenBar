@@ -32,7 +32,15 @@
         "rg": "https://manual.bandai-hobby.net/menus/detail/1585",
         "mg": "https://manual.bandai-hobby.net/menus/detail/611",
         "pg": "https://manual.bandai-hobby.net/menus/detail/1066"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "rx-78-2-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/816"
+        }
+      ]
     },
     {
       "id": 2,
@@ -207,7 +215,7 @@
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660303664000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/471",
         "rg": "https://manual.bandai-hobby.net/menus/detail/846",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/647",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/538",
         "pg": "https://manual.bandai-hobby.net/menus/detail/649"
       },
       "sprites": {
@@ -216,7 +224,15 @@
         "rg": "zeta-gundam-rg",
         "mg": "zeta-gundam-mg",
         "pg": "zeta-gundam-pg"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "zeta-gundam-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/647"
+        }
+      ]
     },
     {
       "id": 8,
@@ -240,7 +256,7 @@
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609281000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/847",
         "rg": "https://manual.bandai-hobby.net/menus/detail/679",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/604",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/868",
         "pg": "https://manual.bandai-hobby.net/menus/detail/4200"
       },
       "sprites": {
@@ -249,7 +265,15 @@
         "rg": "nu-gundam-rg",
         "mg": "nu-gundam-mg",
         "pg": "nu-gundam-pg"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "nu-gundam-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/604"
+        }
+      ]
     },
     {
       "id": 9,
@@ -272,14 +296,22 @@
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102609298000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/403",
         "rg": "https://manual.bandai-hobby.net/menus/detail/677",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/949"
+        "mg": "https://manual.bandai-hobby.net/menus/detail/867"
       },
       "sprites": {
         "sd": "sazabi-sd",
         "hg": "sazabi-hg",
         "rg": "sazabi-rg",
         "mg": "sazabi-mg"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "sazabi-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/949"
+        }
+      ]
     },
     {
       "id": 10,
@@ -1578,13 +1610,21 @@
       "gradeSources": {
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425776286000&grp_id=5325",
         "hg": "https://manual.bandai-hobby.net/menus/detail/417",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/629"
+        "mg": "https://manual.bandai-hobby.net/menus/detail/431"
       },
       "sprites": {
         "sd": "zz-gundam-sd",
         "hg": "zz-gundam-hg",
         "mg": "zz-gundam-mg"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "zz-gundam-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/629"
+        }
+      ]
     },
     {
       "id": 64,
