@@ -22,12 +22,13 @@ final class DexBackNavigationTests: XCTestCase {
     }
 
     /// A one-grade (HG) machine catalog: one cell per machine, `names[id]` as its name in every language.
-    private func catalog(_ names: [Int: String], series: [Int: String] = [:]) throws -> MachineCatalog {
+    private func catalog(_ names: [Int: String], series: [Int: String] = [:],
+                         grades: [GunplaGrade] = [.hg]) throws -> MachineCatalog {
         let seriesNames = Set(series.values).union(series.count < names.count ? ["Meadow"] : [])
         return try MachineCatalog(
             machines: names.keys.sorted().map { id in
                 MachineRecord(id: id, modelNumber: "X\(id)", names: ["ko": names[id]!, "en": names[id]!, "ja": names[id]!],
-                              series: series[id] ?? "Meadow", faction: "efsf", rarity: .common, grades: [.hg],
+                              series: series[id] ?? "Meadow", faction: "efsf", rarity: .common, grades: grades,
                               gradeSources: nil, variantOf: nil, sprites: nil)
             },
             series: seriesNames.sorted().enumerated().map { order, name in
@@ -254,7 +255,11 @@ final class DexBackNavigationTests: XCTestCase {
             DexEntry(baseID: hg(id), finalID: hg(id), chainOrder: [hg(id)], rarity: .common, caughtAt: Date())
         }
         try JSONEncoder().encode(state).write(to: file)
-        let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"]),
+        // Two grades with only HG owned keeps each series at 1/2. A finished series draws its pixel medal
+        // right before the chip's name, and Vision read that medal as "8", turning "Harbor" into "Barbor"
+        // or shifting the click box off the chip (CI flake). The medal is not what this test checks.
+        let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"],
+                                                         grades: [.hg, .mg]),
                                    fileURL: file)
         let navigation = PopoverNavigation()
         navigation.tab = .collection

@@ -889,6 +889,15 @@ read_when:
   restoring the fixed 6pt track still fails. When a test measures lengths in pixels, pin the scale
   and keep the threshold well away from the measured colour; keep CI enabled on the fork.
 
+- **OCR fixtures must not put decoration next to the text they look for.** `testSeriesChipFiltersMountedCollectionAndTogglesBack`
+  failed in about half of the CI runs with `No glyph bounds for Harbor`. Each fixture series held one HG-only
+  machine, so owning it completed the series, and the fork's pixel completion medal (#10, which replaced an
+  emoji) was drawn right before the chip name. At the CI runner's 1x scale Vision read the medal as "8"
+  (`All V 8 Harbor 1/1 8 Meadow 1/1`), which sometimes became "Barbor" or shifted the click box off the chip.
+  At 2x locally the medal was ignored, so the test never failed on a Retina Mac. Rendering the OCR at 1x
+  reproduces the "8"; the fixture now gives each machine HG and MG with only HG owned, so the chips read
+  `Harbor 1/2` with no medal. Upstream passed because its emoji medal was not read as a digit.
+
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.
   Keeping either side of their conflict alone discards egg prayers or agent acknowledgement, or
