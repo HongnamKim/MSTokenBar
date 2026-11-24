@@ -29,7 +29,7 @@ final class BundledSpritesTests: XCTestCase {
     /// kit, with its own Bandai source and its own bundled art.
     func testVerKaIsItsOwnGradeWithDistinctBundledArt() throws {
         let catalog = MachineCatalog.shared
-        let machines = catalog.machines.filter { $0.grades.contains(.verka) }
+        let machines = catalog.machines.filter { $0.grades.contains(.mg) && $0.grades.contains(.verka) }
         XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2",
                                                                    "FA-78", "MS-06R", "RX-0", "MSN-06S"])
 

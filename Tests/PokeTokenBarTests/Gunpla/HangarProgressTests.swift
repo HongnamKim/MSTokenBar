@@ -42,7 +42,7 @@ final class HangarProgressTests: XCTestCase {
 
     func test_unicornModesShareOneHangarEntryAndKeepIndependentGrades() throws {
         let owned = [cell(11, [.hg, .rg]), cell(100, [.hg]), cell(115, [.pg]),
-                     cell(116, [.hg]), cell(117, [.rg])]
+                     cell(116, [.hg]), cell(117, [.hg]), cell(118, [.hg, .rg])]
         let entries = HangarEntry.grouped(owned, catalog: catalog)
         XCTAssertEqual(entries.map(\.id), [11, 116])
         let entry = try XCTUnwrap(entries.first)
@@ -50,8 +50,9 @@ final class HangarProgressTests: XCTestCase {
         XCTAssertEqual(entry.displayed(preferredID: 11).ownedGrades, [.hg, .rg])
         XCTAssertEqual(entry.displayed(preferredID: 115).ownedGrades, [.pg])
         let fullArmor = try XCTUnwrap(entries.first { $0.id == 116 })
-        XCTAssertEqual(fullArmor.displayed(preferredID: 117).ownedGrades, [.rg])
-        XCTAssertEqual(completion("uc", owned)?.ownedCells, 6)
+        XCTAssertEqual(fullArmor.displayed(preferredID: 117).ownedGrades, [.hg])
+        XCTAssertEqual(fullArmor.displayed(preferredID: 118).ownedGrades, [.hg, .rg])
+        XCTAssertEqual(completion("uc", owned)?.ownedCells, 8)
         XCTAssertEqual(HangarEntry.grouped([cell(11, []), cell(100, [.mg])], catalog: catalog)
             .first?.displayed(preferredID: nil).machineID, 100)
     }

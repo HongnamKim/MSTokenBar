@@ -26,6 +26,8 @@ SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../
 - **등급 배지**는 [공용 PNG 8종](../../Sources/PokeTokenBar/Resources/Gunpla/GradeBadges/)을 사용한다. Ver.Ka와 MGEX 배지는 2026-11-24에 박스 참고 사진 없이 그린 초안이다. 플로팅 펫은 같은 펫 크기에서 기본 배지의 가로와 세로를 각각 50%로 줄여 표시 영역 우측 하단에 겹쳐 그린다. 도안을 수정할 때는 각 등급의 박스 표기를 참고하고, 최소 펫 크기인 48pt에서도 색과 윤곽으로 등급 변화를 알아볼 수 있는지 확인한다. [SD](https://www.dalong.net/reviews/sd/e01/p/e01.jpg) · [MGSD](https://www.dalong.net/reviews/sd/mgsd01/p/mgsd01.jpg) · [HG](https://www.dalong.net/reviews/hg/h191/p/h191.jpg) · [RG](https://www.dalong.net/reviews/rg/rg40/p/rg40.jpg) · [MG](https://www.dalong.net/reviews/mg/m172/p/m172.jpg) · [PG](https://www.dalong.net/reviews/pg/p01/p/p01.jpg)
 - **금지**: 공식 일러스트·박스아트·게임 스프라이트를 따거나 트레이싱하기 (설계 문서 §2 반목표).
 
+RX-0 1호기와 풀아머 유니콘은 장비와 사이코프레임 상태를 함께 확인한다. 닫힌 뿔과 바이저는 유니콘 모드, 전개한 V핀과 적색 프레임은 디스트로이, 전개한 V핀과 녹색 프레임은 각성으로 기록한다. BB전사 390은 유니콘 모드에서도 팔다리의 녹색 부품 일부가 보인다. 풀아머 각성은 백팩에 부스터와 중무장을 장착한 사진을 기준으로 그린다.
+
 ### 무장 장착과 가림 순서 [결정]
 
 1. **같은 키트의 두 각도를 확인한다.** 완성품 앞 3/4 사진과 뒤 또는 옆 사진을 함께 연다. 손에 든 상태와 수납 상태가 바뀌는 장비는 이번 그림에 쓸 상태를 하나 고른다. 사진에서 고정부가 보이지 않으면 해당 조립 설명서의 장착 그림으로 확인한다. 사용한 사진은 해당 등급의 `references.csv` 행에 남긴다.
