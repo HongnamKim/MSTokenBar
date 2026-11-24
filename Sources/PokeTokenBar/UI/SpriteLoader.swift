@@ -88,6 +88,17 @@ enum SpriteLoader {
         return cache
     }()
 
+    static func kitPreview(_ edition: KitEdition) -> NSImage? {
+        guard let url = BundledSprites.gifURL(for: edition) else { return nil }
+        let key = url.path as NSString
+        if let cached = imageCache.object(forKey: key) { return cached }
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let frame = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
+        let image = NSImage(cgImage: frame, size: .zero)
+        imageCache.setObject(image, forKey: key)
+        return image
+    }
+
     /// 메모리·디스크 캐시에 이미 있으면 동기 반환(네트워크 없음). 없으면 nil.
     /// shiny 캐시 미스는 일반 캐시로 폴백 — 오프라인에서 live mon 이 박스로 보이는 것 방지.
     /// back 캐시 미스는 앞모습으로 폴백 — 뒷모습이 없어도 화면이 비지 않게.

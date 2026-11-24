@@ -1947,14 +1947,22 @@
         "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?grp_id=5325&prd_id=4543112836434000",
         "hg": "https://manual.bandai-hobby.net/menus/detail/915",
         "rg": "https://manual.bandai-hobby.net/menus/detail/683",
-        "mg": "https://manual.bandai-hobby.net/menus/detail/953"
+        "mg": "https://manual.bandai-hobby.net/menus/detail/547"
       },
       "sprites": {
         "sd": "hi-nu-gundam-sd",
         "hg": "hi-nu-gundam-hg",
         "rg": "hi-nu-gundam-rg",
         "mg": "hi-nu-gundam-mg"
-      }
+      },
+      "alternateKits": [
+        {
+          "grade": "mg",
+          "edition": "Ver.Ka",
+          "sprite": "hi-nu-gundam-mg-ver-ka",
+          "source": "https://manual.bandai-hobby.net/menus/detail/953"
+        }
+      ]
     },
     {
       "id": 79,

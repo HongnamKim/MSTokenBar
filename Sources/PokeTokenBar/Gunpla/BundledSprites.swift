@@ -30,6 +30,10 @@ enum BundledSprites {
         return try? Data(contentsOf: url)
     }
 
+    static func gifURL(for edition: KitEdition, bundle: Bundle = GunplaResources.bundle) -> URL? {
+        url(edition.sprite, "gif", bundle)
+    }
+
     static func boxPNG(bundle: Bundle = GunplaResources.bundle) -> Data? {
         url("box", "png", bundle).flatMap { try? Data(contentsOf: $0) }
     }

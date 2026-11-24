@@ -25,6 +25,24 @@ final class BundledSpritesTests: XCTestCase {
         return try MachineCatalog(machines: [machine], series: [series])
     }
 
+    @MainActor
+    func testHiNuMasterGradeEditionsShareOneGradeWithDistinctArt() throws {
+        let catalog = MachineCatalog.shared
+        let hiNu = try XCTUnwrap(catalog.machines.first { $0.modelNumber == "RX-93-ν2" })
+        XCTAssertEqual(hiNu.grades, [.sd, .hg, .rg, .mg])
+        let id = GunplaID.encode(machineID: hiNu.id, grade: .mg)
+        XCTAssertEqual(BundledSprites.resourceName(speciesID: id, catalog: catalog), "hi-nu-gundam-mg")
+        let editions = try XCTUnwrap(hiNu.alternateKits)
+        XCTAssertEqual(editions.map(\.label), ["MG Ver.Ka"])
+        let verKa = try XCTUnwrap(editions.first)
+        XCTAssertEqual(verKa.grade, .mg)
+        XCTAssertNotEqual(verKa.source, hiNu.gradeSources?["mg"])
+        let url = try XCTUnwrap(BundledSprites.gifURL(for: verKa))
+        let regular = try XCTUnwrap(BundledSprites.gifData(speciesID: id, catalog: catalog))
+        XCTAssertNotEqual(try Data(contentsOf: url), regular)
+        XCTAssertNotNil(SpriteLoader.kitPreview(verKa))
+    }
+
     func test_firstSeriesGradeArtLoadsForStaticAndAnimatedViews() throws {
         let expected = [
             "RX-78-2": "rx-78-2", "RX-77-2": "guncannon", "RX-75": "guntank", "RGM-79": "gm",

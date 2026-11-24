@@ -1,5 +1,15 @@
 import Foundation
 
+/// Another released kit of the same grade. Its artwork shares ownership with the base kit.
+struct KitEdition: Codable, Sendable {
+    let grade: GunplaGrade
+    let edition: String
+    let sprite: String
+    let source: String
+
+    var label: String { "\(grade.label) \(edition)" }
+}
+
 struct MachineRecord: Codable, Sendable {
     let id: Int
     let modelNumber: String
@@ -12,6 +22,8 @@ struct MachineRecord: Codable, Sendable {
     let variantOf: Int?
     /// Keys: grade rawValues for per-grade art, plus "sdBody" / "realBody" for body-type art shared across grades.
     let sprites: [String: String]?
+
+    var alternateKits: [KitEdition]? = nil
 
     var isVariant: Bool { variantOf != nil }
 }
