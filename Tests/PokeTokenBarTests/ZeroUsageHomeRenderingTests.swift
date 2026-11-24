@@ -113,8 +113,8 @@ final class ZeroUsageHomeRenderingTests: XCTestCase {
             .frame(width: PopoverMetrics.width, height: height)
             .background(Color(nsColor: NSColor(calibratedWhite: 0.07, alpha: 1))))
         host.frame = NSRect(x: 0, y: 0, width: PopoverMetrics.width, height: height)
-        let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: PopoverMetrics.width, height: height),
-                              styleMask: .borderless, backing: .buffered, defer: false)
+        let window = FixedScaleWindow(contentRect: NSRect(x: -10000, y: -10000, width: PopoverMetrics.width, height: height),
+                                      styleMask: .borderless, backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.appearance = NSAppearance(named: .darkAqua)
         window.contentView = host

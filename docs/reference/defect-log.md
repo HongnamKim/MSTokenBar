@@ -1467,6 +1467,20 @@ read_when:
   and both CI fixture PNGs so recognition failures can be checked against rendered pixels.
   Other OCR harnesses passed the same CI runs; this repair is limited to the failing fixture.
 
+- **A 2x bitmap does not make a 2x render; the window's backing scale does.** On 2026-11-25 the
+  release gate failed `testEmptyHistoryStillShowsZeroPeriodSummaries` on main and on the v0.4.0 tag,
+  which had passed the day before: Vision read `이번 주` as `이번 수` and `이번 달` as `미번 달`. The
+  Mac's only display had become a 1920×1080 external monitor at 1x. The offscreen window took that
+  backing scale, SwiftUI rasterized its layers at 1x, and `cacheDisplay` scaled them into the fixed
+  2x bitmap, so the saved fixture showed blurred text. The bitmap-size assertions passed because
+  they measure pixel count, not rasterization density; every earlier run was on a Retina main
+  display. The same 1x capture halved the release screenshots from `CollectionReadabilityRenderingTests`
+  (332 px wide instead of 664). Both now use `FixedScaleWindow`, which reports a 2x backing scale,
+  and the screenshot harness asserts a 664 px bitmap. Setting `contentsScale` on the layer tree was
+  tried and rejected: forcing a redraw dropped SF Symbol images, and skipping it left text at 1x.
+  Other OCR tests that capture at the window's scale passed on the same 1x display and are unchanged;
+  switch them to `FixedScaleWindow` if they misread text.
+
 - **A native coordinate test must hit the requested glyphs and await the whole transition.**
   CI run `41867694174` failed only the new region-chip test: Kanto's Maple card remained
   visible after one Johto click, although the local full gate passed. The test clicked the
