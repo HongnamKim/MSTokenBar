@@ -871,11 +871,23 @@ read_when:
 - **System control metrics differ by macOS version; do not hard-code them.** The pace marker
   assumed the small `ProgressView` track is 6pt tall (macOS 26), but macOS 15 draws it 3pt, so
   the 10pt marker was over three times the track. `testPaceMarkerStaysCloseToPaintedTrackHeight`
-  measured the painted track and failed on macOS 15 from the start, yet it was dismissed as a
-  "pre-existing upstream failure" because upstream CI only ran macOS 26. A rendering test that
+  measured the painted track and failed locally on macOS 15 from the start, yet it was dismissed
+  as a "pre-existing upstream failure" because upstream CI passed. That CI is a macOS 15 runner too,
+  but it renders at 1x, where the test's measurement lost the marker's faint ends (next entry). A rendering test that
   fails on one supported OS is a real defect on that OS, not noise. The marker now uses 6pt on
   macOS 26 and 3pt earlier; the same test passes on macOS 15. When sizing overlays against a
   system control, measure it on every supported OS or draw the control yourself.
+
+- **Pixel-measuring tests must render at a fixed scale, not the machine's.** After the fix above,
+  the same test failed only in CI (`트랙 3.0pt, 눈금 5.0pt`, expected 7pt): `bitmapImageRepForCachingDisplay`
+  follows the window's backing scale, which is 2x on a Retina Mac but 1x on the display-less CI
+  runner. At 1x the 7pt marker's ends straddle half pixels and blur (≈0.81), and the marker over
+  bare background is only ≈0.53 against a 0.6 "painted" cut, so the edge rows dropped out. Local
+  runs could not see it, and the fork's CI was not enabled, so `main` stayed red unnoticed through
+  v0.3.0. The test now draws into a fixed 2x `NSBitmapImageRep`, counts rows the marker touches
+  (< 0.9), and prints the marker column's brightness on failure; forcing 1x still passes and
+  restoring the fixed 6pt track still fails. When a test measures lengths in pixels, pin the scale
+  and keep the threshold well away from the measured colour; keep CI enabled on the fork.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.
