@@ -12,15 +12,39 @@ extension CompanionStore {
             owned[decoded.machineID, default: []].insert(decoded.grade)
             if species.isRaising { raising.insert(decoded.machineID) }
         }
-        let seriesOrder = Dictionary(catalog.series.map { ($0.id, $0.order) }, uniquingKeysWith: { first, _ in first })
-        return owned.compactMap { machineID, grades -> (order: Int, cell: HangarCell)? in
+        let order = hangarOrder
+        return owned.compactMap { machineID, grades -> HangarCell? in
             guard let machine = catalog.machine(id: machineID) else { return nil }
-            let cell = HangarCell(machineID: machineID, ownedGrades: grades, releasedGrades: machine.grades,
-                                  isVariant: machine.isVariant, isRaising: raising.contains(machineID))
-            return (seriesOrder[machine.series] ?? .max, cell)
+            return HangarCell(machineID: machineID, ownedGrades: grades, releasedGrades: machine.grades,
+                              isVariant: machine.isVariant, isRaising: raising.contains(machineID))
         }
-        .sorted { ($0.order, $0.cell.machineID) < ($1.order, $1.cell.machineID) }
-        .map(\.cell)
+        .sorted { order($0) < order($1) }
+    }
+
+    /// Base machines not built in any grade yet, in hangar order — the grid's silhouettes. Custom units
+    /// (전용기) stay hidden until built, like the series chips that count base machines only.
+    var unbuiltHangarCells: [HangarCell] {
+        let built = Set(hangarCells.map(\.machineID))
+        let order = hangarOrder
+        return catalog.machines
+            .filter { !$0.isVariant && !built.contains($0.id) }
+            .map { HangarCell(machineID: $0.id, ownedGrades: [], releasedGrades: $0.grades,
+                              isVariant: false, isRaising: false) }
+            .sorted { order($0) < order($1) }
+    }
+
+    /// Hangar order key: series order, then machine id.
+    private var hangarOrder: (HangarCell) -> (Int, Int) {
+        let seriesOrder = Dictionary(catalog.series.map { ($0.id, $0.order) }, uniquingKeysWith: { first, _ in first })
+        let catalog = catalog
+        return { cell in
+            (catalog.machine(id: cell.machineID).flatMap { seriesOrder[$0.series] } ?? .max, cell.machineID)
+        }
+    }
+
+    /// The name a cell shows: the machine's name once built, "???" on a silhouette.
+    func hangarCellName(_ cell: HangarCell) -> String {
+        cell.isBuilt ? machineName(cell.machineID) : "???"
     }
 
     func hangarCell(machineID: Int) -> HangarCell? {
@@ -77,12 +101,39 @@ extension CompanionStore {
 
     /// Filters and sorts hangar cells. The query matches the machine name in the current language or
     /// its model number; `variantOnly` keeps 전용기; `series` keeps one series.
+    ///
+    /// `includeUnbuilt` adds the silhouettes. They take part only in filters that do not reveal them:
+    /// series, and the query by model number (the name stays hidden). A rarity or 전용기 filter shows
+    /// built machines only. Number order interleaves them so the gaps show; name and rarity orders put
+    /// them after the built machines, since both are unknown until built.
     func filteredHangarCells(
         query: String = "",
         rarity: Rarity? = nil,
         variantOnly: Bool = false,
         series: String? = nil,
-        sort: DexSortOption = .numberAsc
+        sort: DexSortOption = .numberAsc,
+        includeUnbuilt: Bool = false
+    ) -> [HangarCell] {
+        let built = filteredBuiltHangarCells(query: query, rarity: rarity, variantOnly: variantOnly,
+                                             series: series, sort: sort)
+        guard includeUnbuilt, rarity == nil, !variantOnly else { return built }
+        let matcher = DexSearchMatcher(query)
+        let unbuilt = unbuiltHangarCells.filter { cell in
+            guard let machine = catalog.machine(id: cell.machineID) else { return false }
+            if let series, machine.series != series { return false }
+            if let matcher, !matcher.matches(name: "", modelNumber: machine.modelNumber) { return false }
+            return true
+        }
+        let order = hangarOrder
+        switch sort {
+        case .numberAsc: return (built + unbuilt).sorted { order($0) < order($1) }
+        case .numberDesc: return (built + unbuilt).sorted { order($0) > order($1) }
+        case .nameAsc, .nameDesc, .rarityDesc: return built + unbuilt
+        }
+    }
+
+    private func filteredBuiltHangarCells(
+        query: String, rarity: Rarity?, variantOnly: Bool, series: String?, sort: DexSortOption
     ) -> [HangarCell] {
         let matcher = DexSearchMatcher(query)
         let cells = hangarCells.filter { cell in

@@ -1432,7 +1432,8 @@ private struct DexGridView: View {
             rarity: selectedRarity,
             variantOnly: shinyOnly,
             series: selectedSeries,
-            sort: sortOption
+            sort: sortOption,
+            includeUnbuilt: true
         )
         let pageCount = max(1, (visible.count + Self.pageSize - 1) / Self.pageSize)
         let current = min(page ?? DexScrollPager.page(containing: Self.anchorCellID(returnAnchor),
@@ -1517,7 +1518,7 @@ private struct DexGridView: View {
         }
     }
 
-    /// 작품 칩 — "전체" + 카탈로그 작품 순서. 탭하면 그 작품만 필터. 아직 한 기체도 없는 작품은 비활성.
+    /// 작품 칩 — "전체" + 카탈로그 작품 순서. 탭하면 그 작품만 필터. 보여줄 칸이 없는 작품은 비활성.
     private var seriesChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
@@ -1544,7 +1545,7 @@ private struct DexGridView: View {
                                     isSelected: selectedSeries == completion.seriesID)
                     }
                     .buttonStyle(.plain)
-                    .disabled(completion.ownedCells + completion.variantOwnedCells == 0)
+                    .disabled(!completion.hasHangarCells)
                     .help(store.l.hangarSeriesProgressLabel(name, owned: completion.ownedCells,
                                                             total: completion.totalCells)
                           + " · " + store.l.hangarSeriesFilterHint)
@@ -1582,7 +1583,7 @@ private struct DexGridView: View {
                                               isSelected: selectedID == cell.machineID,
                                               isRepresentative: store.isRepresentative(cell)) {
                                 selectedID = cell.machineID
-                                onSelectCell(cell)
+                                if cell.isBuilt { onSelectCell(cell) }
                             }
                             .frame(maxWidth: .infinity)
                         } else {
@@ -1598,7 +1599,12 @@ private struct DexGridView: View {
 
     private func footer(_ slice: [HangarCell], current: Int, pageCount: Int) -> some View {
         HStack(spacing: 8) {
-            if let sel = slice.first(where: { $0.machineID == selectedID }),
+            if let sel = slice.first(where: { $0.machineID == selectedID }), !sel.isBuilt,
+               let machine = store.catalog.machine(id: sel.machineID) {
+                // 실루엣은 이름·희귀도를 숨긴다 — 형식번호만 단서로 남긴다.
+                Text("\(machine.modelNumber) \(store.hangarCellName(sel)) · \(store.l.hangarNotBuilt)")
+                    .font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
+            } else if let sel = slice.first(where: { $0.machineID == selectedID }),
                let machine = store.catalog.machine(id: sel.machineID) {
                 // 칸은 형식번호·스프라이트·이름·등급만 보여주므로 희귀도가 선택으로 얻는 정보다.
                 Text("\(machine.modelNumber) \(store.machineName(sel.machineID)) · \(store.l.rarityLabel(machine.rarity))")
@@ -1873,13 +1879,12 @@ struct HangarMachineCell: View {
     static func showsSpriteGradeBadge(isRaising: Bool) -> Bool { !isRaising }
 
     private var machine: MachineRecord? { store.catalog.machine(id: cell.machineID) }
-    private var name: String { store.machineName(cell.machineID) }
+    private var name: String { store.hangarCellName(cell) }
 
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 1) {
-                SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
-                           showsGradeBadge: Self.showsSpriteGradeBadge(isRaising: cell.isRaising))
+                sprite
                     .frame(width: Self.thumb, height: Self.thumb)
                     // Keep the raising badge over the sprite to leave room for the name.
                     .overlay(alignment: .bottom) {
@@ -1905,7 +1910,7 @@ struct HangarMachineCell: View {
             .padding(2)
             // 대표 = 영속적인 accent 배경, 방금 클릭한 칸 = accent 테두리.
             .background(isRepresentative ? Color.accentColor.opacity(0.16)
-                                         : Color.secondary.opacity(isSelected ? 0.16 : 0.06))
+                                         : Color.secondary.opacity(isSelected ? 0.16 : cell.isBuilt ? 0.06 : 0.03))
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay {
                 if isSelected {
@@ -1929,12 +1934,28 @@ struct HangarMachineCell: View {
         .help(tooltip)
         .accessibilityLabel(tooltip)
         .contextMenu {
-            Button {
-                _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : store.hangarRepresentativeSpeciesID(cell))
-            } label: {
-                Label(isRepresentative ? store.l.representativeFollowCurrent : store.l.representativeSet,
-                      systemImage: isRepresentative ? "arrow.triangle.2.circlepath" : "star")
+            if cell.isBuilt {
+                Button {
+                    _ = store.setRepresentativeSpeciesID(isRepresentative ? nil : store.hangarRepresentativeSpeciesID(cell))
+                } label: {
+                    Label(isRepresentative ? store.l.representativeFollowCurrent : store.l.representativeSet,
+                          systemImage: isRepresentative ? "arrow.triangle.2.circlepath" : "star")
+                }
             }
+        }
+    }
+
+    /// A built machine shows its highest owned grade; a silhouette is its first released grade filled
+    /// with a faint primary colour, so it reads in light and dark mode and gives away no colours.
+    @ViewBuilder private var sprite: some View {
+        if cell.isBuilt {
+            SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
+                       showsGradeBadge: Self.showsSpriteGradeBadge(isRaising: cell.isRaising))
+        } else {
+            Color.primary.opacity(0.28)
+                .mask(SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
+                                 showsGradeBadge: false))
+                .accessibilityHidden(true)
         }
     }
 
@@ -1966,7 +1987,7 @@ struct HangarMachineCell: View {
             }
         }
         .font(.system(size: 9, weight: .semibold))
-        .foregroundStyle(rarityColor(machine?.rarity))
+        .foregroundStyle(cell.isBuilt ? rarityColor(machine?.rarity) : Color.secondary)
         .padding(.horizontal, 2)
         .background(.regularMaterial, in: Capsule())
     }
@@ -1980,6 +2001,10 @@ struct HangarMachineCell: View {
     /// 툴팁과 접근성 라벨이 같은 문장을 쓴다 — 칸이 글자로 못 보여주는 희귀도·보유 등급 수를 담는다.
     private var tooltip: String {
         var parts = ["\(machine?.modelNumber ?? "#\(cell.machineID)") \(name)"]
+        guard cell.isBuilt else {
+            return (parts + [store.l.hangarNotBuilt,
+                             store.l.hangarGradesOwned(0, of: cell.releasedGrades.count)]).joined(separator: " · ")
+        }
         if let machine { parts.append(store.l.rarityLabel(machine.rarity)) }
         parts.append(store.l.hangarGradesOwned(cell.ownedGrades.intersection(cell.releasedGrades).count,
                                                of: cell.releasedGrades.count))

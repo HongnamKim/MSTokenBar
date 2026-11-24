@@ -76,6 +76,74 @@ final class HangarCellTests: XCTestCase {
         XCTAssertEqual(s.earnedDexBadges, [.series("zeta")])
     }
 
+    // Silhouettes — base machines not built yet, shown so the player can see what is left.
+
+    /// Hangar order over the whole catalog: series order, then machine id.
+    private func hangarOrder(_ machines: [MachineRecord]) -> [Int] {
+        let order = Dictionary(catalog.series.map { ($0.id, $0.order) }, uniquingKeysWith: { a, _ in a })
+        return machines.sorted { (order[$0.series] ?? .max, $0.id) < (order[$1.series] ?? .max, $1.id) }.map(\.id)
+    }
+
+    func test_unbuiltCellsAreBaseMachinesNotBuiltYet() throws {
+        let s = try store(dex: [entry(1, [.sd]), entry(18, [.hg])])
+        let unbuilt = s.unbuiltHangarCells
+        XCTAssertEqual(unbuilt.map(\.machineID),
+                       hangarOrder(catalog.machines.filter { !$0.isVariant && $0.id != 1 }),
+                       "every base machine except the built one, in hangar order; 전용기 stay hidden")
+        XCTAssertTrue(unbuilt.allSatisfy { !$0.isBuilt && $0.ownedGrades.isEmpty && !$0.isRaising })
+        XCTAssertEqual(unbuilt.first { $0.machineID == 16 }?.releasedGrades, [.sd, .hg, .mg])
+        XCTAssertTrue(s.hangarCells.allSatisfy(\.isBuilt))
+        XCTAssertEqual(s.hangarCells.map(\.machineID), [1, 18], "the hangar's own cells are unchanged")
+    }
+
+    func test_gridInterleavesSilhouettesInNumberOrder() throws {
+        let s = try store(dex: [entry(16, [.hg]), entry(18, [.hg]), entry(6, [.sd])])
+        let expected = hangarOrder(catalog.machines.filter { !$0.isVariant || $0.id == 18 })
+        XCTAssertEqual(s.filteredHangarCells(includeUnbuilt: true).map(\.machineID), expected)
+        XCTAssertEqual(s.filteredHangarCells(sort: .numberDesc, includeUnbuilt: true).map(\.machineID),
+                       expected.reversed())
+        XCTAssertEqual(s.filteredHangarCells().map(\.machineID), [16, 18, 6], "silhouettes are opt-in")
+        XCTAssertEqual(s.filteredHangarCells(series: "zeta", includeUnbuilt: true).map(\.machineID),
+                       hangarOrder(catalog.machines.filter { $0.series == "zeta" && !$0.isVariant }))
+    }
+
+    /// A silhouette gives away only its model number: no name, rarity or 전용기 status.
+    func test_silhouettesStayOutOfRevealingFiltersAndSorts() throws {
+        let s = try store(dex: [entry(1, [.sd])])
+        XCTAssertEqual(s.hangarCellName(try XCTUnwrap(s.unbuiltHangarCells.first { $0.machineID == 16 })), "???")
+        XCTAssertEqual(s.hangarCellName(try XCTUnwrap(s.hangarCell(machineID: 1))), "Gundam")
+
+        XCTAssertEqual(s.filteredHangarCells(query: "Dom", includeUnbuilt: true).map(\.machineID), [],
+                       "an unbuilt machine's name must not find it")
+        let byModel = s.filteredHangarCells(query: "ms-09", includeUnbuilt: true)
+        XCTAssertTrue(byModel.contains { $0.machineID == 16 }, "the model number is the one clue a silhouette gives")
+        XCTAssertTrue(byModel.allSatisfy { catalog.machine(id: $0.machineID)?.modelNumber.contains("MS-09") == true })
+        XCTAssertEqual(s.filteredHangarCells(rarity: .common, includeUnbuilt: true).map(\.machineID), [],
+                       "a rarity filter would reveal each silhouette's rarity")
+        XCTAssertEqual(s.filteredHangarCells(rarity: .rare, includeUnbuilt: true).map(\.machineID), [1])
+        XCTAssertEqual(s.filteredHangarCells(variantOnly: true, includeUnbuilt: true).map(\.machineID), [])
+        for sort in [CompanionStore.DexSortOption.nameAsc, .nameDesc, .rarityDesc] {
+            let ids = s.filteredHangarCells(sort: sort, includeUnbuilt: true).map(\.machineID)
+            XCTAssertEqual(ids.first, 1, "\(sort): built machines come first")
+            XCTAssertEqual(Array(ids.dropFirst()), s.unbuiltHangarCells.map(\.machineID),
+                           "\(sort): silhouettes keep hangar order — their names and rarities are unknown")
+        }
+    }
+
+    /// Series chips open for a series with base machines even before the first build there.
+    func test_seriesChipOpensWhenItHasCellsToShow() throws {
+        let s = try store(dex: [entry(1, [.sd])])
+        let cca = try XCTUnwrap(s.dexCompletions.first { $0.seriesID == "cca" })
+        XCTAssertEqual(cca.ownedCells + cca.variantOwnedCells, 0)
+        XCTAssertTrue(cca.hasHangarCells, "its base machines show as silhouettes")
+        let onlyVariants = SeriesCompletion(seriesID: "x", ownedCells: 0, totalCells: 0,
+                                            variantOwnedCells: 0, variantTotalCells: 3)
+        XCTAssertFalse(onlyVariants.hasHangarCells, "unbuilt 전용기 stay hidden, so nothing to show")
+        let builtVariant = SeriesCompletion(seriesID: "x", ownedCells: 0, totalCells: 0,
+                                            variantOwnedCells: 1, variantTotalCells: 3)
+        XCTAssertTrue(builtVariant.hasHangarCells)
+    }
+
     // Representative selection / raising flag / release — behavior carried over from the removed Unown tests.
 
     func test_representativeIsTheExactGradeAndPersists() throws {
