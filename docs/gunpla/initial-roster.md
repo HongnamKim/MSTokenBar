@@ -36,7 +36,7 @@
 
 기체별 표의 마지막 칸에 격납고 이미지 추가 여부를 기록한다. 출시 등급 전부의 스프라이트가 앱에 연결되면 **추가 완료**, 일부 등급만 연결되면 **부분 완료 (HG, MG 등 완료된 등급)**, 아직 연결된 등급이 없으면 **미추가**로 표시한다. 기체 이미지 PR을 올릴 때 해당 행을 함께 갱신한다.
 
-작품·기체·등급별 그림은 [도트 카탈로그](catalog.html)에서 볼 수 있다. 새 그림을 연결한 뒤 저장소 루트에서 `python3 scripts/build-gunpla-catalog.py`를 실행해 색인을 갱신한다. `--standalone 파일명.html`을 덧붙이면 이미지를 내장한 오프라인 카탈로그도 저장한다.
+[도트 카탈로그](https://hongnamkim.github.io/MSTokenBar/catalog/)에서 작품·기체·등급별 그림을 볼 수 있다. 이미지 PR을 준비할 때 저장소 루트에서 `python3 scripts/build-gunpla-catalog.py`를 실행하고 색인 변경을 함께 커밋한다. GitHub Actions는 PR마다 카탈로그 변경을 검사하고 `gunpla-catalog` 미리보기를 제공한다. 이미지가 `main`에 머지되면 공개 카탈로그도 갱신된다. 로컬에서 오프라인 파일을 만들려면 `--standalone 파일명.html`을 덧붙인다.
 
 ### 집계
 

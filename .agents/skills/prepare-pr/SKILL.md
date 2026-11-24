@@ -24,6 +24,11 @@ same PR as the sprites. List the finished grades for a partial machine and
 mark it `추가 완료` when every listed grade has artwork in the app. When revising
 art for an already completed machine, verify its existing mark.
 
+For artwork PRs, run `python3 scripts/build-gunpla-catalog.py` after editing the
+images, references or bundle. Include changes to `docs/gunpla/catalog-data.js`
+in the PR. The Gunpla catalog workflow builds a downloadable preview for review
+and refreshes the published catalog when the artwork lands on `main`.
+
 Write the title and body in English. Use a Conventional Commits title such as
 `fix(home): retain idle usage history` or `docs: require UI images in PRs`.
 Choose a type and optional scope that describe the final change; do not copy a

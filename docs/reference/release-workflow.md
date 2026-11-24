@@ -23,7 +23,7 @@ read_when:
   (팝오버 라이브 캡처 아님) — Chrome `--headless --screenshot --force-device-scale-factor=2` 로 다크
   팝오버를 720px PNG 로 그린다. 애니 GIF(home)는 프레임 합성 후 `gifsicle -O3 --lossy` 로 최적화
   (PIL 재인코딩 단독은 용량 팽창 주의). 언어별 이미지(`settings.png`/`-ko`/`-ja` 등) 각 README 참조.
-- **랜딩**: `gh-pages` 는 MSTokenBar 안내 페이지(`index.html` + `assets/icon.png`·`assets/hangar.png`) 하나다. GitHub 는 `gh-pages` 브랜치가 있으면 Pages 해제를 막으므로, 원본 랜딩이 다시 올라가지 않게 이 브랜치에 원본 파일을 되살리지 않는다. 기능 문구나 격납고 스크린샷이 크게 바뀌면 함께 갱신한다.
+- **랜딩**: `gh-pages`에는 릴리스 랜딩과 `catalog/index.html`이 있다. 카탈로그는 이미지가 `main`에 머지될 때 Gunpla catalog 워크플로가 생성한다. GitHub 는 `gh-pages` 브랜치가 있으면 Pages 해제를 막으므로, 원본 랜딩이 다시 올라가지 않게 이 브랜치에 원본 파일을 되살리지 않는다. 기능 문구나 격납고 스크린샷이 크게 바뀌면 함께 갱신한다.
 - Homebrew cask 는 아직 없다. 설치·업그레이드는 릴리스의 `MSTokenBar.zip` 으로 안내한다.
 
 ### 게이트의 함정
