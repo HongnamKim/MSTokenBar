@@ -25,27 +25,26 @@ final class BundledSpritesTests: XCTestCase {
         return try MachineCatalog(machines: [machine], series: [series])
     }
 
-    @MainActor
-    func testVerKaKitsShareMasterGradeOwnershipWithDistinctBundledArt() throws {
+    /// Ver.Ka is its own grade after MG (spec §5.2): each of these machines has a separate MG and Ver.Ka
+    /// kit, with its own Bandai source and its own bundled art.
+    func testVerKaIsItsOwnGradeWithDistinctBundledArt() throws {
         let catalog = MachineCatalog.shared
-        let machines = catalog.machines.filter { $0.alternateKits?.isEmpty == false }
+        let machines = catalog.machines.filter { $0.grades.contains(.verka) }
         XCTAssertEqual(Set(machines.map(\.modelNumber)), ["RX-78-2", "MSZ-006", "MSZ-010", "RX-93", "MSN-04", "RX-93-ν2"])
 
         for machine in machines {
             let model = machine.modelNumber
-            XCTAssertEqual(machine.grades.filter { $0 == .mg }.count, 1, model)
-            let editions = try XCTUnwrap(machine.alternateKits, model)
-            XCTAssertEqual(editions.map(\.label), ["MG Ver.Ka"], model)
-            let verKa = try XCTUnwrap(editions.first, model)
-            let regularSource = try XCTUnwrap(machine.gradeSources?["mg"], model)
-            XCTAssertNotEqual(verKa.source, regularSource, model)
+            let mgIndex = try XCTUnwrap(machine.grades.firstIndex(of: .mg), model)
+            XCTAssertEqual(machine.grades[mgIndex + 1], .verka, "\(model): Ver.Ka grows right after MG")
+            let mgSource = try XCTUnwrap(machine.gradeSources?["mg"], model)
+            XCTAssertNotEqual(try XCTUnwrap(machine.gradeSources?["verka"], model), mgSource, model)
 
-            let id = GunplaID.encode(machineID: machine.id, grade: .mg)
-            XCTAssertEqual(BundledSprites.resourceName(speciesID: id, catalog: catalog), machine.sprites?["mg"], model)
-            let regular = try XCTUnwrap(BundledSprites.gifData(speciesID: id, catalog: catalog), model)
-            let url = try XCTUnwrap(BundledSprites.gifURL(for: verKa), model)
-            XCTAssertNotEqual(try Data(contentsOf: url), regular, model)
-            XCTAssertNotNil(SpriteLoader.kitPreview(verKa), model)
+            let mgID = GunplaID.encode(machineID: machine.id, grade: .mg)
+            let verKaID = GunplaID.encode(machineID: machine.id, grade: .verka)
+            XCTAssertEqual(BundledSprites.resourceName(speciesID: verKaID, catalog: catalog), machine.sprites?["verka"], model)
+            let mg = try XCTUnwrap(BundledSprites.gifData(speciesID: mgID, catalog: catalog), model)
+            let verKa = try XCTUnwrap(BundledSprites.gifData(speciesID: verKaID, catalog: catalog), model)
+            XCTAssertNotEqual(verKa, mg, "\(model): the two kits have their own art")
         }
     }
 

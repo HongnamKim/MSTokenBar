@@ -50,7 +50,7 @@ final class DexCompletionStoreTests: XCTestCase {
 
     private var zetaWithoutPGZetaGundam: [Int: [GunplaGrade]?] {
         var owned = zeta
-        owned[7] = [.sd, .hg, .rg, .mg]
+        owned[7] = [.sd, .hg, .rg, .mg, .verka]
         return owned
     }
 
@@ -67,7 +67,7 @@ final class DexCompletionStoreTests: XCTestCase {
     func testCompleteSeriesIsReportedComplete() throws {
         let s = try store(owning: zeta)
         let completion = s.dexCompletions.first { $0.seriesID == "zeta" }
-        XCTAssertEqual(completion?.ownedCells, 30)
+        XCTAssertEqual(completion?.ownedCells, 31)   // 30 + Zeta Gundam's Ver.Ka
         XCTAssertTrue(completion?.isComplete ?? false)
         XCTAssertTrue(s.earnedDexBadges.contains(.series("zeta")))
     }

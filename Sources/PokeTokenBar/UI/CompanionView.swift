@@ -1714,50 +1714,32 @@ struct PokemonDetailView: View {
     /// 등급별 스프라이트 줄 — 보유 등급은 스프라이트, 미보유는 실루엣.
     private func gradeRow(_ cell: HangarCell) -> some View {
         let owned = cell.ownedGrades.intersection(cell.releasedGrades).count
-        let editions = store.catalog.machine(id: cell.machineID)?.alternateKits ?? []
         return VStack(alignment: .leading, spacing: 6) {
             Text(store.l.hangarGradesOwned(owned, of: cell.releasedGrades.count)).font(.callout.weight(.semibold))
             HStack(spacing: 6) {
                 ForEach(cell.releasedGrades, id: \.self) { grade in
                     let isOwned = cell.ownedGrades.contains(grade)
-                    gradeThumbnail(grade.label, owned: isOwned) {
-                        SpriteView(speciesID: GunplaID.encode(machineID: cell.machineID, grade: grade), size: 44)
-                    }
-                    ForEach(editions.filter { $0.grade == grade }, id: \.sprite) { kit in
-                        if let image = SpriteLoader.kitPreview(kit) {
-                            gradeThumbnail(kit.label, owned: isOwned) {
-                                Image(nsImage: image).resizable().interpolation(.none)
-                                    .scaledToFit()
-                                    .scaleEffect(grade.displayScale)
-                                    .overlay(alignment: .bottomTrailing) {
-                                        GunplaGradeBadge(grade: grade, spriteSize: 44)
-                                    }
-                            }
+                    VStack(spacing: 2) {
+                        let sprite = SpriteView(speciesID: GunplaID.encode(machineID: cell.machineID, grade: grade),
+                                                size: 44)
+                            .frame(width: 44, height: 44)
+                        if isOwned {
+                            sprite
+                        } else {
+                            // Silhouette: the sprite's shape only, in a flat tint.
+                            Color.primary.opacity(0.3).frame(width: 44, height: 44).mask { sprite }
                         }
+                        Text(grade.label)
+                            .font(.system(size: 10, weight: isOwned ? .bold : .regular, design: .rounded))
+                            .foregroundStyle(isOwned ? .primary : .secondary)
                     }
+                    .frame(maxWidth: .infinity)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(grade.label)
+                    .accessibilityValue(isOwned ? "" : store.l.hangarNotOwned)
                 }
             }
         }
-    }
-
-    private func gradeThumbnail<Content: View>(_ label: String, owned: Bool,
-                                               @ViewBuilder sprite: () -> Content) -> some View {
-        let thumbnail = sprite().frame(width: 44, height: 44)
-        return VStack(spacing: 2) {
-            if owned {
-                thumbnail
-            } else {
-                Color.primary.opacity(0.3).frame(width: 44, height: 44)
-                    .mask { thumbnail }
-            }
-            Text(verbatim: label)
-                .font(.system(size: 10, weight: owned ? .bold : .regular, design: .rounded))
-                .foregroundStyle(owned ? .primary : .secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: label))
-        .accessibilityValue(owned ? "" : store.l.hangarNotOwned)
     }
 
     private var identityHeader: some View {

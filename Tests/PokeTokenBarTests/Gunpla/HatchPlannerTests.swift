@@ -99,7 +99,7 @@ final class HatchPlannerTests: XCTestCase {
     }
 
     func test_resumeAtFinalGradeGivesSingleStageLine() async throws {
-        let snap = snapshot(graduated: allIDs.subtracting([1]), owned: [1: [.sd, .hg, .rg, .mg, .pg]])
+        let snap = snapshot(graduated: allIDs.subtracting([1]), owned: [1: [.sd, .hg, .rg, .mg, .verka, .pg]])
         let choice = try XCTUnwrap(choose(snap, sequence: [1, 0]))
         XCTAssertEqual(choice.startSpeciesID, GunplaID.encode(machineID: 1, grade: .pg))
         let line = try await catalog.line(baseSpeciesID: choice.startSpeciesID)
