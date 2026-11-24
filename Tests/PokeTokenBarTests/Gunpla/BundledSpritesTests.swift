@@ -123,7 +123,10 @@ final class BundledSpritesTests: XCTestCase {
 
     func test_displayScaleValues() {
         let scales = GunplaGrade.allCases.map { Double($0.displayScale) }
-        XCTAssertEqual(scales, [0.85, 1.0, 0.8, 0.88, 0.95, 1.05])
+        XCTAssertEqual(scales, [0.85, 1.0, 0.8, 0.88, 0.95, 0.98, 1.01, 1.05])
+        // Same body type: the higher the grade, the bigger it is drawn.
+        let real = GunplaGrade.allCases.filter { $0.bodyType == .real }.map { Double($0.displayScale) }
+        XCTAssertEqual(real, real.sorted())
     }
 
     func test_backSpriteIsNilForGunpla() async {

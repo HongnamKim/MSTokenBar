@@ -32,7 +32,8 @@ extension CompanionStore {
         HangarProgress.completions(owned: hangarCells, catalog: catalog)
     }
 
-    /// Every completion badge currently earned — derived, never persisted (ownership only grows).
+    /// Every completion badge currently earned — derived, never persisted. Ownership only grows, but a grade
+    /// released later adds a cell, so a finished series opens again until that cell is filled.
     var earnedDexBadges: [DexBadge] {
         HangarProgress.earnedBadges(dexCompletions)
     }

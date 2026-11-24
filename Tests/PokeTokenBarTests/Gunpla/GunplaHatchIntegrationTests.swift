@@ -144,7 +144,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         let entry = try XCTUnwrap(s.state.dex.last)
         XCTAssertEqual(entry.chainOrder, [hg], "only reached grades that are still released")
         XCTAssertNotNil(entry.releasedAt)
-        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).highestReachedGrade[1], .hg)
+        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).ownedGrades[1], [.hg])
     }
 
     func test_variantHatchIsShiny() async throws {
@@ -210,7 +210,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertEqual(s.state.active?.currentID, GunplaID.encode(machineID: 1, grade: .hg))
 
         XCTAssertTrue(s.buyEgg(nil))
-        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).highestReachedGrade[1], .hg)
+        XCTAssertEqual(s.state.collectionSnapshot(catalog: catalog).ownedGrades[1], [.sd, .hg])
         await openBox(s)
         let active = try XCTUnwrap(s.state.active)
         XCTAssertEqual(active.baseID, GunplaID.encode(machineID: 1, grade: .hg))
@@ -225,6 +225,7 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         var seeded = CompanionState()
         seeded.installBaselineSet = true
         seeded.dex = catalog.machines.filter { $0.id != 1 }.map { gradeEntry($0.id, $0.grades) }
+        seeded.dex.append(gradeEntry(1, [.sd, .hg], released: true))
         seeded.dex.append(gradeEntry(1, [.hg, .rg, .mg, .pg]))
         let hg = GunplaID.encode(machineID: 1, grade: .hg), pg = GunplaID.encode(machineID: 1, grade: .pg)
         seeded.collectedFinals = ["\(hg):\(pg)"]
@@ -323,9 +324,9 @@ final class GunplaHatchIntegrationTests: XCTestCase {
         XCTAssertEqual(s.state.usedSinceInstall, 12345)
         XCTAssertEqual(s.state.inventory["mint"], 2)
         XCTAssertEqual(s.state.dex.count, 1)
-        // Legacy Pokémon dex entries are not catalog machines: nothing graduated, nothing reached but the active.
+        // Legacy Pokémon dex entries are not catalog machines: nothing graduated, nothing owned but the active.
         let snapshot = s.state.collectionSnapshot(catalog: catalog)
         XCTAssertTrue(snapshot.graduatedMachineIDs.isEmpty)
-        XCTAssertEqual(snapshot.highestReachedGrade, [2: .sd])
+        XCTAssertEqual(snapshot.ownedGrades, [2: [.sd]])
     }
 }
