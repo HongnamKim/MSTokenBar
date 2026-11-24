@@ -72,12 +72,6 @@ def catalog(embed):
     icon = ROOT / "assets/icon.png"
     cards.append(dict(group="앱 아이콘", kind="공용 도트", title="MSTokenBar 앱 아이콘", grade="",
                       file=icon.name, image=picture(icon, embed)))
-    for path in [*sorted((ART / "rx-78-2").glob("*.png")), DOCS / "images/gunpla-hangar.png"]:
-        suffix = path.stem.removeprefix("rx-78-2-")
-        grade = grade_name(suffix) if suffix in GRADES else ""
-        title = "격납고 콘셉트" if path.stem == "gunpla-hangar" else ("RX-78-2 등급 비교" if not grade else "RX-78-2 초기 시안")
-        cards.append(dict(group="초기 시안", kind="시안", title=title, grade=grade,
-                          file=path.name, image=picture(path, embed)))
     return cards
 
 

@@ -457,7 +457,7 @@
       const suits = catalogItems.filter((item) => item.kind === "기체");
       const groups = new Set(suits.map((item) => item.group));
       const grades = ["SD", "MGSD", "HG", "RG", "MG", "Ver.Ka", "MGEX", "PG"];
-      const kinds = ["전체", "기체", "공용 도트", "시안"];
+      const kinds = ["전체", "기체", "공용 도트"];
       let kind = "전체";
       function choices(id, values) {
         for (const value of values) el(id).add(new Option(value, value));
@@ -559,7 +559,7 @@
       function render() {
         for (const b of el("tabs").children)
           b.setAttribute("aria-pressed", String(b.textContent === kind));
-        el("series").disabled = kind === "공용 도트" || kind === "시안";
+        el("series").disabled = kind === "공용 도트";
         const terms = el("search")
           .value.trim()
           .split(/\s+/)
