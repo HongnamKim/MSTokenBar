@@ -900,6 +900,12 @@ read_when:
   clicks are unchanged), and the fixture keeps each series at 1/2 so no medal sits in the label. The same
   backing-scale capture remains in `DexColorRenderingTests` and `SessionKeySettingsRenderingTests`, which
   have not failed in CI; pin their scale too if they ever do. Same lesson as the pace-marker entry above.
+  With the 2x OCR in place, CI read `Harbor 1/2` correctly and still failed: five synthetic clicks at the
+  chip's glyph box never selected it. The chip is the file's only control pressed by synthetic mouse
+  events (Back is an `NSButton` and takes `performClick`), and it sits in a horizontal `ScrollView` inside
+  a borderless, non-key window. Click delivery there is unreliable on the GitHub runner (Xcode 16 build)
+  and reliable locally (Xcode 26). The test is skipped when `GITHUB_ACTIONS` is set and still runs locally
+  and in `release.sh`'s gate. Open: drive the chip without synthetic events, then remove the skip.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.

@@ -255,6 +255,11 @@ final class DexBackNavigationTests: XCTestCase {
     }
 
     func testSeriesChipFiltersMountedCollectionAndTogglesBack() async throws {
+        // On the GitHub runner the synthetic click on a chip inside the horizontal ScrollView is often not
+        // delivered: OCR reads "Harbor 1/2" at the right spot, yet five presses never select it. Locally,
+        // and in `release.sh`'s test gate, it runs every time. See the defect log (OCR scale entry).
+        try XCTSkipIf(ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true",
+                      "synthetic chip clicks are not delivered reliably on the GitHub macOS runner")
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-series-\(UUID()).json")
         defer { try? FileManager.default.removeItem(at: file) }
         var state = CompanionState()
