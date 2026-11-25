@@ -17,9 +17,13 @@
 - **격납고**: 기체마다 한 칸에 만든 등급을 모두 기록합니다. 아직 만들지 않은 기체는 형식번호만 단서로 남긴 실루엣으로 보입니다. 작품별로 걸러 볼 수 있고, 작품을 다 모으면 완성 배지를 받습니다.
 - **아이템**: 스펀지 사포는 즉시 성장시키고, 언커먼·레어 박스는 레어도를 보증합니다.
 
-| 격납고 | 기체 상세 | 상점 |
-| ------ | --------- | ---- |
-| ![격납고](assets/screenshot-gunpla-hangar-ko.png) | ![기체 상세](assets/screenshot-gunpla-detail-ko.png) | ![상점](assets/screenshot-gunpla-shop-ko.png) |
+| 격납고 | 작품 목록 |
+| --- | --- |
+| ![격납고](assets/screenshot-gunpla-hangar-ko.png) | ![작품 목록](assets/screenshot-gunpla-series-ko.png) |
+
+| 기체 상세 | 상점 |
+| --- | --- |
+| ![기체 상세](assets/screenshot-gunpla-detail-ko.png) | ![상점](assets/screenshot-gunpla-shop-ko.png) |
 
 ## 요구 사항
 
