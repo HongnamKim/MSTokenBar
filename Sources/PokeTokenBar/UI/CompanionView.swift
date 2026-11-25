@@ -850,40 +850,83 @@ struct RarityTally: View {
     }
 }
 
-/// 작품별 격납고 진행 캡슐 — "제타 3/8"(일반 기체 셀). 일반 기체 완성 시 작품 메달, 전용기 완성 시 전용기 메달.
-/// 희귀도 캡슐(RarityTally)과 같은 시각 언어를 쓰되 색 대신 완성 상태로 강조한다.
+/// 작품 목록 — 격납고 격자 대신 열리는 세로 목록. "전체" + 카탈로그 작품 순서이고, 줄을 누르면 그 작품만 보여준다.
+/// 줄마다 진행도("3/8", 일반 기체 셀)와 막대. 일반 기체 완성 시 작품 메달, 전용기 완성 시 전용기 메달.
+/// 보여줄 칸이 없는 작품은 비활성. 시트·팝오버가 아니라 화면 전환이다 — `ShopView` 주석 참고.
 @MainActor
-struct SeriesTally: View {
-    let label: String
-    /// nil = the "All" chip, which only clears the series filter.
-    let completion: SeriesCompletion?
-    var isSelected: Bool = false
-    private var isComplete: Bool { completion?.isComplete == true }
-    private var accent: Color { isComplete ? .green : .secondary }
-    private var ownedAny: Bool {
-        completion.map { $0.ownedCells + $0.variantOwnedCells > 0 } ?? true
-    }
+struct HangarSeriesListView: View {
+    let store: CompanionStore
+    let selectedSeries: String?
+    /// nil = the "All" row, which clears the series filter.
+    let onSelect: (String?) -> Void
+    let onBack: () -> Void
+
     var body: some View {
-        HStack(spacing: 3) {
-            if isComplete { WorkshopIcon(.seriesMedal, size: 12) }
-            if completion?.isVariantComplete == true { WorkshopIcon(.customMedal, size: 12) }
-            Text(label).font(.system(size: 11, weight: isSelected ? .semibold : .medium))
-            if let completion {
-                Text("\(completion.ownedCells)/\(completion.totalCells)")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(isComplete ? accent : .secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Button(action: onBack) {
+                    Label(store.l.back, systemImage: "chevron.left")
+                }
+                .buttonStyle(.borderless)
+                Spacer()
+                Text(store.l.hangarSeriesLabel).font(.callout).foregroundStyle(.secondary)
             }
-            if isSelected {
-                Image(systemName: "checkmark").font(.system(size: 9, weight: .bold)).foregroundStyle(accent)
+            ScrollView {
+                VStack(spacing: 2) {
+                    row(store.l.hangarSeriesAll, completion: nil)
+                    ForEach(store.dexCompletions) { completion in
+                        row(store.seriesName(completion.seriesID), completion: completion)
+                            .disabled(!completion.hasHangarCells)
+                            .opacity(completion.hasHangarCells ? 1 : 0.5)
+                    }
+                }
+                .reservesScrollerLane()
             }
         }
-        .foregroundStyle(.primary)
-        .padding(.horizontal, 6).padding(.vertical, 2)
-        .background(accent.opacity(isSelected ? 0.22 : (isComplete ? 0.14 : 0.08)))
-        .clipShape(Capsule())
-        .overlay(Capsule().strokeBorder(isSelected ? accent : accent.opacity(0.35),
-                                        lineWidth: isSelected ? 1.5 : 0.5))
-        .opacity(ownedAny ? 1 : 0.5)
+    }
+
+    private func row(_ name: String, completion: SeriesCompletion?) -> some View {
+        let isSelected = selectedSeries == completion?.seriesID
+        return Button { onSelect(completion?.seriesID) } label: {
+            HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 4) {
+                        Text(name).font(.system(size: 12, weight: isSelected ? .semibold : .regular)).lineLimit(1)
+                        if completion?.isComplete == true { WorkshopIcon(.seriesMedal, size: 12) }
+                        if completion?.isVariantComplete == true { WorkshopIcon(.customMedal, size: 12) }
+                        Spacer(minLength: 4)
+                        if let completion {
+                            Text("\(completion.ownedCells)/\(completion.totalCells)")
+                                .font(.system(size: 11, weight: .bold)).monospacedDigit()
+                                .foregroundStyle(completion.isComplete ? Color.green : Color.secondary)
+                        }
+                    }
+                    if let completion { progressBar(completion) }
+                }
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold)).foregroundStyle(Color.accentColor)
+                    .opacity(isSelected ? 1 : 0)
+            }
+            .padding(.horizontal, 8).padding(.vertical, 6)
+            .background(isSelected ? Color.accentColor.opacity(0.12) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func progressBar(_ completion: SeriesCompletion) -> some View {
+        // A series of only 전용기 has no base cells to count.
+        let fraction = completion.totalCells > 0 ? Double(completion.ownedCells) / Double(completion.totalCells) : 0
+        return Capsule().fill(Color.secondary.opacity(0.2))
+            .overlay(alignment: .leading) {
+                GeometryReader { geo in
+                    Capsule().fill(completion.isComplete ? Color.green : Color.accentColor)
+                        .frame(width: geo.size.width * fraction)
+                }
+            }
+            .frame(height: 4)
+            .accessibilityHidden(true)
     }
 }
 
@@ -950,6 +993,8 @@ struct CollectionView: View {
     let navigation: PopoverNavigation
     @State private var selectedRarity: Rarity?
     @State private var selectedSeries: String?
+    /// The series list is open in place of the grid. Like the detail page it replaces the whole content.
+    @State private var showingSeriesList = false
     @State private var searchText = ""
     @State private var shinyOnly = false
     @State private var dexSort: CompanionStore.DexSortOption = .numberAsc
@@ -957,6 +1002,7 @@ struct CollectionView: View {
     /// The species whose detail page was just closed. The detail page replaces the grid, so Back
     /// rebuilds it; this makes it reopen on that species' page instead of page 1. Used once, and set
     /// only when Back lands on the grid: the grid's appearance is what clears it.
+    /// The series list replaces the grid too, so opening it sets a machine of the page it was opened from.
     @State private var dexReturnAnchor: String?
     /// Same for the catch log: the row (`DexEntry.id`) that opened the detail page, scrolled back
     /// into view when Back rebuilds the log. Used once.
@@ -1001,6 +1047,13 @@ struct CollectionView: View {
             }
                 .id(species.collectionID)
                 .frame(height: Self.contentHeight)
+        } else if showingSeriesList {
+            HangarSeriesListView(store: store, selectedSeries: selectedSeries, onSelect: { seriesID in
+                selectedSeries = seriesID
+                dexReturnAnchor = nil   // a chosen series opens on its first page
+                showingSeriesList = false
+            }, onBack: { showingSeriesList = false })
+                .frame(height: Self.contentHeight)
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 Picker("", selection: $nav.showingCollectionLog) {
@@ -1034,6 +1087,10 @@ struct CollectionView: View {
                         selectedRarity: $selectedRarity,
                         selectedSeries: $selectedSeries,
                         returnAnchor: dexReturnAnchor,
+                        onOpenSeriesList: { pageAnchor in
+                            dexReturnAnchor = pageAnchor
+                            showingSeriesList = true
+                        },
                         onSelectCell: { cell in
                             if nav.pickingDisplayPet {
                                 _ = store.setRepresentativeSpeciesID(store.hangarRepresentativeSpeciesID(cell))
@@ -1384,6 +1441,9 @@ private struct DexGridView: View {
     let sortOption: CompanionStore.DexSortOption
     @Binding var selectedRarity: Rarity?
     @Binding var selectedSeries: String?
+    /// Opens the series list. The argument is a machine on the current page (`hangarDetailCollectionID`),
+    /// so Back from the list can return to this page.
+    let onOpenSeriesList: (String?) -> Void
     let onSelectCell: (HangarCell) -> Void
     let onResetFilters: () -> Void
 
@@ -1407,6 +1467,7 @@ private struct DexGridView: View {
          sortOption: CompanionStore.DexSortOption, selectedRarity: Binding<Rarity?>,
          selectedSeries: Binding<String?>,
          returnAnchor: String?,
+         onOpenSeriesList: @escaping (String?) -> Void,
          onSelectCell: @escaping (HangarCell) -> Void,
          onResetFilters: @escaping () -> Void) {
         self.store = store
@@ -1415,6 +1476,7 @@ private struct DexGridView: View {
         self.sortOption = sortOption
         _selectedRarity = selectedRarity
         _selectedSeries = selectedSeries
+        self.onOpenSeriesList = onOpenSeriesList
         self.onSelectCell = onSelectCell
         self.onResetFilters = onResetFilters
         _returnAnchor = State(initialValue: returnAnchor)
@@ -1441,7 +1503,8 @@ private struct DexGridView: View {
         let slice = Array(visible.dropFirst(current * Self.pageSize).prefix(Self.pageSize))
 
         VStack(alignment: .leading, spacing: 6) {
-            header(HangarEntry.grouped(all, catalog: store.catalog).map { $0.displayed(preferredID: preferredID) })
+            header(HangarEntry.grouped(all, catalog: store.catalog).map { $0.displayed(preferredID: preferredID) },
+                   pageAnchor: slice.first.map { store.hangarDetailCollectionID($0.displayed(preferredID: preferredID)) })
             if visible.isEmpty {
                 emptySearchResults
             } else {
@@ -1482,7 +1545,7 @@ private struct DexGridView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func header(_ all: [HangarCell]) -> some View {
+    private func header(_ all: [HangarCell], pageAnchor: String?) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 6) {
                 Text(store.l.hangarTitle).font(.callout.weight(.semibold))
@@ -1490,7 +1553,7 @@ private struct DexGridView: View {
                 Spacer(minLength: 4)
                 earnedMedals
             }
-            seriesChips
+            seriesRow(pageAnchor: pageAnchor)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(rarityDisplayOrder, id: \.self) { r in
@@ -1516,10 +1579,28 @@ private struct DexGridView: View {
         }
     }
 
-    /// 작품 칩 — "전체" + 카탈로그 작품 순서. 탭하면 그 작품만 필터. 보여줄 칸이 없는 작품은 비활성.
-    private var seriesChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
+    /// 작품 줄 — 지금 고른 작품과 진행도(없으면 "전체")를 보여주고, 누르면 작품 목록을 연다.
+    /// 고른 작품이 있으면 ✕ 로 바로 푼다. 셰브론도 같은 목록을 여는 버튼이다 — ✕ 가 그 사이에 끼어
+    /// 줄 전체를 버튼 하나로 묶을 수 없다(버튼 안의 버튼은 클릭이 어디로 갈지 보장되지 않는다).
+    private func seriesRow(pageAnchor: String?) -> some View {
+        let selected = store.dexCompletions.first { $0.seriesID == selectedSeries }
+        return HStack(spacing: 0) {
+            Button { onOpenSeriesList(pageAnchor) } label: {
+                HStack(spacing: 6) {
+                    Text(store.l.hangarSeriesLabel).foregroundStyle(.secondary).fixedSize()
+                    Text(selected.map { store.seriesName($0.seriesID) } ?? store.l.hangarSeriesAll)
+                        .fontWeight(.semibold).lineLimit(1)
+                    if let selected {
+                        Text("\(selected.ownedCells)/\(selected.totalCells)")
+                            .fontWeight(.bold).monospacedDigit().foregroundStyle(.secondary).fixedSize()
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.leading, 8).padding(.vertical, 5)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if selected != nil {
                 Button {
                     withAnimation(.easeInOut(duration: 0.15)) {
                         selectedSeries = nil
@@ -1527,37 +1608,37 @@ private struct DexGridView: View {
                         selectedID = nil
                     }
                 } label: {
-                    SeriesTally(label: store.l.hangarSeriesAll, completion: nil, isSelected: selectedSeries == nil)
+                    // 줄 높이만큼의 히트 영역 — 빗나간 클릭이 옆의 "목록 열기"로 가지 않게.
+                    Image(systemName: "xmark.circle.fill")
+                        .padding(.horizontal, 5)
+                        .frame(maxHeight: .infinity)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                ForEach(store.dexCompletions) { completion in
-                    let name = store.seriesName(completion.seriesID)
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedSeries = (selectedSeries == completion.seriesID) ? nil : completion.seriesID
-                            page = 0
-                            selectedID = nil
-                        }
-                    } label: {
-                        SeriesTally(label: name, completion: completion,
-                                    isSelected: selectedSeries == completion.seriesID)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(!completion.hasHangarCells)
-                    .help(store.l.hangarSeriesProgressLabel(name, owned: completion.ownedCells,
-                                                            total: completion.totalCells)
-                          + " · " + store.l.hangarSeriesFilterHint)
-                }
+                .buttonStyle(.borderless)
+                .help(store.l.hangarSeriesClear)
+                .accessibilityLabel(store.l.hangarSeriesClear)
             }
-            .fixedSize(horizontal: true, vertical: false)
+            Button { onOpenSeriesList(pageAnchor) } label: {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary)
+                    .padding(.leading, 3).padding(.trailing, 8)
+                    .frame(maxHeight: .infinity)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHidden(true)
         }
+        .font(.system(size: 12))
         .fixedSize(horizontal: false, vertical: true)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.secondary.opacity(0.2), lineWidth: 0.5))
     }
 
     /// 격납고 전체·전용기 전체 완성 메달 줄. 하나도 없으면 공간을 차지하지 않는다.
     @ViewBuilder private var earnedMedals: some View {
         let badges = store.earnedDexBadges.filter {
-            // 작품 메달은 작품 캡슐에서 이미 드러나므로 전체 티어만 헤더에 모은다.
+            // 작품 메달은 작품 목록에서 이미 드러나므로 전체 티어만 헤더에 모은다.
             $0.seriesID == nil
         }
         if !badges.isEmpty {

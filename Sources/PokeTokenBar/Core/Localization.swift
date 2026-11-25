@@ -1261,20 +1261,15 @@ struct L {
     var notifGraduateTitle: String { t("완성!", "Complete!", "完成！") }
     func notifGraduateBody(_ name: String) -> String { t("\(name) — 격납고에 보존! 새 건프라 박스가 도착했어요.", "\(name) — saved to your Hangar! A new Kit Box has arrived.", "\(name) — 格納庫に保存！新しいキットボックスが届きました。") }
 
-    // MARK: 격납고 — 작품 칩·완성 배지·완성 알림
+    // MARK: 격납고 — 작품 목록·완성 배지·완성 알림
     var hangarTitle: String { t("격납고", "Hangar", "格納庫") }
     var hangarModes: String { t("수집한 모드", "Collected modes", "収集したモード") }
     func hangarMachineTotal(_ n: Int) -> String { t("\(n)기", n == 1 ? "1 suit" : "\(n) suits", "\(n)機") }
-    /// The series filter chip that clears the filter.
+    /// The hangar's series row, and the title of the series list it opens.
+    var hangarSeriesLabel: String { t("작품", "Series", "作品") }
+    /// The series list's first row, and the series row's value while no series is selected.
     var hangarSeriesAll: String { t("전체", "All", "すべて") }
-    var hangarSeriesFilterHint: String {
-        t("탭하면 이 작품만 보기 · 다시 탭하면 전체", "Tap to show only this series · tap again to clear",
-          "タップでこの作品のみ表示・再タップで全体")
-    }
-    /// Accessible label for a series chip, e.g. "Zeta 3/8".
-    func hangarSeriesProgressLabel(_ series: String, owned: Int, total: Int) -> String {
-        "\(series) \(owned)/\(total)"
-    }
+    var hangarSeriesClear: String { t("작품 선택 해제", "Clear series", "作品の選択を解除") }
     var hangarVariantLabel: String { t("전용기", "Custom", "専用機") }
     var hangarNotOwned: String { t("미보유", "Not owned", "未所持") }
     /// A silhouette cell: a machine the player has not built in any grade yet.

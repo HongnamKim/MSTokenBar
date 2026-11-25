@@ -937,6 +937,11 @@ read_when:
   a borderless, non-key window. Click delivery there is unreliable on the GitHub runner (Xcode 16 build)
   and reliable locally (Xcode 26). The test is skipped when `GITHUB_ACTIONS` is set and still runs locally
   and in `release.sh`'s gate. Open: drive the chip without synthetic events, then remove the skip.
+  On 2026-11-25 the chip row was replaced by a series row and a series list page. Their tests
+  (`testSeriesList…`, `testSeriesClearButton…`, `testBackFromSeriesList…`, `testChoosingASeries…`) press
+  plain SwiftUI buttons with the same synthetic events and keep the skip, because none of them has run on
+  the GitHub runner yet. Open: let them run there once; if the clicks arrive now that no horizontal
+  `ScrollView` is involved, remove the skip.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.

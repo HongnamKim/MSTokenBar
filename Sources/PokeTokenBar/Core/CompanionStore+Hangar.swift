@@ -22,7 +22,7 @@ extension CompanionStore {
     }
 
     /// Base machines not built in any grade yet, in hangar order — the grid's silhouettes. Custom units
-    /// (전용기) stay hidden until built, like the series chips that count base machines only.
+    /// (전용기) stay hidden until built, like the series list that counts base machines only.
     var unbuiltHangarCells: [HangarCell] {
         let built = Set(hangarCells.map(\.machineID))
         let order = hangarOrder
@@ -51,7 +51,7 @@ extension CompanionStore {
         hangarCells.first { $0.machineID == machineID }
     }
 
-    /// Per-series progress in catalog order. Drives the hangar's series chips and the completion badges.
+    /// Per-series progress in catalog order. Drives the hangar's series list and the completion badges.
     var dexCompletions: [SeriesCompletion] {
         HangarProgress.completions(owned: hangarCells, catalog: catalog)
     }

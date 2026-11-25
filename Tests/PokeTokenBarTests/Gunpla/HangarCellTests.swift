@@ -130,8 +130,8 @@ final class HangarCellTests: XCTestCase {
         }
     }
 
-    /// Series chips open for a series with base machines even before the first build there.
-    func test_seriesChipOpensWhenItHasCellsToShow() throws {
+    /// A series can be chosen once it has base machines, even before the first build there.
+    func test_seriesCanBeChosenWhenItHasCellsToShow() throws {
         let s = try store(dex: [entry(1, [.sd])])
         let cca = try XCTUnwrap(s.dexCompletions.first { $0.seriesID == "cca" })
         XCTAssertEqual(cca.ownedCells + cca.variantOwnedCells, 0)
