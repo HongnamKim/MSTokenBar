@@ -54,34 +54,34 @@ struct BuildLog: Codable, Sendable, Equatable {
         switch increment {
         case .providers(let tokens):
             for (key, value) in tokens where value > 0 {
-                stages[index].tokensByProvider[key] = Self.sum(stages[index].tokensByProvider[key] ?? 0, value)
+                stages[index].tokensByProvider[key] = (stages[index].tokensByProvider[key] ?? 0) + value
             }
         case .sandpaper(let n):
-            if n > 0 { stages[index].sandpaper = Self.sum(stages[index].sandpaper, n) }
+            if n > 0 { stages[index].sandpaper = stages[index].sandpaper + n }
         case .unattributed(let n):
-            if n > 0 { stages[index].unattributed = Self.sum(stages[index].unattributed, n) }
+            if n > 0 { stages[index].unattributed = stages[index].unattributed + n }
         }
     }
 
     /// Moves the overflow share (`banked - threshold`) of every bucket from one grade to the next.
     mutating func advance(from: Int, to: Int, banked: Int, threshold: Int, at: Date) {
         let toIndex = stageIndex(for: to, reachedAt: at)
-        guard from != to, banked > 0, let fromIndex = stages.firstIndex(where: { $0.speciesID == from })
+        guard let fromIndex = stages.firstIndex(where: { $0.speciesID == from })
         else { return }
-        let overflow = min(max(0, banked - threshold), banked)
+        let overflow = banked - threshold
         func portion(_ value: Int) -> Int { Self.portion(of: value, share: overflow, banked: banked) }
         for (key, value) in stages[fromIndex].tokensByProvider {
             let moved = portion(value)
             guard moved > 0 else { continue }
             stages[fromIndex].tokensByProvider[key] = value - moved
-            stages[toIndex].tokensByProvider[key] = Self.sum(stages[toIndex].tokensByProvider[key] ?? 0, moved)
+            stages[toIndex].tokensByProvider[key] = (stages[toIndex].tokensByProvider[key] ?? 0) + moved
         }
         let sandpaper = portion(stages[fromIndex].sandpaper)
         stages[fromIndex].sandpaper -= sandpaper
-        stages[toIndex].sandpaper = Self.sum(stages[toIndex].sandpaper, sandpaper)
+        stages[toIndex].sandpaper = stages[toIndex].sandpaper + sandpaper
         let unattributed = portion(stages[fromIndex].unattributed)
         stages[fromIndex].unattributed -= unattributed
-        stages[toIndex].unattributed = Self.sum(stages[toIndex].unattributed, unattributed)
+        stages[toIndex].unattributed = stages[toIndex].unattributed + unattributed
     }
 
     func keeping(_ speciesIDs: [Int]) -> BuildLog {
@@ -104,11 +104,6 @@ struct BuildLog: Codable, Sendable, Equatable {
         if let index = stages.firstIndex(where: { $0.speciesID == speciesID }) { return index }
         stages.append(BuildStage(speciesID: speciesID, reachedAt: reachedAt))
         return stages.count - 1
-    }
-
-    private static func sum(_ a: Int, _ b: Int) -> Int {
-        let (result, overflow) = a.addingReportingOverflow(b)
-        return overflow ? Int.max : result
     }
 
     /// floor(value x share / banked). Both factors can reach 10^15, so the product needs full width.

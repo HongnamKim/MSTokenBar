@@ -123,17 +123,23 @@ final class BuildLogTests: XCTestCase {
         XCTAssertEqual(entry.chainOrder, [1])
     }
 
-    func test_addSaturatesInsteadOfTrappingWhenABucketOverflows() {
-        var log = BuildLog(openedAt: t0, stages: [stage(sd, ["a": Int.max - 1], sandpaper: Int.max, unattributed: Int.max)])
-        log.add(.providers(["a": 5]), to: sd)
-        log.add(.sandpaper(1), to: sd)
-        log.add(.unattributed(1), to: sd)
-        XCTAssertEqual(log.stages, [stage(sd, ["a": Int.max], sandpaper: Int.max, unattributed: Int.max)])
-    }
-
     func test_advanceFromAGradeWithNoStageMovesNothing() {
         var log = BuildLog(openedAt: t0, stages: [stage(sd, ["a": 100])])
         log.advance(from: 999, to: hg, banked: 100, threshold: 50, at: t1)
         XCTAssertEqual(log.stages, [stage(sd, ["a": 100]), stage(hg, at: t1)])
+    }
+
+    /// The shape this release writes. A later change that stops reading it would turn every collected record
+    /// into nil without failing any other test, and the next save would make the loss permanent.
+    func test_recordWrittenByThisReleaseStillDecodes() throws {
+        let record = #"{"openedAt":721692800,"stages":[{"speciesID":100010,"reachedAt":721692800,"#
+            + #""tokensByProvider":{"a":1},"sandpaper":2,"unattributed":3}]}"#
+        let expected = BuildLog(openedAt: t0, stages: [stage(sd, ["a": 1], sandpaper: 2, unattributed: 3, at: t0)])
+        let mon = try JSONDecoder().decode(
+            MonState.self, from: Data((monJSON + #","buildLog":"# + record + "}").utf8))
+        XCTAssertEqual(mon.buildLog, expected)
+        let entry = try JSONDecoder().decode(
+            DexEntry.self, from: Data((entryJSON + #","buildLog":"# + record + "}").utf8))
+        XCTAssertEqual(entry.buildLog, expected)
     }
 }

@@ -797,7 +797,7 @@ final class CompanionStore {
                         if state.active == nil {
                             state.eggUsage += delta
                         } else {
-                            applyUsage(.providers(todayTokensByProvider.filter { $0.value > 0 }))
+                            applyUsage(.providers(todayTokensByProvider))
                         }
                     }
                 } else {
@@ -820,7 +820,7 @@ final class CompanionStore {
                             continue
                         }
                         delta += current - previous
-                        if current > previous { increments[providerID] = current - previous }
+                        increments[providerID] = current - previous
                         ledger[providerID] = current
                     }
                     state.claimedTodayTokensByProvider = ledger
@@ -880,6 +880,7 @@ final class CompanionStore {
         state.active!.buildLog!.add(increment, to: speciesID)
         guard let line = currentLine else { save(); return }
         var guardCount = 0
+        let reachedAt = clock()   // grades passed in one call share one instant
         while state.active != nil, guardCount < 50 {
             guardCount += 1
             let a = state.active!
@@ -908,7 +909,7 @@ final class CompanionStore {
                 state.active!.usedAtStage = a.usedAtStage - thr   // 초과분 이월
                 // 기록도 같은 비율로 이월 — 오르기 직전의 적립량과 그때의 임계 기준.
                 state.active!.buildLog?.advance(from: a.currentID, to: next.speciesID,
-                                                banked: a.usedAtStage, threshold: thr, at: clock())
+                                                banked: a.usedAtStage, threshold: thr, at: reachedAt)
                 let oldName = line.localizedName(a.currentID, state.language)
                 let newName = line.localizedName(next.speciesID, state.language)
                 justEvolvedTo = newName

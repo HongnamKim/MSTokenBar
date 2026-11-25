@@ -3,7 +3,12 @@ import XCTest
 
 @MainActor
 final class BuildLogStoreTests: XCTestCase {
-    private final class Clock { var now = Date(timeIntervalSince1970: 1_700_000_000) }
+    private final class Clock {
+        var now = Date(timeIntervalSince1970: 1_700_000_000)
+        /// Seconds the clock moves forward after every read. 0 = a fixed clock.
+        var step: TimeInterval = 0
+        func read() -> Date { defer { now += step }; return now }
+    }
     private let clock = Clock()
     private let catalog = MachineCatalog.allBundled
     /// RX-78-2: six released grades, rare.
@@ -16,7 +21,7 @@ final class BuildLogStoreTests: XCTestCase {
         let defaults = try XCTUnwrap(UserDefaults(suiteName: "build-log-\(UUID().uuidString)"))
         defaults.set(growth, forKey: "growthDifficulty")
         let clock = clock
-        return CompanionStore(provider: catalog, clock: { clock.now }, fileURL: url,
+        return CompanionStore(provider: catalog, clock: { clock.read() }, fileURL: url,
                               rng: SeededRNG(seed: 7), defaults: defaults)
     }
 
@@ -81,10 +86,12 @@ final class BuildLogStoreTests: XCTestCase {
         let s = try store(seed: seeded())
         await s.hatch(baseID: sd)
         use(s, ["a": 100, "b": 0])
-        use(s, ["a": 60, "b": 0, "c": 500])    // a fell back, c is seen for the first time
-        XCTAssertEqual(try log(s).stages[0].tokensByProvider, ["a": 100])
-        use(s, ["a": 80, "b": 0, "c": 510])
-        XCTAssertEqual(try log(s).stages[0].tokensByProvider, ["a": 120, "c": 10])
+        use(s, ["a": 60, "b": 5, "c": 500])    // a fell back, c is seen for the first time, b grew by 5
+        XCTAssertEqual(try log(s).stages[0].tokensByProvider, ["a": 100, "b": 5])
+        XCTAssertEqual(s.state.active?.usedAtStage, 105)
+        use(s, ["a": 80, "b": 5, "c": 510])
+        XCTAssertEqual(try log(s).stages[0].tokensByProvider, ["a": 120, "b": 5, "c": 10])
+        XCTAssertEqual(s.state.active?.usedAtStage, 135)
     }
 
     func test_sandpaperIsRecordedApart() async throws {
@@ -113,10 +120,14 @@ final class BuildLogStoreTests: XCTestCase {
     func test_oneIncrementAcrossSeveralGradesConservesTheTotal() async throws {
         let s = try store(seed: seeded())
         await s.hatch(baseID: sd)
+        clock.step = 1                                        // every clock read is a second later
         s.applyUsage(.providers(["a": 430_000_000]))          // past the first two thresholds (≈142.9M + 285.7M)
+        clock.step = 0
         let record = try log(s)
         XCTAssertEqual(record.stages.map(\.speciesID), Array(path[0...2]))
         XCTAssertEqual(total(record, "a"), 430_000_000)
+        XCTAssertNotNil(record.stages[1].reachedAt)
+        XCTAssertEqual(record.stages[1].reachedAt, record.stages[2].reachedAt, "one call, one instant")
     }
 
     func test_completionMovesTheRecordIntoTheHangar() async throws {
