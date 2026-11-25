@@ -17,9 +17,9 @@
 - **格納庫**: 機体ごとに 1 マスで、作ったグレードをすべて記録します。まだ作っていない機体は、型式番号だけを手がかりにしたシルエットで表示されます。作品別に絞り込めて、作品をコンプリートするとバッジがもらえます。
 - **アイテム**: スポンジヤスリは即座に成長させ、アンコモン／レアボックスはレアリティを保証します。
 
-| 格納庫 | 機体詳細 |
-| ------ | -------- |
-| ![格納庫](assets/screenshot-gunpla-hangar-ja.png) | ![機体詳細](assets/screenshot-gunpla-detail-ja.png) |
+| 格納庫 | 機体詳細 | ショップ |
+| ------ | -------- | -------- |
+| ![格納庫](assets/screenshot-gunpla-hangar-ja.png) | ![機体詳細](assets/screenshot-gunpla-detail-ja.png) | ![ショップ](assets/screenshot-gunpla-shop-ja.png) |
 
 ## 動作環境
 

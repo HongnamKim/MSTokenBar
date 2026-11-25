@@ -17,9 +17,9 @@ A macOS menu-bar app that turns the AI coding tokens you already spend (Claude C
 - **Hangar**: one cell per suit records every grade you have built. Suits you have not built yet appear as silhouettes with only their model number as a clue. Filter by series and earn a badge for completing each one.
 - **Items**: a Sanding Sponge gives instant progress, and Uncommon or Rare Boxes guarantee a rarity tier.
 
-| Hangar | Suit detail |
-| ------ | ----------- |
-| ![Hangar](assets/screenshot-gunpla-hangar.png) | ![Suit detail](assets/screenshot-gunpla-detail.png) |
+| Hangar | Suit detail | Shop |
+| ------ | ----------- | ---- |
+| ![Hangar](assets/screenshot-gunpla-hangar.png) | ![Suit detail](assets/screenshot-gunpla-detail.png) | ![Shop](assets/screenshot-gunpla-shop.png) |
 
 ## Requirements
 
