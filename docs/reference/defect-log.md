@@ -937,6 +937,11 @@ read_when:
   a borderless, non-key window. Click delivery there is unreliable on the GitHub runner (Xcode 16 build)
   and reliable locally (Xcode 26). The test is skipped when `GITHUB_ACTIONS` is set and still runs locally
   and in `release.sh`'s gate. Open: drive the chip without synthetic events, then remove the skip.
+  On 2026-11-25 the chip row was replaced by a series row and a series list page. Their tests
+  (`testSeriesList…`, `testSeriesClearButton…`, `testBackFromSeriesList…`, `testChoosingASeries…`) press
+  plain SwiftUI buttons with the same synthetic events and keep the skip, because none of them has run on
+  the GitHub runner yet. Open: let them run there once; if the clicks arrive now that no horizontal
+  `ScrollView` is involved, remove the skip.
 
 - **Floating-pet features share one click route and one bubble reservation.** Agent activity (#457)
   and pet interactions (#466) both changed the controller, hosting callbacks and sprite composition.
@@ -1510,6 +1515,17 @@ read_when:
   reset assertions. The production `CollectionView` and OCR candidate acceptance stay unchanged.
   This keeps the guard focused on restoring the viewed catch row rather than reading an
   ambiguous digit in a synthetic name.
+  That repair renamed one label and left `Mon5` as the tests' "the grid shows page 1" marker. On
+  2026-11-25 CI run `45561761650` failed three grid tests with `Mon5 not rendered` after the hangar
+  header grew a few points (series chip row → series row): the page was right, but Vision now read
+  `Mon5` as `Mons`/`Monb`, with `Mon6` and `Mon7` misread in the same render. The local gate had
+  passed, and a window forced to a 1x backing scale did not reproduce it locally, so a local pass
+  says nothing about how the runner reads a marginal label. In that render every two-digit name
+  (`Mon10`…`Mon16`) and `Oldest` read exactly, so the page-1 marker is now `Oldest`. Removing the
+  code that clears the return page, or setting it when Back lands on the log, still fails the tests
+  with `Oldest not rendered`. Rule: a label a test waits for must be a word or end in two digits;
+  a layout change that moves OCR'd text can flip a marginal read on CI only. `Mon20` and `Mon18`
+  remain as page-2 markers; if they misread, rename them or move `host()` to `FixedScaleWindow`.
 
 - **A wider navigation label must not squeeze numeric period summaries.** Adding the localized
   recap capsule to the home's fixed-width summary row left too little space for its week/month

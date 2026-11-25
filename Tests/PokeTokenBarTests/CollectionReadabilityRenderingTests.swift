@@ -37,6 +37,12 @@ final class CollectionReadabilityRenderingTests: XCTestCase {
                                   expectedTexts: [.common, .uncommon, .rare, .legendary].map(store.l.rarityLabel),
                                   to: directory.appendingPathComponent("\(language.rawValue)-\(log ? "log" : "grid").png"))
             }
+            // The page the hangar's series row opens, with the first series selected.
+            let series = try XCTUnwrap(store.dexCompletions.first)
+            try await capture(HangarSeriesListView(store: store, selectedSeries: series.seriesID,
+                                                   onSelect: { _ in }, onBack: {}),
+                              language: language, expectedTexts: [store.seriesName(series.seriesID)],
+                              to: directory.appendingPathComponent("\(language.rawValue)-series.png"))
             let species = try XCTUnwrap(store.dexSpecies.first)
             try await capture(PokemonDetailView(store: store, species: species, onBack: {}), language: language,
                               expectedTexts: [species.name],

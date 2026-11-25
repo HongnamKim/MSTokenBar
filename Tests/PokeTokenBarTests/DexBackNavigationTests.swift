@@ -22,9 +22,10 @@ final class DexBackNavigationTests: XCTestCase {
     }
 
     /// A one-grade (HG) machine catalog: one cell per machine, `names[id]` as its name in every language.
+    /// `emptySeries` are series without any machine.
     private func catalog(_ names: [Int: String], series: [Int: String] = [:],
-                         grades: [GunplaGrade] = [.hg]) throws -> MachineCatalog {
-        let seriesNames = Set(series.values).union(series.count < names.count ? ["Meadow"] : [])
+                         grades: [GunplaGrade] = [.hg], emptySeries: [String] = []) throws -> MachineCatalog {
+        let seriesNames = Set(series.values).union(series.count < names.count ? ["Meadow"] : []).union(emptySeries)
         return try MachineCatalog(
             machines: names.keys.sorted().map { id in
                 MachineRecord(id: id, modelNumber: "X\(id)", names: ["ko": names[id]!, "en": names[id]!, "ja": names[id]!],
@@ -42,7 +43,9 @@ final class DexBackNavigationTests: XCTestCase {
     private func makeStore() throws -> CompanionStore {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-back-\(UUID()).json")
         addTeardownBlock { try? FileManager.default.removeItem(at: file) }
-        // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl.
+        // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl. It is also what
+        // tests look for to tell that the grid shows page 1: on CI a single trailing digit is a coin
+        // toss (Mon5 read as Mons, Mon7 as Mon?), while two digits (Mon20) read reliably.
         let names = Dictionary(uniqueKeysWithValues: (1...20).map { ($0, $0 == 1 ? "Oldest" : "Mon\($0)") })
         var state = CompanionState()
         state.language = .en
@@ -89,8 +92,8 @@ final class DexBackNavigationTests: XCTestCase {
             }
         }
 
-        /// Vision may combine neighboring chips into one observation. Click this label's glyphs,
-        /// rather than the midpoint of that whole row (which can be a different, disabled chip).
+        /// Vision may combine neighboring labels into one observation. Click this label's glyphs,
+        /// rather than the midpoint of that whole row (which can be a different control).
         func focused(on text: String) throws -> Word? {
             for reading in readings {
                 guard let range = reading.string.range(of: text),
@@ -164,6 +167,18 @@ final class DexBackNavigationTests: XCTestCase {
         try words(in: host).contains { $0.reads(text, exactly: exactly) }
     }
 
+    /// Polls like `waitForText`: a label that changes in place fades out over a few frames.
+    private func waitUntilGone(_ text: String, in host: NSView,
+                               file: StaticString = #filePath, line: UInt = #line) async throws {
+        let deadline = ContinuousClock.now + .seconds(5)
+        while try isRendered(text, in: host) {
+            guard ContinuousClock.now < deadline else {
+                return XCTFail("\(text) is still rendered", file: file, line: line)
+            }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+    }
+
     /// Presses the control labeled `text` until the screen changes: `opens` appears, or `text` goes
     /// away. Right after a transition the view tree can still hit-test the previous screen (seen on
     /// CI), so a press that lands there is retried.
@@ -191,25 +206,26 @@ final class DexBackNavigationTests: XCTestCase {
         try await press(store.l.back, in: host)
     }
 
-    // MARK: Hangar grid
+    // MARK: Hangar series list
 
-    /// Uses the same complete rendered state before and after each attempt. Checking the state
-    /// before retrying avoids toggling a selection back off when the first click has just settled.
-    private func pressSeriesChip(_ label: String, showing: [String], hiding: [String] = [],
-                                 in root: NSView, file: StaticString = #filePath,
-                                 line: UInt = #line) async throws -> Bool {
+    /// Presses `label` until the screen shows and hides the given texts. Uses the same complete rendered
+    /// state before and after each attempt: once a press has landed the screen is a different one, and a
+    /// blind second press at the same spot would hit whatever is there now.
+    private func pressUntil(_ label: String, showing: [String], hiding: [String] = [],
+                            in root: NSView, file: StaticString = #filePath,
+                            line: UInt = #line) async throws -> Bool {
         func reached(_ seen: [Word]) -> Bool {
-            showing.allSatisfy { text in seen.contains { $0.reads(text, exactly: true) } }
-                && hiding.allSatisfy { text in !seen.contains { $0.reads(text, exactly: true) } }
+            showing.allSatisfy { text in seen.contains { $0.reads(text, exactly: false) } }
+                && hiding.allSatisfy { text in !seen.contains { $0.reads(text, exactly: false) } }
         }
         var seen = try words(in: root)
         for attempt in 1...5 {
             if reached(seen) { return true }
-            let chip = try XCTUnwrap(try seen.compactMap { try $0.focused(on: label) }
+            let target = try XCTUnwrap(try seen.compactMap { try $0.focused(on: label) }
                 .max { $0.box.midY < $1.box.midY },
                 "No glyph bounds for \(label). Seen: \(seen.map(\.candidates))", file: file, line: line)
-            print("Series click \(attempt): candidates=\(chip.candidates) glyphBox=\(chip.box)")
-            try press(chip, in: root)
+            print("Series click \(attempt): candidates=\(target.candidates) glyphBox=\(target.box)")
+            try press(target, in: root)
             let deadline = ContinuousClock.now + .seconds(1)
             repeat {
                 try await Task.sleep(for: .milliseconds(50))
@@ -254,25 +270,56 @@ final class DexBackNavigationTests: XCTestCase {
         XCTAssertLessThan(middle.box.maxX, merged.box.maxX)
     }
 
-    func testSeriesChipFiltersMountedCollectionAndTogglesBack() async throws {
-        // On the GitHub runner the synthetic click on a chip inside the horizontal ScrollView is often not
-        // delivered: OCR reads "Harbor 1/2" at the right spot, yet five presses never select it. Locally,
-        // and in `release.sh`'s test gate, it runs every time. See the defect log (OCR scale entry).
+    /// The series row and the list's rows are plain SwiftUI buttons, pressed with synthetic mouse events.
+    /// On the GitHub runner those were often not delivered to the series chips this list replaced (OCR
+    /// read the chip at the right spot, yet five presses never selected it), and the new controls have
+    /// not run there yet. Locally, and in `release.sh`'s test gate, these run every time. See the defect
+    /// log (OCR scale entry).
+    private func skipSyntheticClicksOnGitHub() throws {
         try XCTSkipIf(ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true",
-                      "synthetic chip clicks are not delivered reliably on the GitHub macOS runner")
+                      "synthetic clicks are not delivered reliably on the GitHub macOS runner")
+    }
+
+    /// Maple is in Meadow and Willow in Harbor; Vacant is a series without machines.
+    private func makeSeriesStore() throws -> CompanionStore {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-series-\(UUID()).json")
-        defer { try? FileManager.default.removeItem(at: file) }
+        addTeardownBlock { try? FileManager.default.removeItem(at: file) }
         var state = CompanionState()
         state.language = .en
         state.dex = [1, 2].map { id in
             DexEntry(baseID: hg(id), finalID: hg(id), chainOrder: [hg(id)], rarity: .common, caughtAt: Date())
         }
         try JSONEncoder().encode(state).write(to: file)
-        // Two grades with only HG owned keeps each series at 1/2, so no pixel completion medal sits right
-        // before the chip's name (read as "8" at 1x). The medal is not what this test checks.
-        let store = CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"],
-                                                         grades: [.hg, .mg]),
-                                   fileURL: file)
+        // Two grades with only HG owned keeps each series at 1/2, so no pixel completion medal sits next
+        // to a series name (read as "8" at 1x). The medal is not what these tests check.
+        return CompanionStore(provider: try catalog([1: "Maple", 2: "Willow"], series: [1: "Meadow", 2: "Harbor"],
+                                                    grades: [.hg, .mg], emptySeries: ["Vacant"]),
+                              fileURL: file)
+    }
+
+    /// Opens the series list from the grid: its rows replace the machines.
+    private func openSeriesList(_ store: CompanionStore, in root: NSView, file: StaticString = #filePath,
+                                line: UInt = #line) async throws -> Bool {
+        try await pressUntil(store.l.hangarSeriesLabel, showing: [store.l.back, "Meadow"],
+                             hiding: ["Maple", "Willow", "Mon"], in: root, file: file, line: line)
+    }
+
+    private func descendants(_ view: NSView) -> [NSView] { [view] + view.subviews.flatMap(descendants) }
+
+    /// The series row's clear button. It is an icon, so Vision has no text to find: take the borderless
+    /// button (AppKit-backed, like Back) on the line of the series name. Menus are pop-up buttons.
+    private func seriesClearButton(in root: NSView) throws -> NSButton? {
+        guard let name = try words(in: root).compactMap({ try $0.focused(on: "Harbor") }).first else { return nil }
+        let y = (root.isFlipped ? 1 - name.box.midY : name.box.midY) * root.bounds.height
+        return descendants(root).compactMap { $0 as? NSButton }.first { button in
+            let frame = button.convert(button.bounds, to: root)
+            return !(button is NSPopUpButton) && frame.minY <= y && y <= frame.maxY
+        }
+    }
+
+    func testSeriesListRowFiltersTheGridAndAllClearsIt() async throws {
+        try skipSyntheticClicksOnGitHub()
+        let store = try makeSeriesStore()
         let navigation = PopoverNavigation()
         navigation.tab = .collection
         let root = host(store, navigation)
@@ -280,23 +327,111 @@ final class DexBackNavigationTests: XCTestCase {
         try await waitForText("Willow", exactly: true, in: root)
         try saveSeriesRender(root, phase: "before")
 
-        guard try await pressSeriesChip("Harbor", showing: ["Willow"], hiding: ["Maple"], in: root) else { return }
-        XCTAssertFalse(try isRendered("Maple", exactly: true, in: root))
-        try await waitForText("Willow", exactly: true, in: root)
+        guard try await openSeriesList(store, in: root) else { return }
+        try saveSeriesRender(root, phase: "list")
+        guard try await pressUntil("Harbor", showing: ["Willow"], hiding: ["Maple", store.l.back], in: root)
+        else { return }
+        // The series row now names the selection.
+        try await waitForText("Harbor", in: root)
         try saveSeriesRender(root, phase: "harbor")
 
-        guard try await pressSeriesChip("Harbor", showing: ["Maple", "Willow"], in: root) else { return }
-        try await waitForText("Maple", exactly: true, in: root)
-        try await waitForText("Willow", exactly: true, in: root)
+        guard try await openSeriesList(store, in: root) else { return }
+        guard try await pressUntil(store.l.hangarSeriesAll, showing: ["Maple", "Willow"], hiding: [store.l.back],
+                                   in: root) else { return }
+        try await waitUntilGone("Harbor", in: root)   // the series row is back to All
         try saveSeriesRender(root, phase: "restored")
     }
+
+    /// A series with nothing to show is listed but cannot be chosen.
+    func testSeriesListRowWithoutMachinesIsInert() async throws {
+        try skipSyntheticClicksOnGitHub()
+        let store = try makeSeriesStore()
+        let navigation = PopoverNavigation()
+        navigation.tab = .collection
+        let root = host(store, navigation)
+        try await waitForText("Maple", exactly: true, in: root)
+        guard try await openSeriesList(store, in: root) else { return }
+
+        let vacant = try XCTUnwrap(try words(in: root).compactMap { try $0.focused(on: "Vacant") }.first)
+        try press(vacant, in: root)
+        try await Task.sleep(for: .milliseconds(500))
+        XCTAssertTrue(try isRendered("Vacant", in: root), "the list is still open")
+        XCTAssertTrue(try isRendered(store.l.back, in: root))
+
+        // The same press on a series with machines does land, so the row above was disabled, not missed.
+        guard try await pressUntil("Harbor", showing: ["Willow"], hiding: ["Maple", store.l.back], in: root)
+        else { return }
+    }
+
+    func testSeriesClearButtonRemovesTheFilter() async throws {
+        try skipSyntheticClicksOnGitHub()
+        let store = try makeSeriesStore()
+        let navigation = PopoverNavigation()
+        navigation.tab = .collection
+        let root = host(store, navigation)
+        try await waitForText("Maple", exactly: true, in: root)
+        XCTAssertNil(try seriesClearButton(in: root), "nothing to clear while every series shows")
+        guard try await openSeriesList(store, in: root) else { return }
+        guard try await pressUntil("Harbor", showing: ["Willow"], hiding: ["Maple", store.l.back], in: root)
+        else { return }
+
+        try XCTUnwrap(try seriesClearButton(in: root)).performClick(nil)
+
+        try await waitForText("Maple", exactly: true, in: root)
+        try await waitForText("Willow", exactly: true, in: root)
+        try await waitUntilGone("Harbor", in: root)   // the series row is back to All
+    }
+
+    /// Back leaves the filter and the page alone; choosing a series starts on its first page.
+    func testBackFromSeriesListKeepsThePageAndChoosingASeriesResetsIt() async throws {
+        try skipSyntheticClicksOnGitHub()
+        let store = try makeStore()
+        let navigation = PopoverNavigation()
+        navigation.tab = .collection
+        let root = host(store, navigation)
+        try await openPageTwoSpeciesAndGoBack(store, navigation, root)
+        try await waitForText("Mon20", in: root)
+
+        guard try await openSeriesList(store, in: root) else { return }
+        try await press(store.l.back, in: root)
+        try await waitForText("Mon20", in: root)
+
+        guard try await openSeriesList(store, in: root) else { return }
+        guard try await pressUntil("Meadow", showing: ["Oldest"], hiding: [store.l.back, "Mon20"], in: root)
+        else { return }
+    }
+
+    /// Opened from Settings to pick the second pet: choosing a series must not leave that mode.
+    func testChoosingASeriesKeepsDisplayPetPickMode() async throws {
+        try skipSyntheticClicksOnGitHub()
+        let store = try makeSeriesStore()
+        let navigation = PopoverNavigation()
+        navigation.openRepresentativeDex()
+        let root = host(store, navigation)
+        try await waitForText("Willow", exactly: true, in: root)
+        guard try await openSeriesList(store, in: root) else { return }
+        guard try await pressUntil("Harbor", showing: ["Willow"], hiding: ["Maple", store.l.back], in: root)
+        else { return }
+        XCTAssertTrue(navigation.pickingDisplayPet)
+
+        // The cell still picks the machine instead of opening its detail page.
+        let cell = try await waitForText("Willow", exactly: true, in: root)
+        try press(try XCTUnwrap(cell), in: root)
+        let deadline = ContinuousClock.now + .seconds(2)
+        while !navigation.showSettings, ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(50)) }
+        XCTAssertTrue(navigation.showSettings, "picking returns to Settings")
+        XCTAssertEqual(store.representativeDexSpecies?.id, hg(2))
+        XCTAssertNil(navigation.dexDetailCollectionID)
+    }
+
+    // MARK: Hangar grid
 
     func testBackFromDetailReturnsToThePageOfThatSpecies() async throws {
         let store = try makeStore()
         let navigation = PopoverNavigation()
         navigation.tab = .collection
         let root = host(store, navigation)
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
 
         try await openPageTwoSpeciesAndGoBack(store, navigation, root)
 
@@ -318,7 +453,7 @@ final class DexBackNavigationTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(100))
         navigation.showingCollectionLog = false
 
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
     }
 
     /// Back to the log must not leave the grid's return page behind for the next segment switch.
@@ -333,7 +468,7 @@ final class DexBackNavigationTests: XCTestCase {
 
         navigation.showingCollectionLog = false
 
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
     }
 
     // MARK: Catch log
@@ -346,7 +481,6 @@ final class DexBackNavigationTests: XCTestCase {
         navigation.showingCollectionLog = true
         let root = host(store, navigation)
         try await waitForText("Mon20", in: root)
-        func descendants(_ view: NSView) -> [NSView] { [view] + view.subviews.flatMap(descendants) }
         let log = try XCTUnwrap(descendants(root).compactMap { $0 as? NSScrollView }
             .max { ($0.documentView?.frame.height ?? 0) < ($1.documentView?.frame.height ?? 0) })
         // LazyVStack grows the document as rows are realized, so keep scrolling to the end.
