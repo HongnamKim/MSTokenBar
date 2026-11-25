@@ -2998,6 +2998,537 @@
         "verka": "full-armor-unicorn-awakened-verka"
       },
       "hangarGroupID": 116
+    },
+    {
+      "id": 119,
+      "modelNumber": "RX-9/C",
+      "names": {
+        "ko": "내러티브 건담 (C장비)",
+        "en": "Narrative Gundam (C-Packs)",
+        "ja": "ナラティブガンダム（C装備）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/487",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/1255"
+      },
+      "sprites": {
+        "hg": "narrative-c-packs-hg",
+        "verka": "narrative-c-packs-verka"
+      }
+    },
+    {
+      "id": 120,
+      "modelNumber": "RX-9/A",
+      "names": {
+        "ko": "내러티브 건담 (A장비)",
+        "en": "Narrative Gundam (A-Packs)",
+        "ja": "ナラティブガンダム（A装備）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/484"
+      },
+      "sprites": {
+        "hg": "narrative-a-packs-hg"
+      },
+      "hangarGroupID": 119
+    },
+    {
+      "id": 121,
+      "modelNumber": "RX-9/B",
+      "names": {
+        "ko": "내러티브 건담 (B장비)",
+        "en": "Narrative Gundam (B-Packs)",
+        "ja": "ナラティブガンダム（B装備）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/4408",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/2456"
+      },
+      "sprites": {
+        "hg": "narrative-b-packs-hg",
+        "verka": "narrative-b-packs-verka"
+      },
+      "hangarGroupID": 119
+    },
+    {
+      "id": 122,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "페넥스 NT판 (유니콘 모드)",
+        "en": "Phenex Narrative Ver. (Unicorn Mode)",
+        "ja": "フェネクス ナラティブVer.（ユニコーンモード）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "legendary",
+      "grades": [
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1049",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2575",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2660",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2324"
+      },
+      "sprites": {
+        "hg": "phenex-unicorn-hg",
+        "rg": "phenex-unicorn-rg",
+        "mg": "phenex-unicorn-mg",
+        "pg": "phenex-unicorn-pg"
+      }
+    },
+    {
+      "id": 123,
+      "modelNumber": "RX-0",
+      "names": {
+        "ko": "페넥스 NT판 (디스트로이 모드)",
+        "en": "Phenex Narrative Ver. (Destroy Mode)",
+        "ja": "フェネクス ナラティブVer.（デストロイモード）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102555786000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1034",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2575",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2660",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2324"
+      },
+      "sprites": {
+        "sd": "phenex-destroy-sd",
+        "hg": "phenex-destroy-hg",
+        "rg": "phenex-destroy-rg",
+        "mg": "phenex-destroy-mg",
+        "pg": "phenex-destroy-pg"
+      },
+      "hangarGroupID": 122
+    },
+    {
+      "id": 124,
+      "modelNumber": "MSN-06S-2",
+      "names": {
+        "ko": "시난주 스타인 (NT판)",
+        "en": "Sinanju Stein (Narrative Ver.)",
+        "ja": "シナンジュ・スタイン（ナラティブVer.）"
+      },
+      "series": "narrative",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/488",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/632",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/1618"
+      },
+      "sprites": {
+        "hg": "sinanju-stein-nt-hg",
+        "mg": "sinanju-stein-nt-mg",
+        "verka": "sinanju-stein-nt-verka"
+      }
+    },
+    {
+      "id": 125,
+      "modelNumber": "ARX-014S",
+      "names": {
+        "ko": "실버 불릿 서프레서",
+        "en": "Silver Bullet Suppressor",
+        "ja": "シルヴァ・バレト・サプレッサー"
+      },
+      "series": "narrative",
+      "faction": "mineva_faction",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/494"
+      },
+      "sprites": {
+        "hg": "silver-bullet-suppressor-hg"
+      }
+    },
+    {
+      "id": 126,
+      "modelNumber": "RGM-96X",
+      "names": {
+        "ko": "제스타 (셰자르대 A반 사양)",
+        "en": "Jesta (Shezarr Team A)",
+        "ja": "ジェスタ（シェザール隊仕様 A班装備）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2653"
+      },
+      "sprites": {
+        "hg": "jesta-shezarr-a-hg"
+      }
+    },
+    {
+      "id": 127,
+      "modelNumber": "RX-105",
+      "names": {
+        "ko": "크시 건담",
+        "en": "Xi Gundam",
+        "ja": "Ξガンダム"
+      },
+      "series": "hathaway",
+      "faction": "mafty",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112851604000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/502"
+      },
+      "sprites": {
+        "sd": "xi-gundam-sd",
+        "hg": "xi-gundam-hg"
+      }
+    },
+    {
+      "id": 128,
+      "modelNumber": "RX-104FF",
+      "names": {
+        "ko": "페넬로페",
+        "en": "Penelope",
+        "ja": "ペーネロペー"
+      },
+      "series": "hathaway",
+      "faction": "efsf",
+      "rarity": "legendary",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/491"
+      },
+      "sprites": {
+        "hg": "penelope-hg"
+      }
+    },
+    {
+      "id": 129,
+      "modelNumber": "Me02R-F01",
+      "names": {
+        "ko": "멧사 F01형",
+        "en": "Messer Type-F01",
+        "ja": "メッサーF01型"
+      },
+      "series": "hathaway",
+      "faction": "mafty",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/500"
+      },
+      "sprites": {
+        "hg": "messer-f01-hg"
+      }
+    },
+    {
+      "id": 130,
+      "modelNumber": "Me02R-F02",
+      "names": {
+        "ko": "멧사 F02형",
+        "en": "Messer Type-F02",
+        "ja": "メッサーF02型"
+      },
+      "series": "hathaway",
+      "faction": "mafty",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2320"
+      },
+      "sprites": {
+        "hg": "messer-f02-hg"
+      }
+    },
+    {
+      "id": 131,
+      "modelNumber": "FD-03-00",
+      "names": {
+        "ko": "구스타프 칼 00형",
+        "en": "Gustav Karl Type-00",
+        "ja": "グスタフ・カール00型"
+      },
+      "series": "hathaway",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/4226"
+      },
+      "sprites": {
+        "hg": "gustav-karl-type-00-hg"
+      }
+    },
+    {
+      "id": 132,
+      "modelNumber": "TX-ff104",
+      "names": {
+        "ko": "아류제우스",
+        "en": "Alyzeus",
+        "ja": "アリュゼウス"
+      },
+      "series": "hathaway",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/4954"
+      },
+      "sprites": {
+        "hg": "alyzeus-hg"
+      }
+    },
+    {
+      "id": 133,
+      "modelNumber": "F91",
+      "names": {
+        "ko": "건담 F91",
+        "en": "Gundam F91",
+        "ja": "ガンダムF91"
+      },
+      "series": "f91",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/g21/p/g21_m0001.jpg",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/390",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/857"
+      },
+      "sprites": {
+        "sd": "gundam-f91-sd",
+        "hg": "gundam-f91-hg",
+        "mg": "gundam-f91-mg"
+      }
+    },
+    {
+      "id": 134,
+      "modelNumber": "RGM-89J",
+      "names": {
+        "ko": "제간 노멀형 (F91)",
+        "en": "Jegan Normal Type (F91)",
+        "ja": "ジェガン ノーマルタイプ（F91）"
+      },
+      "series": "f91",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2241"
+      },
+      "sprites": {
+        "hg": "jegan-normal-f91-hg"
+      }
+    },
+    {
+      "id": 135,
+      "modelNumber": "RGM-89R",
+      "names": {
+        "ko": "제간 A형 (F91)",
+        "en": "Jegan A Type (F91)",
+        "ja": "ジェガン Aタイプ（F91）"
+      },
+      "series": "f91",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2264"
+      },
+      "sprites": {
+        "hg": "jegan-a-f91-hg"
+      }
+    },
+    {
+      "id": 136,
+      "modelNumber": "RGM-89M",
+      "names": {
+        "ko": "제간 B형 (F91)",
+        "en": "Jegan B Type (F91)",
+        "ja": "ジェガン Bタイプ（F91）"
+      },
+      "series": "f91",
+      "faction": "efsf",
+      "rarity": "common",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2244"
+      },
+      "sprites": {
+        "hg": "jegan-b-f91-hg"
+      }
+    },
+    {
+      "id": 137,
+      "modelNumber": "LM312V04",
+      "names": {
+        "ko": "빅토리 건담",
+        "en": "Victory Gundam",
+        "ja": "ヴィクトリーガンダム"
+      },
+      "series": "victory",
+      "faction": "league_militaire",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/g23/p/g23_m0001.JPG",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/389",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/554"
+      },
+      "sprites": {
+        "sd": "victory-gundam-sd",
+        "hg": "victory-gundam-hg",
+        "verka": "victory-gundam-verka"
+      }
+    },
+    {
+      "id": 138,
+      "modelNumber": "LM312V04+SD-VB03A",
+      "names": {
+        "ko": "V 대시 건담",
+        "en": "V-Dash Gundam",
+        "ja": "Vダッシュガンダム"
+      },
+      "series": "victory",
+      "faction": "league_militaire",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425425252000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/458",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/561"
+      },
+      "sprites": {
+        "sd": "v-dash-gundam-sd",
+        "hg": "v-dash-gundam-hg",
+        "verka": "v-dash-gundam-verka"
+      }
+    },
+    {
+      "id": 139,
+      "modelNumber": "LM314V21",
+      "names": {
+        "ko": "V2 건담",
+        "en": "V2 Gundam",
+        "ja": "V2ガンダム"
+      },
+      "series": "victory",
+      "faction": "league_militaire",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425744308000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/391",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/854"
+      },
+      "sprites": {
+        "sd": "v2-gundam-sd",
+        "hg": "v2-gundam-hg",
+        "verka": "v2-gundam-verka"
+      }
+    },
+    {
+      "id": 140,
+      "modelNumber": "LM314V23/24",
+      "names": {
+        "ko": "V2 어설트 버스터 건담",
+        "en": "V2 Assault Buster Gundam",
+        "ja": "V2アサルトバスターガンダム"
+      },
+      "series": "victory",
+      "faction": "league_militaire",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425432052000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/460",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/2656"
+      },
+      "sprites": {
+        "sd": "v2-assault-buster-sd",
+        "hg": "v2-assault-buster-hg",
+        "verka": "v2-assault-buster-verka"
+      }
     }
   ]
 }

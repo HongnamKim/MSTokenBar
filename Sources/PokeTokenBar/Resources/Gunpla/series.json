@@ -107,6 +107,42 @@
         "ja": "機動戦士ガンダムUC"
       },
       "order": 11
+    },
+    {
+      "id": "narrative",
+      "names": {
+        "ko": "건담 NT",
+        "en": "Mobile Suit Gundam Narrative",
+        "ja": "機動戦士ガンダムNT"
+      },
+      "order": 12
+    },
+    {
+      "id": "hathaway",
+      "names": {
+        "ko": "섬광의 하사웨이",
+        "en": "Mobile Suit Gundam Hathaway",
+        "ja": "機動戦士ガンダム 閃光のハサウェイ"
+      },
+      "order": 13
+    },
+    {
+      "id": "f91",
+      "names": {
+        "ko": "건담 F91",
+        "en": "Mobile Suit Gundam F91",
+        "ja": "機動戦士ガンダムF91"
+      },
+      "order": 14
+    },
+    {
+      "id": "victory",
+      "names": {
+        "ko": "V건담",
+        "en": "Mobile Suit Victory Gundam",
+        "ja": "機動戦士Vガンダム"
+      },
+      "order": 15
     }
   ]
 }
