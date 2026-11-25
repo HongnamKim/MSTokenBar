@@ -6,7 +6,7 @@ enum BuildIncrement: Equatable, Sendable {
     case sandpaper(Int)             // growth credits from sponge sandpaper
     case unattributed(Int)          // source unknown
 
-    /// Plain sum; what `usedAtStage` grows by.
+    /// Sum of the positive amounts; what `usedAtStage` grows by.
     var total: Int {
         switch self {
         case .providers(let tokens): return tokens.values.reduce(0) { $0 + max(0, $1) }
