@@ -51,8 +51,8 @@ final class CollectionReadabilityRenderingTests: XCTestCase {
             .environment(\.colorScheme, .light)
             .environment(\.locale, language.displayLocale))
         host.frame = NSRect(x: 0, y: 0, width: PopoverMetrics.contentWidth, height: 520)
-        let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: PopoverMetrics.contentWidth, height: 520),
-                              styleMask: .borderless, backing: .buffered, defer: false)
+        let window = FixedScaleWindow(contentRect: NSRect(x: -10000, y: -10000, width: PopoverMetrics.contentWidth, height: 520),
+                                      styleMask: .borderless, backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.appearance = NSAppearance(named: .aqua)
         window.contentView = host
@@ -67,6 +67,7 @@ final class CollectionReadabilityRenderingTests: XCTestCase {
             host.layoutSubtreeIfNeeded()
             let bitmap = try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in: host.bounds))
             host.cacheDisplay(in: host.bounds, to: bitmap)
+            XCTAssertEqual(bitmap.pixelsWide, 664, "Render at 2x regardless of the main display")
             let request = VNRecognizeTextRequest()
             request.recognitionLevel = .accurate
             request.recognitionLanguages = [language == .ko ? "ko-KR" : language == .ja ? "ja-JP" : language.rawValue]
