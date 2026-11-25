@@ -187,6 +187,7 @@ enum PokemonBalance {
 
 /// 인벤토리 아이템 종류 — rawValue 로 CompanionState.inventory 에 저장. `rareCandy` 는 저장 호환을 위해 이름을
 /// 유지한 채 스펀지 사포로 표시된다. 공구 4종은 보유형(패시브)이며 `ToolSet.order` 순서로만 산다.
+/// case 선언 순서가 곧 상점 표시 순서다(`CompanionStore.purchasableItems`).
 enum ItemKind: String, Codable, Sendable, CaseIterable {
     case rareCandy
     case maskingTape
@@ -253,7 +254,7 @@ enum FreshEgg {
 
 /// 상점 표시 한 줄 — 판매 아이템(ItemKind) 또는 알 리롤(즉시 액션이라 ItemKind 가 아님).
 /// `egg` 의 연관값은 **보증 등급 하한**(nil = 보증 없는 기존 알).
-/// CompanionStore.shopEntries 가 이 둘을 가격 오름차순으로 병합해 뷰가 단일 목록으로 그린다.
+/// CompanionStore.shopEntries 가 이 둘을 카테고리 순서(아이템 → 알)로 이어 뷰가 단일 목록으로 그린다.
 enum ShopEntry: Hashable, Sendable {
     case item(ItemKind)
     case egg(Rarity?)

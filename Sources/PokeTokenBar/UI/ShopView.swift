@@ -14,8 +14,8 @@ struct ShopView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 walletHeader(l)
-                // shopEntries = 판매 아이템 + 알 3종(보증 없음·고급 이상·희귀 이상)을 가격 오름차순으로
-                // 병합한 단일 목록. 알은 항상 포함되고(즉시 액션이라 ItemKind 가 아님), 알 상태에선
+                // shopEntries = 판매 아이템 → 알 3종(보증 없음·고급 이상·희귀 이상)을 카테고리 순서로
+                // 이은 단일 목록. 알은 항상 포함되고(즉시 액션이라 ItemKind 가 아님), 알 상태에선
                 // EggCard 가 구매만 비활성으로 보여준다.
                 ForEach(store.shopEntries, id: \.self) { entry in
                     switch entry {

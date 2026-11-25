@@ -1104,46 +1104,20 @@ final class CompanionStore {
     /// 여기선 읽기만 — 구매는 spentTokens 만 올려 잔액을 깎는다(진화 진행·오늘/주/월 통계 무영향).
     var availableTokens: Int { max(0, state.usedSinceInstall - state.spentTokens) }
 
-    /// 상점 판매 아이템 — shopPrice 있는 것만. 가격 저렴한 순, 단 구매 완료한 보유형은 맨 아래로.
+    /// 상점 판매 아이템 — shopPrice 있는 것만, `ItemKind` 선언 순서 그대로(스펀지 사포 → 공구 4종을
+    /// 구매 순서대로). 구매 완료한 보유형도 제자리에 남아 공구 줄이 구매 사다리로 읽힌다.
     var purchasableItems: [ItemKind] {
-        ItemKind.allCases
-            .filter { $0.shopPrice != nil }
-            .sorted { a, b in
-                // 구매 완료한 보유형은 맨 아래로 — 재구매 불가라 위에 있을 이유가 없다.
-                let aDone = a.isPassive && itemCount(a) > 0
-                let bDone = b.isPassive && itemCount(b) > 0
-                if aDone != bDone { return !aDone }
-                return (a.shopPrice ?? 0) < (b.shopPrice ?? 0)   // 나머지는 가격 저렴한 순
-            }
+        ItemKind.allCases.filter { $0.shopPrice != nil }
     }
 
-    /// 상점 표시 순서 — 판매 아이템 + 알 3종을 하나의 가격 오름차순 목록으로 병합.
-    /// 정렬 규칙은 purchasableItems 와 동일: 구매 완료한 보유형은 맨 아래, 나머지는 가격 저렴한 순.
-    /// 알은 즉시 액션이라 '보유' 개념이 없어 가격 순서에만 참여한다.
+    /// 상점 표시 순서 — 카테고리별 고정 순서: 판매 아이템(소모품 → 공구) 다음에 박스 3종.
+    /// 가격으로 섞지 않는다(가격 오름차순 병합은 공구 사이에 박스가 끼어 카테고리가 흩어졌다).
     ///
     /// 알은 활성 포켓몬이 없어도(알 상태) 목록에 남는다 — 구매는 `canBuyEgg` 의 `hasActive` 게이트가
     /// 막고, EggCard 가 비활성 버튼 + 사유 한 줄로 보여준다. 목록에서 통째로 빼면 "상점에 알이 원래
     /// 없다"로 읽혀서, 게이트는 유지하되 존재는 계속 보이게 한다.
-    ///
-    /// 등급 알끼리 붙여 '티어 사다리'로 묶어 보이게 하는 안도 검토했으나 채택하지 않았다 — 지금의 순수
-    /// 가격 오름차순은 "알이 무조건 맨 아래로 append 돼 더 비싼 보유형보다 아래에 놓이던" 표시 회귀를
-    /// 고치며 들어온 규칙이라(ShopTests 참조), 그룹 배치는 그 회귀를 부분적으로 되살린다. 티어 관계는
-    /// 카드의 등급 배지로 읽히게 한다.
     var shopEntries: [ShopEntry] {
-        var entries: [ShopEntry] = purchasableItems.map { ShopEntry.item($0) }
-        entries += FreshEgg.shopTiers.map { ShopEntry.egg($0) }
-        return entries.sorted { a, b in
-            let aDone = isPurchasedPassive(a)
-            let bDone = isPurchasedPassive(b)
-            if aDone != bDone { return !aDone }
-            return price(of: a) < price(of: b)
-        }
-    }
-
-    /// 구매 완료한 보유형인지 — shopEntries 정렬에서 맨 아래로 보낼 판정.
-    private func isPurchasedPassive(_ entry: ShopEntry) -> Bool {
-        guard case .item(let kind) = entry else { return false }   // 알은 즉시 액션 — 보유 개념 없음
-        return kind.isPassive && itemCount(kind) > 0
+        purchasableItems.map { ShopEntry.item($0) } + FreshEgg.shopTiers.map { ShopEntry.egg($0) }
     }
 
     /// 구매 가능 — 잔액이 그 아이템 가격 이상(상점 미판매면 false). 활성/알 무관(재고는 미리 쌓아둘 수 있음).
