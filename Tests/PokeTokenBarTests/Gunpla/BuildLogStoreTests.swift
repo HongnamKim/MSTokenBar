@@ -206,4 +206,79 @@ final class BuildLogStoreTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(record.stages.count, 3)
         XCTAssertEqual(record.stages.reduce(0) { $0 + $1.sandpaper }, RareCandy.xp)
     }
+
+    // MARK: save boundary
+
+    private func absurd() -> BuildLog {
+        BuildLog(openedAt: nil, stages: [BuildStage(
+            speciesID: sd, reachedAt: nil, tokensByProvider: ["a": Int.max, "b": -5],
+            sandpaper: Int.min, unattributed: Int.max)])
+    }
+
+    func test_sanitizeClampsRecordNumbersOnTheMachineAndInTheHangar() {
+        var mon = raising(usedAtStage: 5)
+        mon.buildLog = absurd()
+        let state = seeded {
+            $0.active = mon
+            $0.dex = [DexEntry(baseID: self.sd, finalID: self.sd, chainOrder: [self.sd], rarity: .rare,
+                               caughtAt: nil, buildLog: self.absurd())]
+        }
+        let top = SaveTransfer.maxTokenValue
+        let expected = [BuildStage(speciesID: sd, reachedAt: nil, tokensByProvider: ["a": top, "b": 0],
+                                   sandpaper: 0, unattributed: top)]
+        let clean = SaveTransfer.sanitized(state)
+        XCTAssertEqual(clean.active?.buildLog?.stages, expected)
+        XCTAssertEqual(clean.dex.first?.buildLog?.stages, expected)
+        XCTAssertEqual(clean.active?.usedAtStage, 5, "a sum that differs from the banked growth is not repaired")
+    }
+
+    func test_absurdRecordOnDiskLoadsAndKeepsCounting() throws {
+        var mon = raising(usedAtStage: Int.max)
+        mon.buildLog = absurd()
+        let s = try store(seed: seeded { $0.active = mon })
+        s.applyUsage(.providers(["a": 1]))
+        XCTAssertEqual(try log(s).stages[0].tokensByProvider["a"], SaveTransfer.maxTokenValue + 1)
+    }
+
+    func test_recordSurvivesExportAndImport() throws {
+        var mon = raising(usedAtStage: 100)
+        mon.buildLog = BuildLog(openedAt: clock.now, stages: [
+            BuildStage(speciesID: sd, reachedAt: clock.now, tokensByProvider: ["a": 100])])
+        let state = seeded { $0.active = mon }
+        let envelope = try SaveTransfer.decode(
+            SaveTransfer.encode(state: state, appVersion: "x", deviceName: "d", now: clock.now))
+        XCTAssertEqual(envelope.state.active?.buildLog, mon.buildLog)
+        XCTAssertEqual(envelope.schema, 2)
+    }
+
+    func test_importedRecordContinuesFromTheImportPoint() throws {
+        var mon = raising(usedAtStage: 100)
+        mon.buildLog = BuildLog(openedAt: clock.now, stages: [
+            BuildStage(speciesID: sd, reachedAt: clock.now, tokensByProvider: ["a": 100])])
+        let envelope = try SaveTransfer.decode(SaveTransfer.encode(
+            state: seeded { $0.active = mon }, appVersion: "x", deviceName: "d", now: clock.now))
+        let s = try store()
+        try s.applySave(envelope, todayTokensByProvider: ["a": 5_000], todayDate: "d1", hasUsageData: true)
+        use(s, ["a": 5_250])
+        XCTAssertEqual(try log(s).stages[0].tokensByProvider, ["a": 350], "the 5,000 used before the import is not credited")
+    }
+
+    /// A start grade the catalog no longer serves sends the machine back to the box; only the surviving grades' record goes with it.
+    func test_retiringAnUnservableMachineKeepsOnlyTheSurvivingGradesRecord() async throws {
+        let gone = GunplaID.encode(machineID: 1, grade: .mgsd)   // RX-78-2 has no MGSD kit
+        let hg = path[1]
+        var mon = MonState(baseID: gone, pathIDs: [gone, hg], plannedPathIDs: [gone, hg], stageIndex: 1,
+                           usedAtStage: 7, rarity: .rare, totalForms: 2)
+        mon.buildLog = BuildLog(openedAt: clock.now, stages: [
+            BuildStage(speciesID: gone, reachedAt: clock.now, tokensByProvider: ["a": 5]),
+            BuildStage(speciesID: hg, reachedAt: clock.now, tokensByProvider: ["a": 7])])
+        let s = try store(seed: seeded { $0.active = mon })
+        use(s, ["a": 0, "b": 0])                               // kicks the line load, which cannot be served
+        let deadline = Date().addingTimeInterval(2)
+        while s.state.active != nil, Date() < deadline { try? await Task.sleep(nanoseconds: 1_000_000) }
+        XCTAssertNil(s.state.active)
+        let entry = try XCTUnwrap(s.state.dex.last)
+        XCTAssertEqual(entry.chainOrder, [hg])
+        XCTAssertEqual(entry.buildLog?.stages, [BuildStage(speciesID: hg, reachedAt: clock.now, tokensByProvider: ["a": 7])])
+    }
 }

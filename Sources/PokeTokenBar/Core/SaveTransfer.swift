@@ -10,7 +10,7 @@ import Foundation
 struct SaveEnvelope: Codable, Sendable {
     static let formatID = "mstokenbar.save"
     /// v2 adds persistent generated Pokémon profiles (IVs, gender, ability, level and moves).
-    static let schemaVersion = 2
+    static let schemaVersion = 2   // 제작 기록은 선택 필드로 더했고 버전을 올리지 않았다 — 자동 스냅샷이 같은 봉투를 쓰는데 이전 빌드는 못 읽는 봉투를 빈 상태로 읽기 때문이다.
 
     var format: String
     var schema: Int
@@ -172,6 +172,7 @@ enum SaveTransfer {
         }
         if var active = s.active {
             active.usedAtStage = clampToken(active.usedAtStage)
+            active.buildLog = active.buildLog?.clamped(to: maxTokenValue)   // 갈래의 합이 usedAtStage 와 달라도 고치지 않는다
             // totalForms 는 `kk * (kk + 1)` 형태로 쓰여(PokemonBalance.phaseThreshold) 큰 값이 그 자체로 트랩이다.
             active.totalForms = min(max(1, active.totalForms), 12)
             active.stageIndex = min(max(0, active.stageIndex), max(0, active.pathIDs.count - 1))
@@ -184,6 +185,7 @@ enum SaveTransfer {
         }
         for index in s.dex.indices {
             s.dex[index].chainOrder = deduped(s.dex[index].chainOrder)
+            s.dex[index].buildLog = s.dex[index].buildLog?.clamped(to: maxTokenValue)
         }
         FullArmorUnicornMigration.apply(to: &s)
         s.reconcileRepresentativeSelection()

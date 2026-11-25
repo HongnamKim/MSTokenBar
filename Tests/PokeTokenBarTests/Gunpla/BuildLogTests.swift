@@ -122,4 +122,18 @@ final class BuildLogTests: XCTestCase {
         XCTAssertNil(entry.buildLog)
         XCTAssertEqual(entry.chainOrder, [1])
     }
+
+    func test_addSaturatesInsteadOfTrappingWhenABucketOverflows() {
+        var log = BuildLog(openedAt: t0, stages: [stage(sd, ["a": Int.max - 1], sandpaper: Int.max, unattributed: Int.max)])
+        log.add(.providers(["a": 5]), to: sd)
+        log.add(.sandpaper(1), to: sd)
+        log.add(.unattributed(1), to: sd)
+        XCTAssertEqual(log.stages, [stage(sd, ["a": Int.max], sandpaper: Int.max, unattributed: Int.max)])
+    }
+
+    func test_advanceFromAGradeWithNoStageMovesNothing() {
+        var log = BuildLog(openedAt: t0, stages: [stage(sd, ["a": 100])])
+        log.advance(from: 999, to: hg, banked: 100, threshold: 50, at: t1)
+        XCTAssertEqual(log.stages, [stage(sd, ["a": 100]), stage(hg, at: t1)])
+    }
 }
