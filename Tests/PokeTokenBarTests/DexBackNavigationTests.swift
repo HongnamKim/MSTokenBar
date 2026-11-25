@@ -43,7 +43,9 @@ final class DexBackNavigationTests: XCTestCase {
     private func makeStore() throws -> CompanionStore {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("dex-back-\(UUID()).json")
         addTeardownBlock { try? FileManager.default.removeItem(at: file) }
-        // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl.
+        // A word avoids the ambiguous digit in Mon1, which Vision reads as Mont/Monl. It is also what
+        // tests look for to tell that the grid shows page 1: on CI a single trailing digit is a coin
+        // toss (Mon5 read as Mons, Mon7 as Mon?), while two digits (Mon20) read reliably.
         let names = Dictionary(uniqueKeysWithValues: (1...20).map { ($0, $0 == 1 ? "Oldest" : "Mon\($0)") })
         var state = CompanionState()
         state.language = .en
@@ -395,7 +397,7 @@ final class DexBackNavigationTests: XCTestCase {
         try await waitForText("Mon20", in: root)
 
         guard try await openSeriesList(store, in: root) else { return }
-        guard try await pressUntil("Meadow", showing: ["Mon5"], hiding: [store.l.back, "Mon20"], in: root)
+        guard try await pressUntil("Meadow", showing: ["Oldest"], hiding: [store.l.back, "Mon20"], in: root)
         else { return }
     }
 
@@ -429,7 +431,7 @@ final class DexBackNavigationTests: XCTestCase {
         let navigation = PopoverNavigation()
         navigation.tab = .collection
         let root = host(store, navigation)
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
 
         try await openPageTwoSpeciesAndGoBack(store, navigation, root)
 
@@ -451,7 +453,7 @@ final class DexBackNavigationTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(100))
         navigation.showingCollectionLog = false
 
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
     }
 
     /// Back to the log must not leave the grid's return page behind for the next segment switch.
@@ -466,7 +468,7 @@ final class DexBackNavigationTests: XCTestCase {
 
         navigation.showingCollectionLog = false
 
-        try await waitForText("Mon5", in: root)
+        try await waitForText("Oldest", in: root)
     }
 
     // MARK: Catch log
