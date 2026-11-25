@@ -1291,6 +1291,9 @@ struct L {
         case "titans": return t("티탄즈", "Titans", "ティターンズ")
         case "axis": return t("액시즈", "Axis", "アクシズ")
         case "neo_zeon": return t("네오지온", "Neo Zeon", "ネオ・ジオン")
+        case "mafty": return t("마프티", "Mafty", "マフティー")
+        case "league_militaire": return t("리가 밀리티어", "League Militaire", "リガ・ミリティア")
+        case "mineva_faction": return t("미네바 일파", "Mineva Faction", "ミネバ一派")
         case "londo_bell": return t("론도벨", "Londo Bell", "ロンド・ベル")
         default: return key
         }

@@ -85,12 +85,12 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 117)
+        XCTAssertEqual(c.machines.count, 139)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
-        XCTAssertEqual(c.series.count, 12)
+        XCTAssertEqual(c.series.count, 16)
     }
 
     func test_fullArmorUnicornModesFollowTheReleasedFrameColors() throws {
@@ -107,13 +107,32 @@ final class MachineCatalogTests: XCTestCase {
         XCTAssertNotEqual(destroy.gradeSources?["hg"], awakened.gradeSources?["hg"])
     }
 
+    func test_narrativeEquipmentAndPhenexModesKeepTheirReleasedGrades() throws {
+        let catalog = try MachineCatalog.bundled()
+        let tracks: [(Int, Int, [GunplaGrade])] = [
+            (119, 119, [.hg, .verka]), (120, 119, [.hg]), (121, 119, [.hg, .verka]),
+            (122, 122, [.hg, .rg, .mg, .pg]), (123, 122, [.sd, .hg, .rg, .mg, .pg]),
+        ]
+        for (id, hangarID, grades) in tracks {
+            let machine = try XCTUnwrap(catalog.machine(id: id))
+            XCTAssertEqual(machine.hangarID, hangarID)
+            XCTAssertEqual(machine.grades, grades)
+        }
+    }
+
     func test_completedSeriesServeGradeSpecificArtAndKitSources() throws {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
                                         "www.bandaispirits.co.jp", "www.bandainamco.co.jp", "p-bandai.jp"]
         let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
-                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14]
+                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14,
+                      "narrative": 5, "hathaway": 6, "f91": 4, "victory": 4]
+        // These vintage kits are documented by their original Bandai instruction booklets.
+        let printedManuals = [
+            "gundam-f91-sd": "https://www.dalong.net/reviews/sd/g21/p/g21_m0001.jpg",
+            "victory-gundam-sd": "https://www.dalong.net/reviews/sd/g23/p/g23_m0001.JPG",
+        ]
         for (series, count) in counts {
             let machines = catalog.machines.filter { $0.series == series }
             XCTAssertEqual(Set(machines.map(\.hangarID)).count, count, series)
@@ -125,7 +144,11 @@ final class MachineCatalogTests: XCTestCase {
                 XCTAssertEqual(Set(sprites.keys), grades, machine.modelNumber)
                 XCTAssertEqual(Set(sprites.values).count, grades.count, machine.modelNumber)
                 XCTAssertNotNil(MachineCatalog.shared.machine(id: machine.id), machine.modelNumber)
-                for url in sources.values {
+                for (grade, url) in sources {
+                    if let manual = printedManuals[sprites[grade] ?? ""] {
+                        XCTAssertEqual(url, manual)
+                        continue
+                    }
                     XCTAssertTrue(bandaiHosts.contains(URL(string: url)?.host ?? ""), url)
                 }
             }

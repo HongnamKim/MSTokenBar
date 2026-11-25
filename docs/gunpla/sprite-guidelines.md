@@ -2,7 +2,7 @@
 
 2026-11-23 초안 · 이미지를 대량으로 만들 에이전트용
 
-『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [디 오리진](../../assets/sprites/the-origin/), [썬더볼트](../../assets/sprites/thunderbolt/), [쿠쿠루스 도안의 섬](../../assets/sprites/cucuruz-doans-island/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/), [벨토치카 칠드런](../../assets/sprites/beltorchika-children/) 폴더에 있다. [건담 UC](../../assets/sprites/uc/)는 1호기·밴시·퍼펙티빌리티의 모드를 구분한다. 같은 키트가 변형되면 해당 모드로 조립한 앞·뒤 사진을 각각 확인한다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
+『기동전사 건담』 16기의 앱용 원본은 [HGUC](../../assets/sprites/first-hguc/)와 [SD·RG·MG·PG](../../assets/sprites/first-series-grades/)에 있다. 후속 작품의 원본은 [제08MS소대](../../assets/sprites/08th-ms-team/), [0080](../../assets/sprites/0080/), [0083](../../assets/sprites/0083/), [디 오리진](../../assets/sprites/the-origin/), [썬더볼트](../../assets/sprites/thunderbolt/), [쿠쿠루스 도안의 섬](../../assets/sprites/cucuruz-doans-island/), [Z건담](../../assets/sprites/zeta/), [건담 ZZ](../../assets/sprites/zz/), [역습의 샤아](../../assets/sprites/cca/), [벨토치카 칠드런](../../assets/sprites/beltorchika-children/) 폴더에 있다. [건담 UC](../../assets/sprites/uc/)는 1호기·밴시·퍼펙티빌리티의 모드를 구분한다. 같은 키트가 변형되면 해당 모드로 조립한 앞·뒤 사진을 각각 확인한다. [건담 NT](../../assets/sprites/narrative/)는 내러티브 건담의 A·B·C장비와 페넥스의 두 모드를 구분한다. [섬광의 하사웨이](../../assets/sprites/hathaway/), [건담 F91](../../assets/sprites/f91/), [V건담](../../assets/sprites/victory/)도 등급별로 기록한다. 각 폴더의 `references.csv`에서 파일별 키트명, 반다이 상품 정보 또는 설명서와 조립 사진을 확인한다.
 MG와 Ver.Ka가 둘 다 나온 기체는 키트별로 실물 앞·뒤 사진을 따로 대조한다. [MG Ver.Ka 5종](../../assets/sprites/mg-ver-ka/)과 [하이뉴 건담](../../assets/sprites/beltorchika-children/)의 Ver.Ka 그림은 MG와 별개인 Ver.Ka 등급의 그림이다. 원본 PNG는 `<기체>-mg-ver-ka.png`, 앱에 들어가는 GIF는 다른 등급과 같은 규칙으로 `<기체>-verka.gif`다.
 SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../../assets/sprites/first-series-grades/rx-78-2-sd.png)을 참고한다.
 
@@ -17,6 +17,7 @@ SD의 머리 비율과 3/4 구도는 [SD 크로스 실루엣 RX-78-2 건담](../
 - **외곽선**: 순수 검정 대신 어두운 남색 계열.
 - **광원**: 왼쪽 위. 오른쪽·아래쪽 면이 어둡다.
 - **색**: 기체 설정 색을 따르고, 색마다 명암 단계를 나눠 칠한다. 흰 장갑은 순백이 아니라 약간 따뜻한 흰색에 회색 그림자.
+  - 도색 전 조립 사진은 부품 형태와 장착 위치를 확인하는 데 쓴다. 안테나처럼 성형색과 완성 배색이 다른 부분은 같은 키트의 반다이 설명서에 실린 도색 예시를 기준으로 칠한다. SD 빅토리 건담과 SD V 대시 건담의 이마 V 안테나는 노란색이다. [G제네 23 설명서](https://www.dalong.net/reviews/sd/g23/p/g23_m0001.JPG) · [BB전사 124 설명서](https://www.dalong.net/reviews/sd/b124/p/b124m_0001.jpg)
 - **구도 [결정]**: 모든 등급이 같은 3/4 구도.
   - 기체가 화면 왼쪽을 향해 살짝 돌아서 있다. 얼굴이 머리의 왼쪽으로 치우치고, 머리·가슴·허리의 화면 오른쪽에 기체의 왼쪽 옆면이 보인다.
   - 기체의 왼팔은 화면 오른쪽에서 보는 이와 가깝고, 오른팔은 화면 왼쪽에서 더 멀다.
