@@ -119,9 +119,9 @@ final class ToolSetTests: XCTestCase {
         XCTAssertEqual(s.state.spentTokens, 7_500_000_000)
     }
 
-    func test_ownedToolsSinkInShopList() throws {
+    func test_ownedToolsKeepPlaceInShopList() throws {
         let s = try store(used: 0, inventory: ["maskingTape": 1])
-        XCTAssertEqual(s.purchasableItems, [.rareCandy, .panelLinePen, .paintSet, .airbrush, .maskingTape])
+        XCTAssertEqual(s.purchasableItems, [.rareCandy, .maskingTape, .panelLinePen, .paintSet, .airbrush])
         XCTAssertTrue(s.isToolLocked(.paintSet))
         XCTAssertFalse(s.isToolLocked(.panelLinePen))
         XCTAssertFalse(s.isToolLocked(.maskingTape))
