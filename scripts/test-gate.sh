@@ -28,6 +28,7 @@ LOGIC_CORE=(
   "Sources/PokeTokenBar/Gunpla/MachineCatalog+Provider.swift"
   "Sources/PokeTokenBar/Gunpla/HatchPlanner.swift"
   "Sources/PokeTokenBar/Gunpla/ToolSet.swift"
+  "Sources/PokeTokenBar/Gunpla/BuildLog.swift"
   "Sources/PokeTokenBar/Gunpla/HangarProgress.swift"
   "Sources/PokeTokenBar/Gunpla/MachineProfile.swift"
   "Sources/PokeTokenBar/Gunpla/BundledSprites.swift"
