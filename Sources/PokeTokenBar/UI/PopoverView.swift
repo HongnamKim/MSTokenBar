@@ -178,7 +178,7 @@ struct PopoverView: View {
             .labelsHidden()
 
             if nav.tab == .collection {
-                CollectionView(store: companion, navigation: nav)
+                CollectionView(store: companion, navigation: nav, providerNames: store.providerDisplayNames)
             } else if nav.tab == .bag {
                 BagView(store: companion, nav: nav)
             } else if nav.tab == .shop {

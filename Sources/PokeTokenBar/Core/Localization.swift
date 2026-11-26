@@ -1111,6 +1111,18 @@ struct L {
     func dexTotal(_ n: Int) -> String { t("총 \(n)기", "\(n) total", "全\(n)機") }
     /// 포획 로그 = 개체 단위 기록(같은 라인 중복이 정상). 도감 = 종 단위 집계.
     var catchLogTitle: String { t("제작 기록", "Build Log", "製作記録") }
+    // 제작 기록 카드 (기체 상세 화면)
+    func buildRecordOpened(_ date: String) -> String { t("개봉 \(date)", "Opened \(date)", "開封 \(date)") }
+    func buildRecordCompleted(_ date: String) -> String { t("완성 \(date)", "Completed \(date)", "完成 \(date)") }
+    func buildRecordStopped(_ date: String) -> String { t("중단 \(date)", "Stopped \(date)", "中断 \(date)") }
+    func buildRecordDays(_ n: Int) -> String { t("\(n)일", n == 1 ? "1 day" : "\(n) days", "\(n)日") }
+    var buildRecordSameDay: String { t("당일", "Same day", "当日") }
+    func buildRecordDayNumber(_ n: Int) -> String { t("\(n)일째", "Day \(n)", "\(n)日目") }
+    func buildRecordTotal(_ amount: String) -> String { t("총 \(amount)", "Total \(amount)", "合計 \(amount)") }
+    func buildRecordSoFar(_ amount: String) -> String { t("지금까지 \(amount)", "\(amount) so far", "これまで \(amount)") }
+    func buildRecordFromMid(_ grade: String) -> String { t("\(grade) 도중부터 기록", "Recorded from mid-\(grade)", "\(grade)の途中から記録") }
+    var buildRecordBeforeRecord: String { t("기록 전", "Before record", "記録前") }
+    var buildRecordBeforeUnboxing: String { t("개봉 전 사용분", "Before unboxing", "開封前") }
     func dexPageLabel(_ page: Int, _ total: Int) -> String {
         t("\(total)페이지 중 \(page)페이지", "Page \(page) of \(total)", "\(total)ページ中 \(page)ページ", "Página \(page) de \(total)", "Page \(page) sur \(total)", "Página \(page) de \(total)", "Seite \(page) von \(total)", "Страница \(page) из \(total)")
     }
