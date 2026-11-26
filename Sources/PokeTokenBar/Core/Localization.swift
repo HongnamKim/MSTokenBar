@@ -1326,6 +1326,11 @@ struct L {
         t("보유 등급 \(owned)/\(total)", "Grades owned \(owned)/\(total)", "所持グレード \(owned)/\(total)")
     }
 
+    /// The series list's second figure: (machine, grade) cells owned, which is what the medal counts.
+    func hangarSeriesGrades(_ owned: Int, of total: Int) -> String {
+        t("등급 \(owned)/\(total)", "Grades \(owned)/\(total)", "グレード \(owned)/\(total)")
+    }
+
     /// Help/tooltip text for an earned completion badge.
     func dexBadgeLabel(_ badge: DexBadge, seriesName s: String) -> String {
         switch badge {

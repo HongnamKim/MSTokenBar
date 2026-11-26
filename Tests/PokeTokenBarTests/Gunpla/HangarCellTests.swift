@@ -137,10 +137,12 @@ final class HangarCellTests: XCTestCase {
         XCTAssertEqual(cca.ownedCells + cca.variantOwnedCells, 0)
         XCTAssertTrue(cca.hasHangarCells, "its base machines show as silhouettes")
         let onlyVariants = SeriesCompletion(seriesID: "x", ownedCells: 0, totalCells: 0,
-                                            variantOwnedCells: 0, variantTotalCells: 3)
+                                            variantOwnedCells: 0, variantTotalCells: 3,
+                                            builtMachines: 0, totalMachines: 0)
         XCTAssertFalse(onlyVariants.hasHangarCells, "unbuilt 전용기 stay hidden, so nothing to show")
         let builtVariant = SeriesCompletion(seriesID: "x", ownedCells: 0, totalCells: 0,
-                                            variantOwnedCells: 1, variantTotalCells: 3)
+                                            variantOwnedCells: 1, variantTotalCells: 3,
+                                            builtMachines: 0, totalMachines: 0)
         XCTAssertTrue(builtVariant.hasHangarCells)
     }
 
