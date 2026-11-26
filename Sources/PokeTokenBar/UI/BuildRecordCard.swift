@@ -35,20 +35,21 @@ struct BuildRecordCard: View {
     @ViewBuilder
     private func gradeRow(_ row: BuildRecordSummary.Row, isRaisingRow: Bool) -> some View {
         if row.amounts.isEmpty {
-            GridRow { cells(row, isRaisingRow: isRaisingRow) }
+            GridRow { cells(row, isRaisingRow: isRaisingRow, breakdown: nil) }
         } else {
             let breakdown = Self.breakdownText(row.amounts, openedAtKnown: summary.openedAt != nil, l: l)
-            GridRow { cells(row, isRaisingRow: isRaisingRow) }
+            GridRow { cells(row, isRaisingRow: isRaisingRow, breakdown: breakdown) }
                 .help(breakdown)
-                .accessibilityValue(breakdown)
         }
     }
 
+    /// `breakdown` is the grade cell's accessibility value: on the row, VoiceOver would read it on every cell.
     @ViewBuilder
-    private func cells(_ row: BuildRecordSummary.Row, isRaisingRow: Bool) -> some View {
-        Text(Self.gradeLabel(row.speciesID))
+    private func cells(_ row: BuildRecordSummary.Row, isRaisingRow: Bool, breakdown: String?) -> some View {
+        let grade = Text(Self.gradeLabel(row.speciesID))
             .fontWeight(.semibold)
             .foregroundStyle(isRaisingRow ? Color.accentColor : Color.primary)
+        if let breakdown { grade.accessibilityValue(breakdown) } else { grade }
         Text(row.reachedAt.map { Self.dateText($0, year: false, locale: locale, calendar: calendar) } ?? "—")
             .foregroundStyle(.secondary)
         bar(row)
@@ -65,7 +66,7 @@ struct BuildRecordCard: View {
                 let scale = geometry.size.width / CGFloat(largest)
                 HStack(spacing: 0) {
                     Color.secondary.frame(width: CGFloat(row.unattributed) * scale)
-                    Color.accentColor.frame(width: CGFloat(row.tokens) * scale)
+                    Color.blue.frame(width: CGFloat(row.tokens) * scale)
                     Color.orange.frame(width: CGFloat(row.sandpaper) * scale)
                 }
                 .clipShape(Capsule())
@@ -104,25 +105,27 @@ struct BuildRecordCard: View {
         return date.formatted(style)
     }
 
-    /// The line under the title (spec 5.4).
+    /// The line under the title (spec 5.4). It wraps only at a separator: the spaces inside a part are the
+    /// footer's non-breaking ones.
     static func headerText(_ summary: BuildRecordSummary, l: L, locale: Locale, now: Date, calendar: Calendar) -> String {
         func date(_ date: Date) -> String { dateText(date, year: true, locale: locale, calendar: calendar) }
-        var opening = summary.openedAt.map { l.buildRecordOpened(date($0)) }
-            ?? l.buildRecordFromMid(gradeLabel(summary.firstRecordedSpeciesID))
+        func part(_ text: String) -> String { text.replacingOccurrences(of: " ", with: "\u{00A0}") }
+        var opening = part(summary.openedAt.map { l.buildRecordOpened(date($0)) }
+            ?? l.buildRecordFromMid(gradeLabel(summary.firstRecordedSpeciesID)))
         switch summary.end {
-        case .completed(let endedAt?): opening += " → " + l.buildRecordCompleted(date(endedAt))
-        case .stopped(let endedAt?): opening += " → " + l.buildRecordStopped(date(endedAt))
+        case .completed(let endedAt?): opening += " → " + part(l.buildRecordCompleted(date(endedAt)))
+        case .stopped(let endedAt?): opening += " → " + part(l.buildRecordStopped(date(endedAt)))
         case .raising, .completed(.none), .stopped(.none): break
         }
         var parts = [opening]
         switch summary.duration(now: now, calendar: calendar) {
-        case .sameDay: parts.append(l.buildRecordSameDay)
-        case .days(let n): parts.append(l.buildRecordDays(n))
-        case .dayNumber(let n): parts.append(l.buildRecordDayNumber(n))
+        case .sameDay: parts.append(part(l.buildRecordSameDay))
+        case .days(let n): parts.append(part(l.buildRecordDays(n)))
+        case .dayNumber(let n): parts.append(part(l.buildRecordDayNumber(n)))
         case nil: break
         }
         let total = TokenFormatter.compact(summary.total)
-        parts.append(summary.end == .raising ? l.buildRecordSoFar(total) : l.buildRecordTotal(total))
+        parts.append(part(summary.end == .raising ? l.buildRecordSoFar(total) : l.buildRecordTotal(total)))
         return parts.joined(separator: " · ")
     }
 
@@ -145,7 +148,7 @@ struct BuildRecordCard: View {
     /// The bar's segment colour for a source.
     private static func color(_ source: BuildRecordSummary.Source) -> Color {
         switch source {
-        case .provider: .accentColor
+        case .provider: .blue
         case .sandpaper: .orange
         case .unattributed: .secondary
         }

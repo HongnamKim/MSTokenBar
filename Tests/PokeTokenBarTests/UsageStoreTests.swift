@@ -1251,6 +1251,9 @@ final class UsageStoreTests: XCTestCase {
         let ids = store.registeredProviderIDs
         XCTAssertFalse(ids.isEmpty)
         XCTAssertEqual(Set(ids).count, ids.count, "프로바이더 id 중복")
+        let names = store.providerDisplayNames
+        XCTAssertEqual(names.count, store.registeredProviders.count)
+        for provider in store.registeredProviders { XCTAssertEqual(names[provider.id], provider.displayName, provider.id) }
     }
 
     // MARK: stale

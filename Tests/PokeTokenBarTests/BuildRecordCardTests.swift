@@ -47,6 +47,9 @@ final class BuildRecordCardTests: XCTestCase {
         XCTAssertEqual(all { $0.buildRecordBeforeUnboxing }, ["개봉 전 사용분", "Before unboxing", "開封前"])
     }
 
+    /// A header part never breaks inside: its spaces are non-breaking.
+    private func nb(_ part: String) -> String { part.replacingOccurrences(of: " ", with: "\u{00A0}") }
+
     func test_headerText() throws {
         let completed = try build([.sd, .mgsd, .hg, .rg, .mg],
                                   [142_900_000, 285_700_000, 428_600_000, 571_400_000, 982_100_000],
@@ -58,6 +61,9 @@ final class BuildRecordCardTests: XCTestCase {
         let endUnknown = try build([.sd, .mgsd, .hg, .rg, .mg],
                                    [142_900_000, 285_700_000, 428_600_000, 571_400_000, 982_100_000],
                                    openedAt: t0)
+        let sameDay = try build([.sd], [142_900_000], openedAt: t0, caughtAt: t0)
+        let raisingMidBuild = try build([.sd, .mgsd, .hg], [91_300_000], openedAt: nil, raising: true,
+                                        recordedFrom: 2, unattributed: 50_000_000)
 
         func date(_ d: Date, _ language: AppLanguage) -> String {
             BuildRecordCard.dateText(d, year: true, locale: language.displayLocale, calendar: utc)
@@ -65,13 +71,27 @@ final class BuildRecordCardTests: XCTestCase {
         func header(_ s: BuildRecordSummary, _ language: AppLanguage, now: Date) -> String {
             BuildRecordCard.headerText(s, l: L(language), locale: language.displayLocale, now: now, calendar: utc)
         }
-        XCTAssertEqual(header(completed, .ko, now: day(30)), "개봉 \(date(t0, .ko)) → 완성 \(date(day(17), .ko)) · 17일 · 총 2.41B")
-        XCTAssertEqual(header(raising, .ko, now: day(5)), "개봉 \(date(t0, .ko)) · 6일째 · 지금까지 519.9M")
-        XCTAssertEqual(header(stopped, .ko, now: day(30)), "개봉 \(date(t0, .ko)) → 중단 \(date(day(6), .ko)) · 6일 · 총 310.2M")
-        XCTAssertEqual(header(midBuild, .ko, now: day(30)), "HG 도중부터 기록 → 완성 \(date(day(20), .ko)) · 총 1B")
-        XCTAssertEqual(header(endUnknown, .ko, now: day(30)), "개봉 \(date(t0, .ko)) · 총 2.41B")
-        XCTAssertEqual(header(completed, .en, now: day(30)), "Opened \(date(t0, .en)) → Completed \(date(day(17), .en)) · 17 days · Total 2.41B")
-        XCTAssertEqual(header(completed, .ja, now: day(30)), "開封 \(date(t0, .ja)) → 完成 \(date(day(17), .ja)) · 17日 · 合計 2.41B")
+        XCTAssertEqual(header(completed, .ko, now: day(30)),
+                       nb("개봉 \(date(t0, .ko))") + " → " + nb("완성 \(date(day(17), .ko))") + " · " + nb("17일")
+                           + " · " + nb("총 2.41B"))
+        XCTAssertEqual(header(raising, .ko, now: day(5)),
+                       nb("개봉 \(date(t0, .ko))") + " · " + nb("6일째") + " · " + nb("지금까지 519.9M"))
+        XCTAssertEqual(header(stopped, .ko, now: day(30)),
+                       nb("개봉 \(date(t0, .ko))") + " → " + nb("중단 \(date(day(6), .ko))") + " · " + nb("6일")
+                           + " · " + nb("총 310.2M"))
+        XCTAssertEqual(header(midBuild, .ko, now: day(30)),
+                       nb("HG 도중부터 기록") + " → " + nb("완성 \(date(day(20), .ko))") + " · " + nb("총 1B"))
+        XCTAssertEqual(header(endUnknown, .ko, now: day(30)), nb("개봉 \(date(t0, .ko))") + " · " + nb("총 2.41B"))
+        XCTAssertEqual(header(sameDay, .ko, now: day(30)),
+                       nb("개봉 \(date(t0, .ko))") + " → " + nb("완성 \(date(t0, .ko))") + " · " + nb("당일")
+                           + " · " + nb("총 142.9M"))
+        XCTAssertEqual(header(raisingMidBuild, .ko, now: day(5)), nb("HG 도중부터 기록") + " · " + nb("지금까지 141.3M"))
+        XCTAssertEqual(header(completed, .en, now: day(30)),
+                       nb("Opened \(date(t0, .en))") + " → " + nb("Completed \(date(day(17), .en))") + " · "
+                           + nb("17 days") + " · " + nb("Total 2.41B"))
+        XCTAssertEqual(header(completed, .ja, now: day(30)),
+                       nb("開封 \(date(t0, .ja))") + " → " + nb("完成 \(date(day(17), .ja))") + " · " + nb("17日")
+                           + " · " + nb("合計 2.41B"))
         XCTAssertNotEqual(date(t0, .ko), BuildRecordCard.dateText(t0, year: false, locale: AppLanguage.ko.displayLocale, calendar: utc),
                           "rows drop the year")
     }
@@ -98,12 +118,17 @@ final class BuildRecordCardTests: XCTestCase {
                              caughtAt: day(400), buildLog: BuildLog(openedAt: t0, stages: stages))
         let names = ["claude": "Claude Code", "codex": "Codex", "gemini": "Antigravity (Gemini and 3P models)"]
         let wide = try XCTUnwrap(BuildRecordSummary(entry: entry, isRaising: false, providerNames: names))
+        let raising = try build([.sd, .mgsd, .hg], [142_900_000, 285_700_000, 91_300_000], openedAt: t0, raising: true)
+        let midBuild = try build([.sd, .mgsd, .hg, .rg], [248_600_000, 571_400_000], openedAt: nil, caughtAt: day(20),
+                                 recordedFrom: 2, unattributed: 180_000_000)
         let width = PopoverMetrics.scrollContentWidth
         for language in AppLanguage.allCases {
-            let controller = NSHostingController(rootView: BuildRecordCard(
-                summary: wide, l: L(language), locale: language.displayLocale, now: day(400), calendar: utc))
-            let size = controller.sizeThatFits(in: CGSize(width: width, height: 10_000))
-            XCTAssertLessThanOrEqual(size.width, width + 0.5, "\(language)")
+            for (summary, name) in [(wide, "wide"), (raising, "raising"), (midBuild, "mid-build")] {
+                let controller = NSHostingController(rootView: BuildRecordCard(
+                    summary: summary, l: L(language), locale: language.displayLocale, now: day(400), calendar: utc))
+                let size = controller.sizeThatFits(in: CGSize(width: width, height: 10_000))
+                XCTAssertLessThanOrEqual(size.width, width + 0.5, "\(language) \(name)")
+            }
         }
     }
 
@@ -161,25 +186,38 @@ final class BuildRecordCardTests: XCTestCase {
         let stopped = try build([.sd, .mgsd], [142_900_000, 167_300_000], openedAt: t0, caughtAt: day(6), stopped: true)
         let midBuild = try build([.sd, .mgsd, .hg, .rg], [248_600_000, 571_400_000], openedAt: nil, caughtAt: day(20),
                                  recordedFrom: 2, unattributed: 180_000_000)
-        for (summary, name) in [(raising, "card-raising"), (stopped, "card-stopped"), (midBuild, "card-mid-build")] {
+        let completed = try build([.sd, .mgsd, .hg, .rg, .mg],
+                                  [142_900_000, 285_700_000, 428_600_000, 571_400_000, 982_100_000],
+                                  openedAt: t0, caughtAt: day(17))
+        let cards: [(BuildRecordSummary, String, AppLanguage, ColorScheme)] = [
+            (raising, "card-raising", .ko, .light), (stopped, "card-stopped", .ko, .light),
+            (midBuild, "card-mid-build", .ko, .light), (completed, "card-completed-en", .en, .light),
+            (completed, "card-completed-ja", .ja, .light), (completed, "card-completed-dark", .ko, .dark),
+        ]
+        for (summary, name, language, scheme) in cards {
             let width = PopoverMetrics.scrollContentWidth
-            let card = BuildRecordCard(summary: summary, l: L(.ko), locale: AppLanguage.ko.displayLocale,
+            let card = BuildRecordCard(summary: summary, l: L(language), locale: language.displayLocale,
                                        now: day(5), calendar: utc)
             let height = NSHostingController(rootView: card).sizeThatFits(in: CGSize(width: width, height: 10_000)).height
-            let view = card.frame(width: width, height: height).background(Color.white).environment(\.colorScheme, .light)
-            let host = try await mountOffscreen(view, width: width, height: height)
+            let view = card.frame(width: width, height: height)
+                .background(scheme == .dark ? Color(nsColor: .windowBackgroundColor) : Color.white)
+                .environment(\.colorScheme, scheme)
+            let host = try await mountOffscreen(view, width: width, height: height,
+                                                appearance: scheme == .dark ? .darkAqua : .aqua)
             try writePNG(host, to: output.appendingPathComponent("\(name).png"))
             host.window?.close()
         }
     }
 
-    /// Mounts `view` in an off-screen light window, as `IndividualPickerRenderingTests` does.
-    private func mountOffscreen<V: View>(_ view: V, width: CGFloat, height: CGFloat) async throws -> NSHostingView<V> {
+    /// Mounts `view` in an off-screen window, light unless `appearance` says otherwise, as
+    /// `IndividualPickerRenderingTests` does.
+    private func mountOffscreen<V: View>(_ view: V, width: CGFloat, height: CGFloat,
+                                         appearance: NSAppearance.Name = .aqua) async throws -> NSHostingView<V> {
         let host = NSHostingView(rootView: view)
         host.frame = NSRect(x: 0, y: 0, width: width, height: height)
         let window = NSWindow(contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
-        window.appearance = NSAppearance(named: .aqua)
+        window.appearance = NSAppearance(named: appearance)
         window.contentView = host
         window.setFrameOrigin(NSPoint(x: -10000, y: -10000))
         window.orderFront(nil)

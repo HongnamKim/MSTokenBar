@@ -28,7 +28,7 @@ struct BuildRecordSummary: Equatable, Sendable {
     let totals: [Amount]              // whole build, display order, values > 0 only
 
     var total: Int { rows.reduce(0) { $0 + $1.total } }
-    var largestRowTotal: Int { rows.map(\.total).max() ?? 0 }
+    var largestRowTotal: Int { rows.reduce(0) { max($0, $1.total) } }
 
     /// nil = no card: the entry has no record, or none of its grades has a stage.
     init?(entry: DexEntry, isRaising: Bool, providerNames: [String: String]) {

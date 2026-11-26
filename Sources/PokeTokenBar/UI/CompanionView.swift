@@ -1211,12 +1211,12 @@ struct CollectionView: View {
         }
     }
 
-    /// 포획 로그 — 개체 단위 기록. 필터(요약 헤더)는 고정, 목록만 스크롤한다
     /// The build a log row's click should open: the row's own entry when the clicked sprite is its final grade.
     static func detailInstance(for entry: DexEntry, opening collectionID: String, links: [Int: String]) -> String? {
         links[entry.finalID] == collectionID ? entry.id : nil
     }
 
+    /// 포획 로그 — 개체 단위 기록. 필터(요약 헤더)는 고정, 목록만 스크롤한다
     private var catchLog: some View {
         let dexLinks = store.dexLinkTargets   // once for all rows, not per row
         return VStack(alignment: .leading, spacing: 6) {
