@@ -1045,7 +1045,7 @@ struct CollectionView: View {
                 // Back to the log would leave it for the next switch to the grid.
                 if !nav.showingCollectionLog { dexReturnAnchor = id }
                 nav.dexDetailCollectionID = nil
-            }, providerNames: providerNames)
+            }, initialInstanceID: nav.dexDetailInstanceID ?? "", providerNames: providerNames)
                 .id(species.collectionID)
                 .frame(height: Self.contentHeight)
         } else if showingSeriesList {
@@ -1212,6 +1212,11 @@ struct CollectionView: View {
     }
 
     /// 포획 로그 — 개체 단위 기록. 필터(요약 헤더)는 고정, 목록만 스크롤한다
+    /// The build a log row's click should open: the row's own entry when the clicked sprite is its final grade.
+    static func detailInstance(for entry: DexEntry, opening collectionID: String, links: [Int: String]) -> String? {
+        links[entry.finalID] == collectionID ? entry.id : nil
+    }
+
     private var catchLog: some View {
         let dexLinks = store.dexLinkTargets   // once for all rows, not per row
         return VStack(alignment: .leading, spacing: 6) {
@@ -1231,7 +1236,11 @@ struct CollectionView: View {
                                 // Keeps the segment, so Back from the detail page returns to the log.
                                 DexEntryRow(store: store, entry: entry, dexLinks: dexLinks) {
                                     logReturnAnchor = entry.id
-                                    navigation.dexDetailCollectionID = $0
+                                    if let instanceID = Self.detailInstance(for: entry, opening: $0, links: dexLinks) {
+                                        navigation.openDexDetail(collectionID: $0, instanceID: instanceID)
+                                    } else {
+                                        navigation.dexDetailCollectionID = $0
+                                    }
                                 }
                             }
                         }
@@ -1753,7 +1762,7 @@ struct PokemonDetailView: View {
     @State private var selectedShiny: Bool?
 
     init(store: CompanionStore, species: CompanionStore.DexSpecies,
-         onBack: @escaping () -> Void, selectedShiny: Bool? = nil,
+         onBack: @escaping () -> Void, selectedShiny: Bool? = nil, initialInstanceID: String = "",
          providerNames: [String: String] = [:],
          spriteStore: SpriteStore = .shared) {
         self.store = store
@@ -1762,6 +1771,7 @@ struct PokemonDetailView: View {
         self.providerNames = providerNames
         self.spriteStore = spriteStore
         _selectedShiny = State(initialValue: selectedShiny)
+        _selectedInstanceID = State(initialValue: initialInstanceID)
     }
 
     private var displayedSpecies: CompanionStore.DexSpecies { species }
