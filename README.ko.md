@@ -6,7 +6,7 @@
 
 이미 쓰고 있는 AI 코딩 토큰(Claude Code, Codex, Gemini CLI 등)을 건프라(건담 플라스틱 모델) 제작 진행도로 바꿔 주는 macOS 메뉴바 앱입니다. [chattymin/PokeTokenBar](https://github.com/chattymin/PokeTokenBar)를 건프라 테마로 포크한 프로젝트입니다.
 
-> 우주세기와 비우주세기를 합쳐 21개 작품의 기체 145기를 수록했습니다. 출시된 건프라 등급과 모드·장비별 도트 스프라이트는 385종입니다. 토큰 사용량 추적은 원본 프로젝트에서 그대로 가져온 기능입니다(지원 도구는 [원본 README](https://github.com/chattymin/PokeTokenBar#readme) 참고).
+> 우주세기와 비우주세기를 합쳐 22개 작품의 기체를 격납고 150칸에 수록했습니다. 출시된 건프라 등급과 모드·장비별 도트 스프라이트는 414종입니다. 토큰 사용량 추적은 원본 프로젝트에서 그대로 가져온 기능입니다(지원 도구는 [원본 README](https://github.com/chattymin/PokeTokenBar#readme) 참고).
 
 ## 작동 방식
 
