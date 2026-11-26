@@ -323,7 +323,8 @@ final class CompanionStore {
                 Dictionary(uniqueKeysWithValues:
                     active.pathIDs.compactMap { id in line.names[id].map { (id, $0) } })
             },
-            prayers: active.prayers
+            prayers: active.prayers,
+            buildLog: active.buildLog
         )
     }
 

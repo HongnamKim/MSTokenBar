@@ -292,4 +292,16 @@ final class BuildLogStoreTests: XCTestCase {
         XCTAssertEqual(entry.chainOrder, [hg])
         XCTAssertEqual(entry.buildLog?.stages, [BuildStage(speciesID: hg, reachedAt: clock.now, tokensByProvider: ["a": 7])])
     }
+
+    // MARK: display
+
+    func test_theRaisingEntryCarriesItsRecord() async throws {
+        let s = try store(seed: seeded())
+        await s.hatch(baseID: sd)
+        use(s, ["a": 100])
+        let entry = try XCTUnwrap(s.pokemonIndividuals(speciesID: sd).first)
+        XCTAssertTrue(s.isActiveDexEntry(entry))
+        XCTAssertEqual(entry.buildLog, try log(s))
+        XCTAssertEqual(entry.buildLog?.stages.first?.tokensByProvider, ["a": 100])
+    }
 }
