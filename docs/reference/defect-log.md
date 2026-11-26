@@ -7,6 +7,7 @@ read_when:
   - 메뉴바·플로팅 펫 등 상시 표시 애니메이션의 성능을 손볼 때
   - 스프라이트·이미지를 고정 크기 프레임에 그릴 때(비율 왜곡 부류)
   - 세이브 이전/병합·외부 파일 입력 경로를 만들 때
+  - 릴리스 스크립트의 태그·게시 경로를 손볼 때
 ---
 
 # 결함 대응 축적 규칙
@@ -1548,3 +1549,18 @@ read_when:
   On the same CI image, English-only recognition corrected the period label but still read
   the unrelated chart caption `Daily` as `Dally`; do not teach OCR that misspelling or relax
   the original chart guard to make a period-row regression pass.
+
+## 릴리스·태그
+
+- **A release must never attach to a tag that already exists.** This fork inherited the upstream
+  PokeTokenBar tags `v1.0.0` and `v2.0.0`–`v2.5.7`. `release.sh` called `gh release create v$VERSION
+  --target main`, and gh ignores `--target` when the tag exists, so the 1.0.0 release attached to the
+  upstream commit `b33229e`; its source archives and tag showed upstream code while the uploaded zip was
+  correct. Immutable releases are enabled, so that tag cannot be moved or deleted: `v1.0.0` stays on
+  `b33229e`, and the 1.0.0 release commit is `77dd599`. The 0.x releases never collided, and nothing
+  in the script or its fixture test looked at tags, so the gap stayed hidden until the first 1.x version. `release.sh` now stops before the test gate when
+  `v$VERSION` exists locally or on `origin`, tags the release commit itself, pushes `main` and the tag
+  with `--atomic`, and publishes with `--verify-tag`.
+  `test_release_stops_before_side_effects_when_the_tag_already_exists` covers the local and remote
+  cases and fails when the guard is removed. Any new publish path must create its tag explicitly, never
+  rely on `gh`'s implicit tag creation.

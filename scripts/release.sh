@@ -84,6 +84,12 @@ VERSION="${1:?사용: release.sh <version>  (예: 2.1.1)}"
 PREV=$(grep -oE 'VERSION="[0-9.]+"' scripts/build-app.sh | grep -oE '[0-9.]+')
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 [[ "$BRANCH" == "main" ]] || { echo "✗ main 브랜치에서 실행하세요 (현재: $BRANCH) — 커밋/push 대상 일치 보장"; exit 1; }
+# 원본 PokeTokenBar 에서 물려받은 v1.0.0·v2.x 태그가 저장소에 남아 있다. gh release create 는 같은 이름의
+# 태그가 있으면 --target 을 무시하고 그 태그에 릴리스를 붙인다(v1.0.0 릴리스가 원본 커밋에 붙은 원인).
+TAG="v$VERSION"
+if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || [[ -n "$(git ls-remote --tags origin "refs/tags/$TAG")" ]]; then
+  echo "✗ 태그 $TAG 가 이미 있습니다 — 릴리스가 그 커밋에 붙습니다. 버전이나 기존 태그를 확인하세요." >&2; exit 1
+fi
 echo "=== MSTokenBar 릴리스 $PREV → $VERSION ==="
 
 # Fail before tests, version changes, local installation, or publication.
@@ -144,11 +150,13 @@ lipo build/MSTokenBar.app/Contents/MacOS/MSTokenBar -verify_arch arm64 x86_64 \
 echo "▶ 5/7 커밋 + push (빌드 성공 후)"
 git add scripts/build-app.sh
 git commit -q -m "$COMMIT_MESSAGE"
-git push -q origin main
+# 태그를 릴리스 커밋에 직접 만든다. 그 사이 원격에 같은 태그가 생겼으면 --atomic push 가 main 과 함께 거부된다.
+git tag "$TAG" HEAD
+git push -q --atomic origin main "refs/tags/$TAG"
 
-echo "▶ 6/7 GitHub Release v$VERSION"
-gh release create "v$VERSION" build/MSTokenBar.zip --repo "$REPO" \
-  --title "MSTokenBar v$VERSION" --target main --notes-file "$NOTES_FILE"
+echo "▶ 6/7 GitHub Release $TAG"
+gh release create "$TAG" build/MSTokenBar.zip --repo "$REPO" \
+  --title "MSTokenBar $TAG" --verify-tag --notes-file "$NOTES_FILE"
 
 echo "▶ 7/7 GitHub Pages 재빌드(랜딩 동적 배지 갱신 유도)"
 gh api -X POST "repos/$REPO/pages/builds" >/dev/null 2>&1 || true

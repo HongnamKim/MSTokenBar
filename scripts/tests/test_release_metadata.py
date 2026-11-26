@@ -115,9 +115,11 @@ class ReleaseMetadataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             metadata.commit_message("2.5.4", str(authors))
 
-    def test_release_stops_before_side_effects_when_notes_are_missing(self):
+    def release_fixture(self):
         # Run the real shell entry point inside a disposable fixture. No git writes,
         # network, app build, signing, or installation commands are reachable.
+        # The fake git answers only the read-only branch and tag lookups; the tag
+        # lookups report FAKE_LOCAL_TAG / FAKE_REMOTE_TAG as existing.
         scripts = self.root / "scripts"
         scripts.mkdir()
         for name in ("release.sh", "release-metadata.py"):
@@ -130,11 +132,41 @@ class ReleaseMetadataTests(unittest.TestCase):
         commands = self.root / "bin"
         commands.mkdir()
         git = commands / "git"
-        git.write_text('#!/bin/sh\nif [ "$1" = rev-parse ]; then echo main; else exit 99; fi\n')
+        git.write_text(
+            '#!/bin/sh\n'
+            'case "$1" in\n'
+            '  rev-parse)\n'
+            '    if [ "$2" = --abbrev-ref ]; then echo main; exit 0; fi\n'
+            '    [ -n "$FAKE_LOCAL_TAG" ] && [ "$4" = "refs/tags/$FAKE_LOCAL_TAG" ] && exit 0\n'
+            '    exit 1 ;;\n'
+            '  ls-remote)\n'
+            '    [ -n "$FAKE_REMOTE_TAG" ] && [ "$4" = "refs/tags/$FAKE_REMOTE_TAG" ] && echo "b33229e\t$4"\n'
+            '    exit 0 ;;\n'
+            '  *) exit 99 ;;\n'
+            'esac\n')
         git.chmod(0o755)
-        env = {k: v for k, v in os.environ.items() if not k.startswith("PTB_")}
+        env = {k: v for k, v in os.environ.items() if not k.startswith(("PTB_", "FAKE_"))}
         env["PATH"] = str(commands) + os.pathsep + env["PATH"]
         command = ["bash", str(scripts / "release.sh"), "2.5.4"]
+        return scripts, marker, env, command
+
+    def test_release_stops_before_side_effects_when_the_tag_already_exists(self):
+        # Inherited upstream tags (v1.0.0, v2.x) made gh attach the 1.0.0 release to an
+        # upstream commit. An existing tag, local or remote, must stop before the test gate.
+        scripts, marker, env, command = self.release_fixture()
+        env.update(PTB_NOTES_FILE=str(self.notes), PTB_CONTRIBUTORS_FILE=str(self.roster))
+        for key in ("FAKE_LOCAL_TAG", "FAKE_REMOTE_TAG"):
+            result = subprocess.run(command, env={**env, key: "v2.5.4"}, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0, key)
+            self.assertIn("v2.5.4", result.stderr, key)
+            self.assertFalse(marker.exists(), key)
+        self.assertEqual((scripts / "build-app.sh").read_text(), 'VERSION="2.5.3"\n')
+        other = subprocess.run(command, env={**env, "FAKE_REMOTE_TAG": "v2.5.3"}, capture_output=True, text=True)
+        self.assertNotEqual(other.returncode, 0, "Fixture intentionally stops at test-gate")
+        self.assertTrue(marker.exists(), "A different existing tag must not block the release")
+
+    def test_release_stops_before_side_effects_when_notes_are_missing(self):
+        scripts, marker, env, command = self.release_fixture()
         missing = subprocess.run(command, env=env, capture_output=True, text=True)
         self.assertNotEqual(missing.returncode, 0)
         self.assertIn("PTB_NOTES_FILE", missing.stderr)
