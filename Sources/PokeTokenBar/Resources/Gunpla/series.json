@@ -143,6 +143,51 @@
         "ja": "機動戦士Vガンダム"
       },
       "order": 15
+    },
+    {
+      "id": "g-gundam",
+      "names": {
+        "ko": "G건담",
+        "en": "Mobile Fighter G Gundam",
+        "ja": "機動武闘伝Gガンダム"
+      },
+      "order": 16
+    },
+    {
+      "id": "gundam-wing",
+      "names": {
+        "ko": "건담 W",
+        "en": "Mobile Suit Gundam Wing",
+        "ja": "新機動戦記ガンダムW"
+      },
+      "order": 17
+    },
+    {
+      "id": "endless-waltz",
+      "names": {
+        "ko": "엔드리스 왈츠",
+        "en": "Gundam Wing: Endless Waltz",
+        "ja": "新機動戦記ガンダムW Endless Waltz"
+      },
+      "order": 18
+    },
+    {
+      "id": "after-war-x",
+      "names": {
+        "ko": "건담 X",
+        "en": "After War Gundam X",
+        "ja": "機動新世紀ガンダムX"
+      },
+      "order": 19
+    },
+    {
+      "id": "turn-a-gundam",
+      "names": {
+        "ko": "∀건담",
+        "en": "Turn A Gundam",
+        "ja": "∀ガンダム"
+      },
+      "order": 20
     }
   ]
 }

@@ -3529,6 +3529,423 @@
         "hg": "v2-assault-buster-hg",
         "verka": "v2-assault-buster-verka"
       }
+    },
+    {
+      "id": 141,
+      "modelNumber": "GF13-017NJ",
+      "names": {
+        "ko": "샤이닝 건담",
+        "en": "Shining Gundam",
+        "ja": "シャイニングガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "neo_japan",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112139368000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/435",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/3169",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/814"
+      },
+      "sprites": {
+        "sd": "shining-gundam-sd",
+        "hg": "shining-gundam-hg",
+        "rg": "shining-gundam-rg",
+        "mg": "shining-gundam-mg"
+      }
+    },
+    {
+      "id": 142,
+      "modelNumber": "GF13-017NJII",
+      "names": {
+        "ko": "갓 건담",
+        "en": "God Gundam",
+        "ja": "ゴッドガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "neo_japan",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112142160000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/930",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/685",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/813"
+      },
+      "sprites": {
+        "sd": "god-gundam-sd",
+        "hg": "god-gundam-hg",
+        "rg": "god-gundam-rg",
+        "mg": "god-gundam-mg"
+      }
+    },
+    {
+      "id": 143,
+      "modelNumber": "GF13-001NHII",
+      "names": {
+        "ko": "마스터 건담",
+        "en": "Master Gundam",
+        "ja": "マスターガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "neo_hong_kong",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112008862000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/436",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/514"
+      },
+      "sprites": {
+        "sd": "master-gundam-sd",
+        "hg": "master-gundam-hg",
+        "mg": "master-gundam-mg"
+      }
+    },
+    {
+      "id": 144,
+      "modelNumber": "XXXG-01W",
+      "names": {
+        "ko": "윙 건담",
+        "en": "Wing Gundam",
+        "ja": "ウイングガンダム"
+      },
+      "series": "gundam-wing",
+      "faction": "colony_liberation",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/g34/p/g34_m0001.JPG",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/387",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/684",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/578",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/525"
+      },
+      "sprites": {
+        "sd": "wing-gundam-tv-sd",
+        "hg": "wing-gundam-tv-hg",
+        "rg": "wing-gundam-tv-rg",
+        "mg": "wing-gundam-tv-mg",
+        "verka": "wing-gundam-tv-verka"
+      }
+    },
+    {
+      "id": 145,
+      "modelNumber": "XXXG-00W0",
+      "names": {
+        "ko": "윙 건담 제로",
+        "en": "Wing Gundam Zero",
+        "ja": "ウイングガンダムゼロ"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102617866000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/393",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/3897",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/608"
+      },
+      "sprites": {
+        "sd": "wing-zero-tv-sd",
+        "hg": "wing-zero-tv-hg",
+        "rg": "wing-zero-tv-rg",
+        "mg": "wing-zero-tv-mg"
+      }
+    },
+    {
+      "id": 146,
+      "modelNumber": "OZ-00MS",
+      "names": {
+        "ko": "톨기스",
+        "en": "Tallgeese",
+        "ja": "トールギス"
+      },
+      "series": "gundam-wing",
+      "faction": "oz",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425771700000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/676",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/848"
+      },
+      "sprites": {
+        "sd": "tallgeese-tv-sd",
+        "rg": "tallgeese-tv-rg",
+        "mg": "tallgeese-tv-mg"
+      }
+    },
+    {
+      "id": 147,
+      "modelNumber": "OZ-13MS",
+      "names": {
+        "ko": "건담 에피온",
+        "en": "Gundam Epyon",
+        "ja": "ガンダムエピオン"
+      },
+      "series": "gundam-wing",
+      "faction": "white_fang",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425770772000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/1097",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/590"
+      },
+      "sprites": {
+        "sd": "gundam-epyon-sd",
+        "rg": "gundam-epyon-rg",
+        "mg": "gundam-epyon-mg"
+      }
+    },
+    {
+      "id": 148,
+      "modelNumber": "XXXG-00W0",
+      "names": {
+        "ko": "윙 건담 제로 (EW판)",
+        "en": "Wing Gundam Zero (EW)",
+        "ja": "ウイングガンダムゼロ（EW版）"
+      },
+      "series": "endless-waltz",
+      "faction": "gundam_pilots",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "mgsd",
+        "hg",
+        "rg",
+        "mg",
+        "verka",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102578419000&grp_id=5325",
+        "mgsd": "https://manual.bandai-hobby.net/menus/detail/1816",
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425612096000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/1073",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/995",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/642",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/650"
+      },
+      "sprites": {
+        "sd": "wing-zero-ew-sd",
+        "mgsd": "wing-zero-ew-mgsd",
+        "hg": "wing-zero-ew-hg",
+        "rg": "wing-zero-ew-rg",
+        "mg": "wing-zero-ew-mg",
+        "verka": "wing-zero-ew-verka",
+        "pg": "wing-zero-ew-pg"
+      }
+    },
+    {
+      "id": 149,
+      "modelNumber": "XXXG-01S2",
+      "names": {
+        "ko": "알트론 건담 (EW판)",
+        "en": "Altron Gundam (EW)",
+        "ja": "アルトロンガンダム（EW版）"
+      },
+      "series": "endless-waltz",
+      "faction": "mariemaia_army",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425612157000&grp_id=5325",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2265"
+      },
+      "sprites": {
+        "hg": "altron-ew-hg",
+        "mg": "altron-ew-mg"
+      }
+    },
+    {
+      "id": 150,
+      "modelNumber": "OZ-00MS2B",
+      "names": {
+        "ko": "톨기스 III",
+        "en": "Tallgeese III",
+        "ja": "トールギスIII"
+      },
+      "series": "endless-waltz",
+      "faction": "preventer",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425612119000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2563",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2270"
+      },
+      "sprites": {
+        "hg": "tallgeese-iii-hg",
+        "rg": "tallgeese-iii-rg",
+        "mg": "tallgeese-iii-mg"
+      }
+    },
+    {
+      "id": 151,
+      "modelNumber": "GX-9900",
+      "names": {
+        "ko": "건담 X",
+        "en": "Gundam X",
+        "ja": "ガンダムX"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756707000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/924",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/619"
+      },
+      "sprites": {
+        "sd": "gundam-x-sd",
+        "hg": "gundam-x-hg",
+        "mg": "gundam-x-mg"
+      }
+    },
+    {
+      "id": 152,
+      "modelNumber": "GX-9901-DX",
+      "names": {
+        "ko": "건담 더블 X",
+        "en": "Gundam Double X",
+        "ja": "ガンダムダブルエックス"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425770741000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/388",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/622"
+      },
+      "sprites": {
+        "sd": "gundam-double-x-sd",
+        "hg": "gundam-double-x-hg",
+        "mg": "gundam-double-x-mg"
+      }
+    },
+    {
+      "id": 153,
+      "modelNumber": "NRX-0013",
+      "names": {
+        "ko": "건담 버사고",
+        "en": "Gundam Virsago",
+        "ja": "ガンダムヴァサーゴ"
+      },
+      "series": "after-war-x",
+      "faction": "new_earth_federation",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/5710"
+      },
+      "sprites": {
+        "hg": "gundam-virsago-hg"
+      }
+    },
+    {
+      "id": 154,
+      "modelNumber": "WD-M01",
+      "names": {
+        "ko": "∀건담",
+        "en": "Turn A Gundam",
+        "ja": "∀ガンダム"
+      },
+      "series": "turn-a-gundam",
+      "faction": "inglessa_militia",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425761572000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/394",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/550"
+      },
+      "sprites": {
+        "sd": "turn-a-gundam-sd",
+        "hg": "turn-a-gundam-hg",
+        "mg": "turn-a-gundam-mg"
+      }
+    },
+    {
+      "id": 155,
+      "modelNumber": "Concept-X 6-1-2",
+      "names": {
+        "ko": "턴 X",
+        "en": "Turn X",
+        "ja": "ターンX"
+      },
+      "series": "turn-a-gundam",
+      "faction": "gingham_fleet",
+      "rarity": "legendary",
+      "grades": [
+        "mg"
+      ],
+      "gradeSources": {
+        "mg": "https://manual.bandai-hobby.net/menus/detail/620"
+      },
+      "sprites": {
+        "mg": "turn-x-mg"
+      }
     }
   ]
 }

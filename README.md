@@ -6,7 +6,7 @@
 
 A macOS menu-bar app that turns the AI coding tokens you already spend (Claude Code, Codex, Gemini CLI, and more) into Gunpla (plastic model kit) progress. It is a Gunpla-themed fork of [chattymin/PokeTokenBar](https://github.com/chattymin/PokeTokenBar).
 
-> The initial roster includes all 130 mobile suits from 16 Universal Century works, with 336 pixel sprites covering their released grades, modes and equipment. Token usage tracking is inherited from the original project; see the [upstream README](https://github.com/chattymin/PokeTokenBar#readme) for the supported tools.
+> The hangar includes 145 mobile suits from 21 works, with 385 pixel sprites covering their released grades, modes and equipment. Token usage tracking is inherited from the original project; see the [upstream README](https://github.com/chattymin/PokeTokenBar#readme) for the supported tools.
 
 ## How it works
 

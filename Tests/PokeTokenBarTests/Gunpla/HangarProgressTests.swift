@@ -37,7 +37,8 @@ final class HangarProgressTests: XCTestCase {
     func test_completionsFollowCatalogSeriesOrder() {
         XCTAssertEqual(HangarProgress.completions(owned: [], catalog: catalog).map(\.seriesID),
                        ["first", "08th-ms-team", "0080", "0083", "the-origin", "thunderbolt", "cucuruz-doans-island",
-                        "zeta", "zz", "cca", "beltorchika-children", "uc", "narrative", "hathaway", "f91", "victory"])
+                        "zeta", "zz", "cca", "beltorchika-children", "uc", "narrative", "hathaway", "f91", "victory",
+                        "g-gundam", "gundam-wing", "endless-waltz", "after-war-x", "turn-a-gundam"])
     }
 
     func test_unicornModesShareOneHangarEntryAndKeepIndependentGrades() throws {
@@ -97,7 +98,9 @@ final class HangarProgressTests: XCTestCase {
                                 .series("0080"), .series("0083"), .series("the-origin"), .seriesVariant("the-origin"),
                                 .series("thunderbolt"), .series("cucuruz-doans-island"), .series("zeta"), .series("zz"), .seriesVariant("zz"),
                                 .series("cca"), .seriesVariant("cca"), .series("beltorchika-children"), .series("uc"), .seriesVariant("uc"),
-                                .series("narrative"), .series("hathaway"), .series("f91"), .series("victory"), .all, .allVariant])
+                                .series("narrative"), .series("hathaway"), .series("f91"), .series("victory"),
+                                .series("g-gundam"), .series("gundam-wing"), .series("endless-waltz"),
+                                .series("after-war-x"), .series("turn-a-gundam"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))

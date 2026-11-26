@@ -85,12 +85,12 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 139)
+        XCTAssertEqual(c.machines.count, 154)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
-        XCTAssertEqual(c.series.count, 16)
+        XCTAssertEqual(c.series.count, 21)
     }
 
     func test_fullArmorUnicornModesFollowTheReleasedFrameColors() throws {
@@ -120,6 +120,18 @@ final class MachineCatalogTests: XCTestCase {
         }
     }
 
+    func test_wingZeroDesignsWithTheSameModelNumberHaveSeparateHangarSlots() throws {
+        let catalog = try MachineCatalog.bundled()
+        let tv = try XCTUnwrap(catalog.machine(id: 145))
+        let ew = try XCTUnwrap(catalog.machine(id: 148))
+        XCTAssertEqual(tv.modelNumber, ew.modelNumber)
+        XCTAssertNotEqual(tv.hangarID, ew.hangarID)
+        XCTAssertEqual(tv.grades, [.sd, .hg, .rg, .mg])
+        XCTAssertEqual(ew.grades, [.sd, .mgsd, .hg, .rg, .mg, .verka, .pg])
+        let tvSprites = Set((tv.sprites ?? [:]).values)
+        XCTAssertTrue(tvSprites.isDisjoint(with: (ew.sprites ?? [:]).values))
+    }
+
     func test_completedSeriesServeGradeSpecificArtAndKitSources() throws {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
@@ -127,10 +139,12 @@ final class MachineCatalogTests: XCTestCase {
         let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
                       "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14,
-                      "narrative": 5, "hathaway": 6, "f91": 4, "victory": 4]
+                      "narrative": 5, "hathaway": 6, "f91": 4, "victory": 4,
+                      "g-gundam": 3, "gundam-wing": 4, "endless-waltz": 3, "after-war-x": 3, "turn-a-gundam": 2]
         // These vintage kits are documented by their original Bandai instruction booklets.
         let printedManuals = [
             "gundam-f91-sd": "https://www.dalong.net/reviews/sd/g21/p/g21_m0001.jpg",
+            "wing-gundam-tv-sd": "https://www.dalong.net/reviews/sd/g34/p/g34_m0001.JPG",
             "victory-gundam-sd": "https://www.dalong.net/reviews/sd/g23/p/g23_m0001.JPG",
         ]
         for (series, count) in counts {
