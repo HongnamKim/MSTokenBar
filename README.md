@@ -15,15 +15,16 @@ A macOS menu-bar app that turns the AI coding tokens you already spend (Claude C
 - **Complete**: at its final grade the suit is complete. It is saved to your Hangar and a new Kit Box arrives. A completed suit does not come out again until you have completed every suit.
 - **Customs**: commander and ace customs, such as Char's Zaku II, are rare variants of their base suit. Paint tools from the shop (Masking Tape → Panel Line Pen → Paint Set → Airbrush) raise the chance for good.
 - **Hangar**: one cell per suit records every grade you have built. Suits you have not built yet appear as silhouettes with only their model number as a clue. Filter by series and earn a badge for completing each one.
+- **Build record**: every build keeps a record of when its box was opened, when each grade was reached and how many tokens each tool contributed. The suit's detail page shows it as one bar per grade, split by source.
 - **Items**: a Sanding Sponge gives instant progress, and Uncommon or Rare Boxes guarantee a rarity tier.
 
 | Hangar | Series list |
 | --- | --- |
 | ![Hangar](assets/screenshot-gunpla-hangar.png) | ![Series list](assets/screenshot-gunpla-series.png) |
 
-| Suit detail | Shop |
+| Suit detail and build record | Shop |
 | --- | --- |
-| ![Suit detail](assets/screenshot-gunpla-detail.png) | ![Shop](assets/screenshot-gunpla-shop.png) |
+| ![Suit detail and build record](assets/screenshot-gunpla-build-record.png) | ![Shop](assets/screenshot-gunpla-shop.png) |
 
 ## Requirements
 
@@ -39,7 +40,7 @@ When a new version is out, the app shows an update banner. Click **Update** and 
 
 ## Versioning
 
-Each sprite drop, which adds one or more finished series, raises the minor version (0.1.0, 0.2.0, …). Version 1.0.0 ships when every Universal Century series is drawn.
+Version 1.0.0 completed every Universal Century series. From there, each sprite drop (one or more finished series) or new feature raises the minor version (1.1.0, 1.2.0, …), and fixes raise the patch version. 2.0.0 is kept for a major change to the app.
 
 ## Build from source
 
