@@ -991,6 +991,7 @@ struct DexSummaryHeader: View {
 struct CollectionView: View {
     let store: CompanionStore
     let navigation: PopoverNavigation
+    var providerNames: [String: String] = [:]
     @State private var selectedRarity: Rarity?
     @State private var selectedSeries: String?
     /// The series list is open in place of the grid. Like the detail page it replaces the whole content.
@@ -1040,11 +1041,11 @@ struct CollectionView: View {
             emptyState
         } else if let id = nav.dexDetailCollectionID,
                   let species = store.dexSpecies.first(where: { $0.collectionID == id }) {
-            PokemonDetailView(store: store, species: species) {
+            PokemonDetailView(store: store, species: species, onBack: {
                 // Back to the log would leave it for the next switch to the grid.
                 if !nav.showingCollectionLog { dexReturnAnchor = id }
                 nav.dexDetailCollectionID = nil
-            }
+            }, initialInstanceID: nav.dexDetailInstanceID ?? "", providerNames: providerNames)
                 .id(species.collectionID)
                 .frame(height: Self.contentHeight)
         } else if showingSeriesList {
@@ -1210,6 +1211,11 @@ struct CollectionView: View {
         }
     }
 
+    /// The build a log row's click should open: the row's own entry when the clicked sprite is its final grade.
+    static func detailInstance(for entry: DexEntry, opening collectionID: String, links: [Int: String]) -> String? {
+        links[entry.finalID] == collectionID ? entry.id : nil
+    }
+
     /// 포획 로그 — 개체 단위 기록. 필터(요약 헤더)는 고정, 목록만 스크롤한다
     private var catchLog: some View {
         let dexLinks = store.dexLinkTargets   // once for all rows, not per row
@@ -1230,7 +1236,11 @@ struct CollectionView: View {
                                 // Keeps the segment, so Back from the detail page returns to the log.
                                 DexEntryRow(store: store, entry: entry, dexLinks: dexLinks) {
                                     logReturnAnchor = entry.id
-                                    navigation.dexDetailCollectionID = $0
+                                    if let instanceID = Self.detailInstance(for: entry, opening: $0, links: dexLinks) {
+                                        navigation.openDexDetail(collectionID: $0, instanceID: instanceID)
+                                    } else {
+                                        navigation.dexDetailCollectionID = $0
+                                    }
                                 }
                             }
                         }
@@ -1746,18 +1756,22 @@ struct PokemonDetailView: View {
     let store: CompanionStore
     let species: CompanionStore.DexSpecies
     let onBack: () -> Void
+    private let providerNames: [String: String]
     private let spriteStore: SpriteStore
     @State private var selectedInstanceID = ""
     @State private var selectedShiny: Bool?
 
     init(store: CompanionStore, species: CompanionStore.DexSpecies,
-         onBack: @escaping () -> Void, selectedShiny: Bool? = nil,
+         onBack: @escaping () -> Void, selectedShiny: Bool? = nil, initialInstanceID: String = "",
+         providerNames: [String: String] = [:],
          spriteStore: SpriteStore = .shared) {
         self.store = store
         self.species = species
         self.onBack = onBack
+        self.providerNames = providerNames
         self.spriteStore = spriteStore
         _selectedShiny = State(initialValue: selectedShiny)
+        _selectedInstanceID = State(initialValue: initialInstanceID)
     }
 
     private var displayedSpecies: CompanionStore.DexSpecies { species }
@@ -1795,6 +1809,11 @@ struct PokemonDetailView: View {
                     if individuals.count > 1 { individualPicker }
                     if individuals.isEmpty {
                         Text(store.l.dexAppearancePreview).font(.callout).foregroundStyle(.secondary)
+                    }
+                    if let individual,
+                       let summary = BuildRecordSummary(entry: individual, isRaising: store.isActiveDexEntry(individual),
+                                                        providerNames: providerNames) {
+                        BuildRecordCard(summary: summary, l: store.l, locale: store.language.displayLocale)
                     }
                     if let profile { profileSection(profile, entry: individual) }
                 }
@@ -1945,7 +1964,7 @@ struct PokemonDetailView: View {
 
 }
 
-private extension View {
+extension View {
     func detailCard() -> some View {
         self.padding(9)
             .frame(maxWidth: .infinity, alignment: .leading)

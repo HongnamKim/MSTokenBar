@@ -51,7 +51,10 @@ final class PopoverNavigation {
     /// It lives here so Home sprites can open it, but it only lasts while the collection content is
     /// on screen: leaving the tab, switching segment, or covering it with Settings/Recap drops it —
     /// the same lifetime it had as `CollectionView`'s own `@State`.
-    var dexDetailCollectionID: String?
+    var dexDetailCollectionID: String? { didSet { dexDetailInstanceID = nil } }
+    /// The build (`DexEntry.id`) the open detail page starts on; nil = the page's default (raising, then newest).
+    /// Every plain write to `dexDetailCollectionID`, opening or closing, forgets it.
+    private(set) var dexDetailInstanceID: String?
     /// 프로바이더 탭 선택 — reset() 대상이 아님(팝오버를 다시 열어도 보던 서비스 유지).
     var providerID: String?
     /// Claude account tab in the limits section. Kept across openings, like `providerID`.
@@ -80,6 +83,12 @@ final class PopoverNavigation {
         showSettings = false
         tab = .collection
         dexDetailCollectionID = collectionID   // last: the didSets above clear it
+    }
+
+    /// A build-log row opens its own build.
+    func openDexDetail(collectionID: String, instanceID: String) {
+        openDexEntry(collectionID: collectionID)
+        dexDetailInstanceID = instanceID   // last: the collection write above clears it
     }
 
     /// 설정의 「함께 띄울 기체」 행에서 격납고를 선택 모드로 연다. 세그먼트를 격납고로 명시해, 직전에
@@ -178,7 +187,7 @@ struct PopoverView: View {
             .labelsHidden()
 
             if nav.tab == .collection {
-                CollectionView(store: companion, navigation: nav)
+                CollectionView(store: companion, navigation: nav, providerNames: store.providerDisplayNames)
             } else if nav.tab == .bag {
                 BagView(store: companion, nav: nav)
             } else if nav.tab == .shop {

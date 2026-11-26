@@ -4,7 +4,7 @@ import XCTest
 final class GunplaCopyTests: XCTestCase {
     /// Words that must never reach the user in the Gunpla build.
     private static let forbidden = try! NSRegularExpression(
-        pattern: "포켓몬|Pokémon|Pokemon|ポケモン|Pokédex|도감|図鑑|이로치|色違い|사탕|Rare Candy")
+        pattern: "포켓몬|Pokémon|Pokemon|ポケモン|Pokédex|도감|図鑑|이로치|色違い|사탕|Rare Candy|놓아|逃が")
 
     private func hits(_ text: String) -> Bool {
         forbidden.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil
@@ -195,5 +195,20 @@ final class GunplaCopyTests: XCTestCase {
         XCTAssertEqual(L(.en).hangarMachineTotal(0), "0 suits")
         XCTAssertEqual(L(.en).hangarMachineTotal(2), "2 suits")
         XCTAssertEqual(L(.ko).hangarMachineTotal(1), "1기")
+    }
+
+    func test_stoppedBuildWording() {
+        let ko = L(.ko)
+        XCTAssertEqual([ko.dexReleased, L(.en).dexReleased, L(.ja).dexReleased], ["제작 중단", "Build stopped", "製作中断"])
+        XCTAssertEqual(ko.eggDescription(nil), "지금 기체 제작을 중단하고 새 건프라 박스로 다시 시작해요.")
+        XCTAssertEqual(ko.eggDescription(.rare), "지금 기체 제작을 중단하고 \(ko.rarityRare) 이상이 확정으로 나오는 박스를 받아요.")
+        XCTAssertEqual(ko.eggReleaseNote, "제작을 중단한 기체도 격납고에 남고, 같은 확률로 다시 만날 수 있어요. 키운 진행도만 사라져요.")
+        XCTAssertEqual(ko.eggConfirm("레트라", ko.eggName(.rare)), "레트라 제작을 중단하고 레어 박스로 바꿀까요?")
+        XCTAssertEqual(ko.freshEggShinyWarning, "전용기예요! 정말 중단할까요?")
+        XCTAssertEqual(ko.freshEggLegendaryWarning, "전설 등급 기체예요! 정말 중단할까요?")
+        XCTAssertEqual(ko.freshEggDiscardShiny, "전용기 제작 중단")
+        XCTAssertEqual(ko.freshEggDiscardValuable, "제작 중단")
+        XCTAssertEqual(L(.en).freshEggDiscardValuable, "Send off")
+        XCTAssertEqual(L(.ja).freshEggDiscardValuable, "手放す")
     }
 }

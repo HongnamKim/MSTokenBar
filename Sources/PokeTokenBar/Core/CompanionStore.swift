@@ -323,7 +323,8 @@ final class CompanionStore {
                 Dictionary(uniqueKeysWithValues:
                     active.pathIDs.compactMap { id in line.names[id].map { (id, $0) } })
             },
-            prayers: active.prayers
+            prayers: active.prayers,
+            buildLog: active.buildLog
         )
     }
 
@@ -351,7 +352,7 @@ final class CompanionStore {
                 Dictionary(uniqueKeysWithValues:
                     chain.compactMap { id in line.names[id].map { (id, $0) } })
             },
-            releasedAt: now, prayers: a.prayers)
+            releasedAt: now, prayers: a.prayers, buildLog: a.buildLog?.keeping(chain))
     }
 
     var dexEntries: [DexEntry] {
@@ -797,12 +798,13 @@ final class CompanionStore {
                         if state.active == nil {
                             state.eggUsage += delta
                         } else {
-                            applyUsage(delta)
+                            applyUsage(.providers(todayTokensByProvider))
                         }
                     }
                 } else {
                     var ledger = state.claimedTodayTokensByProvider ?? [:]
                     var delta = 0
+                    var increments: [String: Int] = [:]
                     for (providerID, current) in todayTokensByProvider {
                         guard let previous = ledger[providerID] else {
                             // 새로 관측된 프로바이더의 과거 로그를 소급하지 않는다. 이후 refresh부터
@@ -819,6 +821,7 @@ final class CompanionStore {
                             continue
                         }
                         delta += current - previous
+                        increments[providerID] = current - previous
                         ledger[providerID] = current
                     }
                     state.claimedTodayTokensByProvider = ledger
@@ -827,7 +830,7 @@ final class CompanionStore {
                         if state.active == nil {
                             state.eggUsage += delta   // 알 인큐베이션 누적
                         } else {
-                            applyUsage(delta)
+                            applyUsage(.providers(increments))
                         }
                     }
                 }
@@ -861,14 +864,24 @@ final class CompanionStore {
         autoSnapshotIfNeeded()
     }
 
+    /// 출처를 모르는 증분 — `applyUsage(.unattributed(delta))` 와 같다.
+    func applyUsage(_ delta: Int) { applyUsage(.unattributed(delta)) }
+
     /// 토큰 증분을 현재 포켓몬에 적용 — 임계 도달 시 진화/졸업.
     /// 라인 미로딩(재시작 직후·오프라인)이어도 사용량은 항상 적립한다 — 여기서 드롭하면
     /// 프로바이더별 ledger 는 이미 전진해 델타가 영구 유실된다. 진화 판정만 라인 로드 후로 미룬다.
-    func applyUsage(_ delta: Int) {
-        guard state.active != nil else { return }
-        state.active!.usedAtStage += delta
+    /// 출처는 빌드 기록의 현재 등급에 쌓이고, 등급이 오르면 이월분 비율만큼 다음 등급으로 옮겨진다.
+    func applyUsage(_ increment: BuildIncrement) {
+        guard let speciesID = state.active?.currentID else { return }
+        if state.active!.buildLog == nil {
+            // 기록 이전 세이브의 개체 — 이미 쌓인 성장은 출처를 모르는 양으로 시작한다.
+            state.active!.buildLog = .resumed(speciesID: speciesID, banked: state.active!.usedAtStage)
+        }
+        state.active!.usedAtStage += increment.total
+        state.active!.buildLog!.add(increment, to: speciesID)
         guard let line = currentLine else { save(); return }
         var guardCount = 0
+        let reachedAt = clock()   // grades passed in one call share one instant
         while state.active != nil, guardCount < 50 {
             guardCount += 1
             let a = state.active!
@@ -895,6 +908,9 @@ final class CompanionStore {
                 state.active!.pathIDs = Array(a.pathIDs.prefix(a.stageIndex + 1)) + [next.speciesID]
                 state.active!.stageIndex += 1
                 state.active!.usedAtStage = a.usedAtStage - thr   // 초과분 이월
+                // 기록도 같은 비율로 이월 — 오르기 직전의 적립량과 그때의 임계 기준.
+                state.active!.buildLog?.advance(from: a.currentID, to: next.speciesID,
+                                                banked: a.usedAtStage, threshold: thr, at: reachedAt)
                 let oldName = line.localizedName(a.currentID, state.language)
                 let newName = line.localizedName(next.speciesID, state.language)
                 justEvolvedTo = newName
@@ -999,7 +1015,7 @@ final class CompanionStore {
                                   names: currentLine.map { line in   // 체인 각 종의 다국어 이름 저장(표시 즉시)
                                       Dictionary(uniqueKeysWithValues:
                                           a.pathIDs.compactMap { id in line.names[id].map { (id, $0) } })
-                                  }, prayers: a.prayers))
+                                  }, prayers: a.prayers, buildLog: a.buildLog))
         let name = currentLine?.localizedName(finalID, state.language) ?? ""
         justGraduated = name
         notifyCompanionEvent(l.notifGraduateTitle, l.notifGraduateBody(name))
@@ -1092,7 +1108,7 @@ final class CompanionStore {
         // 진화 안 될 때(부분 진행)도 즉시 "+XP" 피드백 — CompanionHeader 가 연출과 별개로 표시.
         candyFeedbackAmount = xp
         candyFeedbackSeq += 1
-        applyUsage(xp)   // Saves inventory and growth together, with existing evolution effects.
+        applyUsage(.sandpaper(xp))   // Saves inventory and growth together, with existing evolution effects.
         if state.active == nil { return .graduated }
         if state.active!.stageIndex > beforeStage { return .evolved }
         return .progressed
@@ -1561,7 +1577,8 @@ final class CompanionStore {
         activeGeneration += 1
         state.active = MonState(baseID: line.baseID, pathIDs: [line.baseID], plannedPathIDs: evolutionPlan,
                                 stageIndex: 0, usedAtStage: 0, rarity: line.rarity, totalForms: evolutionPlan.count,
-                                isShiny: isShiny, hasGrowthBoost: hasGrowthBoost, prayers: prayers)
+                                isShiny: isShiny, hasGrowthBoost: hasGrowthBoost, prayers: prayers,
+                                buildLog: .opened(speciesID: line.baseID, at: clock()))
         AppLog.write("hatch: base=\(line.baseID) rarity=\(line.rarity) shiny=\(isShiny) forms=\(evolutionPlan.count) boost=\(hasGrowthBoost)")
         let name = line.localizedName(line.baseID, state.language)
         let hatchBody: String
@@ -1623,7 +1640,8 @@ final class CompanionStore {
         if let first = reached.first, let last = reached.last {
             let now = clock()
             state.dex.append(DexEntry(baseID: first, finalID: last, chainOrder: reached, rarity: a.rarity,
-                                      caughtAt: now, isShiny: a.isShiny, releasedAt: now, prayers: a.prayers))
+                                      caughtAt: now, isShiny: a.isShiny, releasedAt: now, prayers: a.prayers,
+                                      buildLog: a.buildLog?.keeping(reached)))
         }
         AppLog.write("line: \(error) for active base \(a.baseID) — kept \(reached.count) released grade(s), back to the box")
         state.active = nil

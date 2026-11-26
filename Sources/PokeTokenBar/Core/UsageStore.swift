@@ -234,6 +234,13 @@ final class UsageStore {
         providers.map { (id: $0.id, displayName: $0.displayName) }
     }
 
+    /// Tool id → the name Settings shows; what the build record card labels a tool with.
+    var providerDisplayNames: [String: String] {
+        var names: [String: String] = [:]
+        for provider in providers { names[provider.id] = provider.displayName }
+        return names
+    }
+
     /// 등록된 프로바이더 id 목록 — 확장 규약 레지스트리 무결성 테스트용.
     var registeredProviderIDs: [String] { registeredProviders.map(\.id) }
 

@@ -1111,6 +1111,18 @@ struct L {
     func dexTotal(_ n: Int) -> String { t("총 \(n)기", "\(n) total", "全\(n)機") }
     /// 포획 로그 = 개체 단위 기록(같은 라인 중복이 정상). 도감 = 종 단위 집계.
     var catchLogTitle: String { t("제작 기록", "Build Log", "製作記録") }
+    // 제작 기록 카드 (기체 상세 화면)
+    func buildRecordOpened(_ date: String) -> String { t("개봉 \(date)", "Opened \(date)", "開封 \(date)") }
+    func buildRecordCompleted(_ date: String) -> String { t("완성 \(date)", "Completed \(date)", "完成 \(date)") }
+    func buildRecordStopped(_ date: String) -> String { t("중단 \(date)", "Stopped \(date)", "中断 \(date)") }
+    func buildRecordDays(_ n: Int) -> String { t("\(n)일", n == 1 ? "1 day" : "\(n) days", "\(n)日") }
+    var buildRecordSameDay: String { t("당일", "Same day", "当日") }
+    func buildRecordDayNumber(_ n: Int) -> String { t("\(n)일째", "Day \(n)", "\(n)日目") }
+    func buildRecordTotal(_ amount: String) -> String { t("총 \(amount)", "Total \(amount)", "合計 \(amount)") }
+    func buildRecordSoFar(_ amount: String) -> String { t("지금까지 \(amount)", "\(amount) so far", "これまで \(amount)") }
+    func buildRecordFromMid(_ grade: String) -> String { t("\(grade) 도중부터 기록", "Recorded from mid-\(grade)", "\(grade)の途中から記録") }
+    var buildRecordBeforeRecord: String { t("기록 전", "Before record", "記録前") }
+    var buildRecordBeforeUnboxing: String { t("개봉 전 사용분", "Before unboxing", "開封前") }
     func dexPageLabel(_ page: Int, _ total: Int) -> String {
         t("\(total)페이지 중 \(page)페이지", "Page \(page) of \(total)", "\(total)ページ中 \(page)ページ", "Página \(page) de \(total)", "Page \(page) sur \(total)", "Página \(page) de \(total)", "Seite \(page) von \(total)", "Страница \(page) из \(total)")
     }
@@ -1118,7 +1130,7 @@ struct L {
     var dexPageNext: String { t("다음 페이지", "Next page", "次のページ", "Página siguiente", "Page suivante", "Próxima página", "Nächste Seite", "Следующая страница") }
     var dexRaising: String { t("키우는 중", "Raising", "育成中", "Criando", "En élevage", "Treinando", "In Aufzucht", "Растёт") }
     /// 포획 로그에서 졸업분과 놓아준 개체를 가르는 표식. 종은 도감에 남고 개체 기록만 이 뱃지를 단다.
-    var dexReleased: String { t("놓아줌", "Released", "逃がした", "Liberado", "Relâché", "Solto", "Freigelassen", "Отпущен") }
+    var dexReleased: String { t("제작 중단", "Build stopped", "製作中断", "Liberado", "Relâché", "Solto", "Freigelassen", "Отпущен") }
     var rarityCommon: String { t("일반", "Common", "ノーマル", "Común", "Commun", "Comum", "Gewöhnlich", "Обычный") }
     var rarityUncommon: String { t("고급", "Uncommon", "アンコモン", "Poco común", "Peu commun", "Incomum", "Ungewöhnlich", "Необычный") }
     var rarityRare: String { t("희귀", "Rare", "レア", "Raro", "Rare", "Raro", "Selten", "Редкий") }
@@ -1664,12 +1676,12 @@ struct L {
     }
     func eggDescription(_ tier: Rarity?) -> String {
         guard let tier, tier != .common else {
-            return t("지금 기체를 놓아주고 새 건프라 박스로 다시 시작해요.",
+            return t("지금 기체 제작을 중단하고 새 건프라 박스로 다시 시작해요.",
                      "Send off your current Mobile Suit and start fresh with a new Kit Box.",
                      "いまの機体を手放して新しいキットボックスからやり直します。")
         }
         let r = rarityLabel(tier)
-        return t("지금 기체를 놓아주고 \(r) 이상이 확정으로 나오는 박스를 받아요.",
+        return t("지금 기체 제작을 중단하고 \(r) 이상이 확정으로 나오는 박스를 받아요.",
                  "Send off your current Mobile Suit for a box guaranteed to unbox \(r) or better.",
                  "いまの機体を手放して \(r) 以上が確定で出るボックスをもらいます。")
     }
@@ -1689,7 +1701,7 @@ struct L {
     /// → 놓아준 종의 부화 가중치는 100% 를 유지한다. 재인큐베이션은 말하지 않는다(`eggDescription`
     /// 의 "새 알로 다시 시작해요" 와 중복).
     var eggReleaseNote: String {
-        t("놓아준 기체도 격납고에 남고, 같은 확률로 다시 만날 수 있어요. 키운 진행도만 사라져요.",
+        t("제작을 중단한 기체도 격납고에 남고, 같은 확률로 다시 만날 수 있어요. 키운 진행도만 사라져요.",
           "A released Mobile Suit stays in your Hangar and can come out again at the same odds — only the growth progress is lost.",
           "手放した機体も格納庫に残り、同じ確率でまた出会えます。失われるのは育てた進み具合だけです。")
     }
@@ -1699,14 +1711,14 @@ struct L {
         return t("\(r) 이상 확정", "\(r) or better", "\(r) 以上確定", "\(r) o superior garantizado", "\(r) ou mieux garanti", "\(r) ou melhor garantido", "Garantiert \(r) oder besser", "\(r) или выше")
     }
     func eggConfirm(_ monName: String, _ eggName: String) -> String {
-        t("\(KoreanParticle.object.attach(to: monName)) 놓아주고 \(KoreanParticle.direction.attach(to: eggName)) 바꿀까요?",
+        t("\(monName) 제작을 중단하고 \(KoreanParticle.direction.attach(to: eggName)) 바꿀까요?",
           "Send off \(monName) for the \(eggName)?",
           "\(monName) を手放して \(eggName) にしますか？")
     }
-    var freshEggShinyWarning: String { t("전용기예요! 정말 놓아줄까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
-    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 놓아줄까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
-    var freshEggDiscardShiny: String { t("전용기 놓아주기", "Send Custom off", "専用機を手放す") }
-    var freshEggDiscardValuable: String { t("놓아주기", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
+    var freshEggShinyWarning: String { t("전용기예요! 정말 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
+    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
+    var freshEggDiscardShiny: String { t("전용기 제작 중단", "Send Custom off", "専用機を手放す") }
+    var freshEggDiscardValuable: String { t("제작 중단", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
 
     // MARK: 사탕 획득 알림 ("왜 받는지" = 토큰 한도를 다 채운 수고에 대한 보상)
     func notifCandyTitle(item: String, count: Int) -> String {

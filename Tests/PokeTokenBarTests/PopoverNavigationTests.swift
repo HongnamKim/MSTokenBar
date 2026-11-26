@@ -108,6 +108,32 @@ final class PopoverNavigationTests: XCTestCase {
             .deletingLastPathComponent()
             .appendingPathComponent("Sources/PokeTokenBar/UI/PopoverView.swift")
     }()
+
+    /// A build-log row opens its own build; every other way of opening or leaving a detail page forgets it.
+    func testOpenDexDetailRemembersTheBuildUntilThePageChanges() {
+        let nav = PopoverNavigation()
+        nav.tab = .collection
+        nav.openDexDetail(collectionID: "25", instanceID: "entry-1")
+        XCTAssertEqual(nav.dexDetailCollectionID, "25")
+        XCTAssertEqual(nav.dexDetailInstanceID, "entry-1")
+
+        nav.dexDetailCollectionID = "26"             // a hangar cell
+        XCTAssertNil(nav.dexDetailInstanceID)
+
+        nav.openDexDetail(collectionID: "25", instanceID: "entry-1")
+        nav.openDexEntry(collectionID: "25")         // a Home sprite, the same page
+        XCTAssertEqual(nav.dexDetailCollectionID, "25")
+        XCTAssertNil(nav.dexDetailInstanceID)
+
+        nav.openDexDetail(collectionID: "25", instanceID: "entry-1")
+        nav.dexDetailCollectionID = nil              // Back
+        XCTAssertNil(nav.dexDetailInstanceID)
+
+        nav.openDexDetail(collectionID: "25", instanceID: "entry-1")
+        nav.tab = .home                              // leaving the tab
+        XCTAssertNil(nav.dexDetailCollectionID)
+        XCTAssertNil(nav.dexDetailInstanceID)
+    }
 }
 
 final class RepresentativeLocalizationTests: XCTestCase {

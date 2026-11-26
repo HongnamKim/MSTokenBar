@@ -398,6 +398,8 @@ struct MonState: Codable, Sendable {
     var hasGrowthBoost = false
     /// Prayers said over the egg this individual hatched from. Nil = none (and every pre-prayer save).
     var prayers: PrayerRecord?
+    /// Where this build's growth came from. Nil = no record (every save from before the build log).
+    var buildLog: BuildLog?
     /// 화면에 이로치(전용기)로 보여도 되는가. 표시 경로는 전부 이것만 쓴다.
     var displaysShiny: Bool { isShiny }
     // pathIDs 가 비면(손상된 상태 파일) baseID 로 폴백 — 렌더마다 읽히므로 out-of-bounds 크래시 방지.
@@ -430,7 +432,7 @@ struct MonState: Codable, Sendable {
     init(baseID: Int, pathIDs: [Int], plannedPathIDs: [Int]? = nil, stageIndex: Int, usedAtStage: Int,
          rarity: Rarity, totalForms: Int, isShiny: Bool = false,
          hasGrowthBoost: Bool = false,
-         prayers: PrayerRecord? = nil) {
+         prayers: PrayerRecord? = nil, buildLog: BuildLog? = nil) {
         self.baseID = baseID
         self.pathIDs = pathIDs
         if let plannedPathIDs, !plannedPathIDs.isEmpty {
@@ -445,6 +447,7 @@ struct MonState: Codable, Sendable {
         self.isShiny = isShiny
         self.hasGrowthBoost = hasGrowthBoost
         self.prayers = prayers
+        self.buildLog = buildLog
     }
 
     // 하위호환 디코딩: 구버전 저장에 없는 부화 속성은 기본값.
@@ -469,6 +472,7 @@ struct MonState: Codable, Sendable {
         isShiny = try c.decodeIfPresent(Bool.self, forKey: .isShiny) ?? false
         hasGrowthBoost = try c.decodeIfPresent(Bool.self, forKey: .hasGrowthBoost) ?? false
         prayers = (try? c.decodeIfPresent(PrayerRecord.self, forKey: .prayers)) ?? nil
+        buildLog = (try? c.decodeIfPresent(BuildLog.self, forKey: .buildLog)) ?? nil
     }
 }
 
@@ -485,6 +489,8 @@ struct DexEntry: Codable, Sendable, Identifiable {
     var isShiny = false
     /// Prayers said over the egg this individual hatched from. Nil = none (and every pre-prayer save).
     var prayers: PrayerRecord?
+    /// Where this build's growth came from. Nil = no record (every save from before the build log).
+    var buildLog: BuildLog?
     /// 진화 체인 각 종의 다국어 이름(speciesID → langCode → name). 졸업 시 로드된 라인에서 저장 →
     /// 도감의 단계별 스프라이트 밑 이름 표시가 네트워크 없이 즉시 + 언어 전환 대응. 구버전 저장분엔
     /// 없어(nil) 뷰가 line fetch 로 조회 후 백필한다.
@@ -507,7 +513,7 @@ struct DexEntry: Codable, Sendable, Identifiable {
          baseID: Int, finalID: Int, chainOrder: [Int], rarity: Rarity,
          caughtAt: Date?, isShiny: Bool = false,
          names: [Int: [String: String]]? = nil, releasedAt: Date? = nil,
-         prayers: PrayerRecord? = nil) {
+         prayers: PrayerRecord? = nil, buildLog: BuildLog? = nil) {
         self.id = id
         self.baseID = baseID
         self.finalID = finalID
@@ -520,6 +526,7 @@ struct DexEntry: Codable, Sendable, Identifiable {
             ? Self.currentNamesVersion : nil
         self.releasedAt = releasedAt
         self.prayers = prayers
+        self.buildLog = buildLog
     }
 
     // 하위호환 디코딩 (MonState 와 동일 이유).
@@ -533,6 +540,7 @@ struct DexEntry: Codable, Sendable, Identifiable {
         caughtAt = try c.decodeIfPresent(Date.self, forKey: .caughtAt)
         isShiny = try c.decodeIfPresent(Bool.self, forKey: .isShiny) ?? false
         prayers = (try? c.decodeIfPresent(PrayerRecord.self, forKey: .prayers)) ?? nil
+        buildLog = (try? c.decodeIfPresent(BuildLog.self, forKey: .buildLog)) ?? nil
         // try? — 구버전(최종체 단일 [String:String]) 형식이 남아 있어도 종별 맵 디코딩 실패 시 nil 로
         // 강등(항목 전체 로드는 유지). 뷰가 line 조회로 백필한다.
         names = (try? c.decodeIfPresent([Int: [String: String]].self, forKey: .names)) ?? nil
