@@ -34,6 +34,33 @@ final class HangarProgressTests: XCTestCase {
         XCTAssertEqual(first.id, "first")
     }
 
+    /// The series list counts machines, so several grades of one machine are one. Dom, Z'Gok and Acguy in
+    /// every released grade fill 10 of the 42 cells but are 3 of the 13 machines the grid shows.
+    func test_builtMachinesCountAMachineOnceHoweverManyGrades() throws {
+        let empty = try XCTUnwrap(completion("first", []))
+        XCTAssertEqual(empty.builtMachines, 0)
+        XCTAssertEqual(empty.totalMachines, 13)
+
+        let first = try XCTUnwrap(completion("first", [cell(16), cell(19), cell(21)]))
+        XCTAssertEqual(first.ownedCells, 10)
+        XCTAssertEqual(first.builtMachines, 3)
+        XCTAssertEqual(first.totalMachines, 13)
+    }
+
+    /// 전용기 keep their own tally: building one adds no machine to the series count.
+    func test_builtMachinesLeaveVariantsOut() throws {
+        let first = try XCTUnwrap(completion("first", [cell(16), cell(3)]))   // Dom + Char's Zaku II
+        XCTAssertEqual(first.builtMachines, 1)
+        XCTAssertEqual(first.variantOwnedCells, 5)
+    }
+
+    /// Modes share a hangar entry but grow on their own, so each mode is a machine of its own.
+    func test_builtMachinesCountEachModeOnItsOwn() throws {
+        let uc = try XCTUnwrap(completion("uc", [cell(11, [.hg, .rg]), cell(100, [.hg])]))
+        XCTAssertEqual(uc.builtMachines, 2)
+        XCTAssertEqual(uc.totalMachines, 19)
+    }
+
     func test_completionsFollowCatalogSeriesOrder() {
         XCTAssertEqual(HangarProgress.completions(owned: [], catalog: catalog).map(\.seriesID),
                        ["first", "08th-ms-team", "0080", "0083", "the-origin", "thunderbolt", "cucuruz-doans-island",

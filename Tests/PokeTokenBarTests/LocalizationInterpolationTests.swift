@@ -103,6 +103,7 @@ final class LocalizationInterpolationTests: XCTestCase {
             // Pokédex / 도감
             expect(lang, "dexTotal", l.dexTotal(4242), "4242")
             expect(lang, "hangarMachineTotal", l.hangarMachineTotal(4242), "4242")
+            expect(lang, "hangarSeriesGrades", l.hangarSeriesGrades(4242, of: 1717), "4242", "1717")
             expect(lang, "dexPageLabel", l.dexPageLabel(4242, 1717), "4242", "1717")
 
             // System notifications / 시스템 알림

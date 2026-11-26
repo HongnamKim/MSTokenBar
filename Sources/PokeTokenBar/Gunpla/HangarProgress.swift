@@ -39,13 +39,18 @@ struct HangarEntry: Identifiable {
 }
 
 /// Owned/total progress for one series. A cell is a (machine, released grade) pair; base machines and
-/// variants (전용기) are counted separately so each has its own badge.
+/// variants (전용기) are counted separately so each has its own badge. Cells decide the badges; the
+/// series list leads with machines, because the grid shows one square per machine.
 struct SeriesCompletion: Identifiable, Sendable, Equatable {
     let seriesID: String
     let ownedCells: Int
     let totalCells: Int
     let variantOwnedCells: Int
     let variantTotalCells: Int
+    /// Base machines built in at least one released grade, and how many the series has. A mode is a
+    /// machine of its own: it grows on its own track even though it shares a hangar entry.
+    let builtMachines: Int
+    let totalMachines: Int
 
     var isComplete: Bool { totalCells > 0 && ownedCells >= totalCells }
     /// A series without variants has nothing to complete, so it never earns the variant badge.
@@ -90,7 +95,7 @@ enum HangarProgress {
         var ownedByMachine: [Int: Set<GunplaGrade>] = [:]
         for cell in owned { ownedByMachine[cell.machineID, default: []].formUnion(cell.ownedGrades) }
         return catalog.series.sorted { $0.order < $1.order }.map { series in
-            var owned = 0, total = 0, variantOwned = 0, variantTotal = 0
+            var owned = 0, total = 0, variantOwned = 0, variantTotal = 0, built = 0, machines = 0
             for machine in catalog.machines where machine.series == series.id {
                 let have = ownedByMachine[machine.id].map { $0.intersection(machine.grades).count } ?? 0
                 if machine.isVariant {
@@ -99,10 +104,13 @@ enum HangarProgress {
                 } else {
                     owned += have
                     total += machine.grades.count
+                    if have > 0 { built += 1 }
+                    machines += 1
                 }
             }
             return SeriesCompletion(seriesID: series.id, ownedCells: owned, totalCells: total,
-                                    variantOwnedCells: variantOwned, variantTotalCells: variantTotal)
+                                    variantOwnedCells: variantOwned, variantTotalCells: variantTotal,
+                                    builtMachines: built, totalMachines: machines)
         }
     }
 

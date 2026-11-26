@@ -851,7 +851,8 @@ struct RarityTally: View {
 }
 
 /// 작품 목록 — 격납고 격자 대신 열리는 세로 목록. "전체" + 카탈로그 작품 순서이고, 줄을 누르면 그 작품만 보여준다.
-/// 줄마다 진행도("3/8", 일반 기체 셀)와 막대. 일반 기체 완성 시 작품 메달, 전용기 완성 시 전용기 메달.
+/// 줄마다 만든 기체 수("3/13", 일반 기체)와 그 기준의 막대, 숫자 왼쪽에 메달 기준인 등급 수("등급 10/42").
+/// 일반 기체를 전 등급으로 모으면 작품 메달, 전용기를 그렇게 모으면 전용기 메달.
 /// 보여줄 칸이 없는 작품은 비활성. 시트·팝오버가 아니라 화면 전환이다 — `ShopView` 주석 참고.
 @MainActor
 struct HangarSeriesListView: View {
@@ -891,14 +892,19 @@ struct HangarSeriesListView: View {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
-                        Text(name).font(.system(size: 12, weight: isSelected ? .semibold : .regular)).lineLimit(1)
+                        Text(name).font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                            .lineLimit(1).minimumScaleFactor(0.85)
                         if completion?.isComplete == true { WorkshopIcon(.seriesMedal, size: 12) }
                         if completion?.isVariantComplete == true { WorkshopIcon(.customMedal, size: 12) }
                         Spacer(minLength: 4)
                         if let completion {
-                            Text("\(completion.ownedCells)/\(completion.totalCells)")
+                            Text(store.l.hangarSeriesGrades(completion.ownedCells, of: completion.totalCells))
+                                .font(.system(size: 10)).monospacedDigit().foregroundStyle(.secondary)
+                                .fixedSize().padding(.trailing, 4)
+                            Text("\(completion.builtMachines)/\(completion.totalMachines)")
                                 .font(.system(size: 11, weight: .bold)).monospacedDigit()
                                 .foregroundStyle(completion.isComplete ? Color.green : Color.secondary)
+                                .fixedSize()
                         }
                     }
                     if let completion { progressBar(completion) }
@@ -916,8 +922,9 @@ struct HangarSeriesListView: View {
     }
 
     private func progressBar(_ completion: SeriesCompletion) -> some View {
-        // A series of only 전용기 has no base cells to count.
-        let fraction = completion.totalCells > 0 ? Double(completion.ownedCells) / Double(completion.totalCells) : 0
+        // A series of only 전용기 has no base machines to count.
+        let fraction = completion.totalMachines > 0
+            ? Double(completion.builtMachines) / Double(completion.totalMachines) : 0
         return Capsule().fill(Color.secondary.opacity(0.2))
             .overlay(alignment: .leading) {
                 GeometryReader { geo in
@@ -1591,7 +1598,7 @@ private struct DexGridView: View {
                     Text(selected.map { store.seriesName($0.seriesID) } ?? store.l.hangarSeriesAll)
                         .fontWeight(.semibold).lineLimit(1)
                     if let selected {
-                        Text("\(selected.ownedCells)/\(selected.totalCells)")
+                        Text("\(selected.builtMachines)/\(selected.totalMachines)")
                             .fontWeight(.bold).monospacedDigit().foregroundStyle(.secondary).fixedSize()
                     }
                     Spacer(minLength: 0)
