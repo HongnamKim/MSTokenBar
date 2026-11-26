@@ -197,6 +197,15 @@
         "ja": "機動戦士ガンダムSEED"
       },
       "order": 21
+    },
+    {
+      "id": "gundam-seed-destiny",
+      "names": {
+        "ko": "건담 SEED 데스티니",
+        "en": "Mobile Suit Gundam SEED Destiny",
+        "ja": "機動戦士ガンダムSEED DESTINY"
+      },
+      "order": 22
     }
   ]
 }

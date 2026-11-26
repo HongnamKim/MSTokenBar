@@ -4180,6 +4180,234 @@
         "hg": "providence-gundam-hg",
         "mg": "providence-gundam-mg"
       }
+    },
+    {
+      "id": 164,
+      "modelNumber": "ZGMF-X56S",
+      "names": {
+        "ko": "임펄스 건담",
+        "en": "Impulse Gundam",
+        "ja": "インパルスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112341068000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/466",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/681",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/556"
+      },
+      "sprites": {
+        "sd": "impulse-gundam-sd",
+        "hg": "impulse-gundam-hg",
+        "rg": "impulse-gundam-rg",
+        "mg": "impulse-gundam-mg"
+      }
+    },
+    {
+      "id": 165,
+      "modelNumber": "ZGMF-X56S/α",
+      "names": {
+        "ko": "포스 임펄스 건담",
+        "en": "Force Impulse Gundam",
+        "ja": "フォースインパルスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112341068000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/466",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/681",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/556"
+      },
+      "sprites": {
+        "sd": "force-impulse-gundam-sd",
+        "hg": "force-impulse-gundam-hg",
+        "rg": "force-impulse-gundam-rg",
+        "mg": "force-impulse-gundam-mg"
+      },
+      "hangarGroupID": 164
+    },
+    {
+      "id": 166,
+      "modelNumber": "ZGMF-X56S/β",
+      "names": {
+        "ko": "소드 임펄스 건담",
+        "en": "Sword Impulse Gundam",
+        "ja": "ソードインパルスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2813",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2601",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/566"
+      },
+      "sprites": {
+        "hg": "sword-impulse-gundam-hg",
+        "rg": "sword-impulse-gundam-rg",
+        "mg": "sword-impulse-gundam-mg"
+      },
+      "hangarGroupID": 164
+    },
+    {
+      "id": 167,
+      "modelNumber": "ZGMF-X56S/γ",
+      "names": {
+        "ko": "블라스트 임펄스 건담",
+        "en": "Blast Impulse Gundam",
+        "ja": "ブラストインパルスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2800",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2576"
+      },
+      "sprites": {
+        "hg": "blast-impulse-gundam-hg",
+        "mg": "blast-impulse-gundam-mg"
+      },
+      "hangarGroupID": 164
+    },
+    {
+      "id": 168,
+      "modelNumber": "ZGMF-X42S",
+      "names": {
+        "ko": "데스티니 건담",
+        "en": "Destiny Gundam",
+        "ja": "デスティニーガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "mgsd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660078548000&grp_id=5325",
+        "mgsd": "https://manual.bandai-hobby.net/menus/detail/3532",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/489",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/663",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/552"
+      },
+      "sprites": {
+        "sd": "destiny-gundam-sd",
+        "mgsd": "destiny-gundam-mgsd",
+        "hg": "destiny-gundam-hg",
+        "rg": "destiny-gundam-rg",
+        "mg": "destiny-gundam-mg"
+      }
+    },
+    {
+      "id": 169,
+      "modelNumber": "ZGMF-X20A",
+      "names": {
+        "ko": "스트라이크 프리덤 건담",
+        "en": "Strike Freedom Gundam",
+        "ja": "ストライクフリーダムガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "three_ships_alliance",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "mgex",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660049340000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/470",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/950",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/545",
+        "mgex": "https://manual.bandai-hobby.net/menus/detail/646",
+        "pg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112655066000&grp_id=5325"
+      },
+      "sprites": {
+        "sd": "strike-freedom-gundam-sd",
+        "hg": "strike-freedom-gundam-hg",
+        "rg": "strike-freedom-gundam-rg",
+        "mg": "strike-freedom-gundam-mg",
+        "mgex": "strike-freedom-gundam-mgex",
+        "pg": "strike-freedom-gundam-pg"
+      }
+    },
+    {
+      "id": 170,
+      "modelNumber": "ZGMF-X19A",
+      "names": {
+        "ko": "인피니트 저스티스 건담",
+        "en": "Infinite Justice Gundam",
+        "ja": "インフィニットジャスティスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "three_ships_alliance",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/497",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/563"
+      },
+      "sprites": {
+        "hg": "infinite-justice-gundam-hg",
+        "mg": "infinite-justice-gundam-mg"
+      }
+    },
+    {
+      "id": 171,
+      "modelNumber": "ZGMF-X666S",
+      "names": {
+        "ko": "레전드 건담",
+        "en": "Legend Gundam",
+        "ja": "レジェンドガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/4193"
+      },
+      "sprites": {
+        "hg": "legend-gundam-hg"
+      }
     }
   ]
 }
