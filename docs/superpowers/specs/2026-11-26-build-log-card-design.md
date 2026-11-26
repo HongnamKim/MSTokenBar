@@ -186,8 +186,8 @@
 | `eggDescription` (등급 박스) | 지금 기체를 놓아주고 {r} 이상이 확정으로 나오는 박스를 받아요. | 지금 기체 제작을 중단하고 {r} 이상이 확정으로 나오는 박스를 받아요. |
 | `eggReleaseNote` | 놓아준 기체도 격납고에 남고, … | 제작을 중단한 기체도 격납고에 남고, … (뒤는 그대로) |
 | `eggConfirm` | {기체}을 놓아주고 {박스}로 바꿀까요? | {기체} 제작을 중단하고 {박스}로 바꿀까요? |
-| `freshEggShinyWarning` | 전용기예요! 정말 놓아줄까요? | 전용기예요! 정말 제작을 중단할까요? |
-| `freshEggLegendaryWarning` | 전설 등급 기체예요! 정말 놓아줄까요? | 전설 등급 기체예요! 정말 제작을 중단할까요? |
+| `freshEggShinyWarning` | 전용기예요! 정말 놓아줄까요? | 전용기예요! 정말 중단할까요? |
+| `freshEggLegendaryWarning` | 전설 등급 기체예요! 정말 놓아줄까요? | 전설 등급 기체예요! 정말 중단할까요? |
 | `freshEggDiscardShiny` | 전용기 놓아주기 | 전용기 제작 중단 |
 | `freshEggDiscardValuable` | 놓아주기 | 제작 중단 |
 

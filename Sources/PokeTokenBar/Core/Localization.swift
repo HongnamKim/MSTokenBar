@@ -1712,8 +1712,8 @@ struct L {
           "Send off \(monName) for the \(eggName)?",
           "\(monName) を手放して \(eggName) にしますか？")
     }
-    var freshEggShinyWarning: String { t("전용기예요! 정말 제작을 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
-    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 제작을 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
+    var freshEggShinyWarning: String { t("전용기예요! 정말 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
+    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
     var freshEggDiscardShiny: String { t("전용기 제작 중단", "Send Custom off", "専用機を手放す") }
     var freshEggDiscardValuable: String { t("제작 중단", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
 
