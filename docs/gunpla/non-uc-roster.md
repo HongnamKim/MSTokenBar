@@ -12,7 +12,7 @@
 - 주역 한정이라 양산기(커먼)와 지휘관기·커스텀기(언커먼)는 아직 없다. 그래서 레전더리 비중이 높다.
 - 담지 않은 것: 만화·게임 외전 출신 기체(SEED 아스트레이, 00 외전, 철혈의 오펀스 월강·우르드 헌트), 빌드 시리즈, 평행 우주세기인 지쿠악스, 키트가 발매 예정뿐인 2027년 신작.
 - 애니메이션에 나오지 않은 EW 디자인 초기형(윙 건담 EW, 데스사이즈 EW 등)도 담지 않았다.
-- 본체 별매 파츠 세트로만 나온 형태는 원칙적으로 담지 않는다. 예외로 2기 초반의 엑시아 리페어는 RG·PG 리페어 파츠 세트(엑시아 본체와 조합)로 센다.
+- 본체 별매 파츠 세트로만 나온 형태는 원칙적으로 담지 않는다. 예외로 2기 초반의 엑시아 리페어는 RG·PG 리페어 파츠 세트(엑시아 본체와 조합)도 센다.
 
 ### 출시 등급
 
@@ -27,8 +27,8 @@
 ### 집계
 
 - 희귀도: 레어 43 · 레전더리 23
-- 등급별 기체 수: SD 41 · MGSD 5 · HG 60 · RG 24 · MG 36 · Ver.Ka 1 · MGEX 1 · PG 6
-- 등급 칸 합계: 174
+- 등급별 기체 수: SD 41 · MGSD 5 · HG 60 · RG 24 · MG 37 · Ver.Ka 1 · MGEX 1 · PG 6
+- 등급 칸 합계: 175
 
 ## 90년대 작품 · 5개 작품, 15기
 
@@ -123,7 +123,7 @@
 | 기체 | 희귀도 | 근거 | 출시 등급 | 확인한 키트 | 비고 |
 |---|---|---|---|---|---|
 | 건담 엑시아 | 레어 | 주역기(세츠나, 1기) | SD → HG → RG → MG → PG | SD EX 003 · HG00 01 · RG 15 · MG(2009) · PG(2017) | 리페어 계열 키트는 다른 사양 |
-| 건담 엑시아 리페어 | 레어 | 주역기(세츠나, 2기 초반) | RG → PG | RG 리페어 파츠 세트(2014) · PG 리페어 파츠 세트(2018) | 둘 다 엑시아 본체 별매 파츠 세트(프리미엄 반다이 등 한정). 엑시아 초회 한정판에 파츠 세트가 동봉됐다는 기억이 있으나 미확인 |
+| 건담 엑시아 리페어 | 레어 | 주역기(세츠나, 2기 초반) | RG → MG → PG | RG 리페어 파츠 세트(2014) · MG 엑시아 이그니션 모드(2009) · PG 리페어 파츠 세트(2018) | MG는 한정 생산 이그니션 모드에 리페어 파츠(파손 헤드·GN 소드 칼날·망토) 동봉. RG·PG는 엑시아 본체 별매 파츠 세트 |
 | 더블오 건담 | 레어 | 주역기(세츠나, 2기 전반) | SD → HG | BB전사 316 · HG00 22 | 오 라이저 없는 단품. SD EX 008도 있음 |
 | 그라함 전용 유니온 플래그 커스텀 | 레어 | 라이벌기(그라함) | HG | HG00 07 |  |
 | 더블오 라이저 | 레전더리 | 최종 결전기(세츠나) | SD → HG → RG → MG → PG | BB전사 322 · HG00 54 · RG 18 · MG(2011) · PG(2009) | HG는 GN 소드 III 동봉 키트. MGSD는 2027-03 발매 예정이라 세지 않음 |
@@ -187,4 +187,4 @@
 
 - 반다이 하비 사이트 상품 목록: [전체 검색](https://bandai-hobby.net/item_all/) · [RG](https://bandai-hobby.net/brand/rg/) · [MG](https://bandai-hobby.net/brand/mg/) · [MG Ver.Ka](https://bandai-hobby.net/brand/mgka/) · [MGEX](https://bandai-hobby.net/brand/mgex/) · [PG](https://bandai-hobby.net/brand/pg/) · [MGSD](https://bandai-hobby.net/brand/mgsd/)
 - 일본어 위키백과: [HGUC(HGFC·HGAC·HGAW·HGCC·HGCE 포함)](https://ja.wikipedia.org/wiki/ハイグレード・ユニバーサルセンチュリー) · [SEED HG](https://ja.wikipedia.org/wiki/SEED_HG) · [건프라 목록](https://ja.wikipedia.org/wiki/ガンプラの一覧) · [리얼 그레이드](https://ja.wikipedia.org/wiki/リアルグレード) · [마스터 그레이드](https://ja.wikipedia.org/wiki/マスターグレード) · [퍼펙트 그레이드](https://ja.wikipedia.org/wiki/パーフェクトグレード) · [SD건담 BB전사](https://ja.wikipedia.org/wiki/SDガンダム_BB戦士)
-- 2026-11-26 수정분: [MG 건담 비다르 발매 기사](https://dengekionline.com/article/202503/36816) · [건담베이스 한정 RG 에일 스트라이크 & 런처·소드 팩 세트](https://www.toy-people.com/jp/?p=72861) · [PG 스카이그래스퍼+에일 스트라이커(본체 별매)](https://www.mightyape.co.nz/product/gundam-perfect-grade-pg-skygrasper-aile-striker-160-model-kit/21592055) · [P-Bandai RG 엑시아 리페어 파츠 세트](https://www.gundamkitscollection.com/2014/02/p-bandai-rg-1144-exia-repair-release.html)
+- 2026-11-26 수정분: [MG 건담 비다르 발매 기사](https://dengekionline.com/article/202503/36816) · [건담베이스 한정 RG 에일 스트라이크 & 런처·소드 팩 세트](https://www.toy-people.com/jp/?p=72861) · [PG 스카이그래스퍼+에일 스트라이커(본체 별매)](https://www.mightyape.co.nz/product/gundam-perfect-grade-pg-skygrasper-aile-striker-160-model-kit/21592055) · [P-Bandai RG 엑시아 리페어 파츠 세트](https://www.gundamkitscollection.com/2014/02/p-bandai-rg-1144-exia-repair-release.html) · [MG 엑시아 이그니션 모드(리페어 파츠 동봉)](https://bbts.com/Product/VariationDetails/130212?o=4)
