@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 APP_NAME="MSTokenBar"
 SWIFT_PRODUCT="PokeTokenBar"   # SwiftPM 타깃/실행파일 이름은 업스트림 병합을 위해 유지
 BUILD_DIR="build"
