@@ -9,11 +9,6 @@ final class KoreanParticleTests: XCTestCase {
         XCTAssertEqual(KoreanParticle.subject.attach(to: "피카츄"), "피카츄가")
     }
 
-    func testObjectFollowsFinalConsonant() {
-        XCTAssertEqual(KoreanParticle.object.attach(to: "꼬부기"), "꼬부기를")
-        XCTAssertEqual(KoreanParticle.object.attach(to: "리자몽"), "리자몽을")
-    }
-
     /// "으로/로"는 받침 없음과 ㄹ 받침이 같은 쪽이다 — 이 분기가 빠지면 "알으로"가 된다.
     func testDirectionTreatsRieulLikeNoFinalConsonant() {
         XCTAssertEqual(KoreanParticle.direction.attach(to: "란쿨루스"), "란쿨루스로")
@@ -25,7 +20,6 @@ final class KoreanParticleTests: XCTestCase {
     /// 받침을 알 수 없는 끝(안농 글자, 이름 로딩 전 번호, 라틴 문자, 빈 문자열)은 병기 형태 그대로.
     func testNonHangulEndingKeepsBothForms() {
         XCTAssertEqual(KoreanParticle.subject.attach(to: "안농 [A]"), "안농 [A]이(가)")
-        XCTAssertEqual(KoreanParticle.object.attach(to: "#123"), "#123을(를)")
         XCTAssertEqual(KoreanParticle.direction.attach(to: "Pikachu"), "Pikachu(으)로")
         XCTAssertEqual(KoreanParticle.subject.attach(to: ""), "이(가)")
     }
@@ -37,7 +31,7 @@ final class KoreanParticleTests: XCTestCase {
         XCTAssertEqual(l.notifShinyHatchBody("뚜벅쵸", odds: 48), "전용기 뚜벅쵸가 나왔어요! (1/48)")
         XCTAssertEqual(l.notifEvolveBody(from: "솔록", to: "듀란"), "솔록이 듀란으로 등급 업했어요!")
         XCTAssertEqual(l.statusEvolved("란쿨루스"), "란쿨루스로 등급 업했어요!")
-        XCTAssertEqual(l.eggConfirm("레트라", l.eggName(.rare)), "레트라를 놓아주고 레어 박스로 바꿀까요?")
+        XCTAssertEqual(l.eggConfirm("레트라", l.eggName(.rare)), "레트라 제작을 중단하고 레어 박스로 바꿀까요?")
     }
 
     /// 조사 선택은 한국어 문구에만 적용된다.
