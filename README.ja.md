@@ -6,7 +6,7 @@
 
 すでに使っている AI コーディングトークン（Claude Code・Codex・Gemini CLI など）を、ガンプラ（ガンダムのプラモデル）の制作進行度に変える macOS メニューバーアプリです。[chattymin/PokeTokenBar](https://github.com/chattymin/PokeTokenBar) をガンプラテーマにしたフォークです。
 
-> 宇宙世紀16作品の初期リスト全130機を収録しています。発売済みのキットに合わせ、グレード・モード・装備別に336点のドット絵を用意しました。トークン使用量の追跡は元プロジェクトから引き継いだ機能です（対応ツールは[元の README](https://github.com/chattymin/PokeTokenBar#readme) を参照）。
+> 宇宙世紀とそれ以外を合わせて21作品から145機を収録しています。発売済みキットのグレード・モード・装備に合わせたドット絵は385点です。トークン使用量の追跡は元プロジェクトから引き継いだ機能です（対応ツールは[元の README](https://github.com/chattymin/PokeTokenBar#readme) を参照）。
 
 ## 仕組み
 
