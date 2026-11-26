@@ -3946,6 +3946,240 @@
       "sprites": {
         "mg": "turn-x-mg"
       }
+    },
+    {
+      "id": 156,
+      "modelNumber": "GAT-X105",
+      "names": {
+        "ko": "스트라이크 건담",
+        "en": "Strike Gundam",
+        "ja": "ストライクガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "archangel",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112176042000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/392",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/658",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/849",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/652"
+      },
+      "sprites": {
+        "sd": "strike-gundam-sd",
+        "hg": "strike-gundam-hg",
+        "rg": "strike-gundam-rg",
+        "mg": "strike-gundam-mg",
+        "pg": "strike-gundam-pg"
+      }
+    },
+    {
+      "id": 157,
+      "modelNumber": "GAT-X105+AQM/E-X01",
+      "names": {
+        "ko": "에일 스트라이크 건담",
+        "en": "Aile Strike Gundam",
+        "ja": "エールストライクガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "archangel",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112967282000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/392",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/658",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/849"
+      },
+      "sprites": {
+        "sd": "aile-strike-gundam-sd",
+        "hg": "aile-strike-gundam-hg",
+        "rg": "aile-strike-gundam-rg",
+        "mg": "aile-strike-gundam-mg"
+      },
+      "hangarGroupID": 156
+    },
+    {
+      "id": 158,
+      "modelNumber": "GAT-X105+AQM/E-X02",
+      "names": {
+        "ko": "소드 스트라이크 건담",
+        "en": "Sword Strike Gundam",
+        "ja": "ソードストライクガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "archangel",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112237163000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/845",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/555"
+      },
+      "sprites": {
+        "sd": "sword-strike-gundam-sd",
+        "rg": "sword-strike-gundam-rg",
+        "mg": "sword-strike-gundam-mg"
+      },
+      "hangarGroupID": 156
+    },
+    {
+      "id": 159,
+      "modelNumber": "GAT-X105+AQM/E-X03",
+      "names": {
+        "ko": "런처 스트라이크 건담",
+        "en": "Launcher Strike Gundam",
+        "ja": "ランチャーストライクガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "archangel",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112237163000&grp_id=5325",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/845",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/555"
+      },
+      "sprites": {
+        "sd": "launcher-strike-gundam-sd",
+        "rg": "launcher-strike-gundam-rg",
+        "mg": "launcher-strike-gundam-mg"
+      },
+      "hangarGroupID": 156
+    },
+    {
+      "id": 160,
+      "modelNumber": "ZGMF-X10A",
+      "names": {
+        "ko": "프리덤 건담",
+        "en": "Freedom Gundam",
+        "ja": "フリーダムガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "three_ships_alliance",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "mgsd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102567529000&grp_id=5325",
+        "mgsd": "https://manual.bandai-hobby.net/menus/detail/648",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/463",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/945",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/624"
+      },
+      "sprites": {
+        "sd": "freedom-gundam-sd",
+        "mgsd": "freedom-gundam-mgsd",
+        "hg": "freedom-gundam-hg",
+        "rg": "freedom-gundam-rg",
+        "mg": "freedom-gundam-mg"
+      }
+    },
+    {
+      "id": 161,
+      "modelNumber": "ZGMF-X09A",
+      "names": {
+        "ko": "저스티스 건담",
+        "en": "Justice Gundam",
+        "ja": "ジャスティスガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "three_ships_alliance",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112294524000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/345",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/662",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/627"
+      },
+      "sprites": {
+        "sd": "justice-gundam-sd",
+        "hg": "justice-gundam-hg",
+        "rg": "justice-gundam-rg",
+        "mg": "justice-gundam-mg"
+      }
+    },
+    {
+      "id": 162,
+      "modelNumber": "GAT-X303",
+      "names": {
+        "ko": "이지스 건담",
+        "en": "Aegis Gundam",
+        "ja": "イージスガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112241245000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/334",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/948"
+      },
+      "sprites": {
+        "sd": "aegis-gundam-sd",
+        "hg": "aegis-gundam-hg",
+        "mg": "aegis-gundam-mg"
+      }
+    },
+    {
+      "id": 163,
+      "modelNumber": "ZGMF-X13A",
+      "names": {
+        "ko": "프로비던스 건담",
+        "en": "Providence Gundam",
+        "ja": "プロヴィデンスガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "legendary",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/344",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/626"
+      },
+      "sprites": {
+        "hg": "providence-gundam-hg",
+        "mg": "providence-gundam-mg"
+      }
     }
   ]
 }

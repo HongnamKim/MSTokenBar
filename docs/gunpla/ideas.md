@@ -20,6 +20,10 @@
 | RX-78-2 건담 | G 파이터와 합체한 G 아머 | [HGUC G 아머](https://manual.bandai-hobby.net/menus/detail/244) |
 | 백식 | 메가 바주카 런처 운용 사양 | [HGUC 백식＋메가 바주카 런처](https://manual.bandai-hobby.net/menus/detail/821) |
 
+## 특별판 배색과 표면 처리
+
+일반색 스프라이트 제작 후 클리어 컬러와 티타늄 피니시 등으로 발매된 키트를 후보로 검토한다. 소드·런처 스트라이크 RG의 클리어 컬러는 건담베이스 한정 세트 한 상자로 두 형태를 조립할 수 있다. [반다이 공식 상품](https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102638199000&grp_id=5325)
+
 ## 클라우드 사용량 집계
 
 - **문제** — 지금은 이 Mac에 남는 로컬 로그(`~/.claude/projects`, `~/.codex/sessions` 등)만 센다. Codex 클라우드 작업이나 Claude 웹·클라우드 세션처럼 서버에서 돈 사용량은 로그 파일이 생기지 않아 박스·기체 성장에 반영되지 않는다.

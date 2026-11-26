@@ -188,6 +188,15 @@
         "ja": "∀ガンダム"
       },
       "order": 20
+    },
+    {
+      "id": "gundam-seed",
+      "names": {
+        "ko": "건담 SEED",
+        "en": "Mobile Suit Gundam SEED",
+        "ja": "機動戦士ガンダムSEED"
+      },
+      "order": 21
     }
   ]
 }
