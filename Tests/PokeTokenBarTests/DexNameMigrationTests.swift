@@ -130,6 +130,23 @@ final class DexNameMigrationTests: XCTestCase {
         XCTAssertEqual(store.state.dex[0].names?[2]?["it"], "Ivysaur")
     }
 
+    /// A bundled name changed (자쿠 II 개 → 자쿠 II 改). Entries keep a saved copy of the names, so a
+    /// save written under the previous version must re-read them instead of showing the old spelling.
+    func testRenamedBundledNameReplacesTheSavedCopy() async throws {
+        let id = GunplaID.encode(machineID: 34, grade: .hg)
+        var saved = DexEntry(baseID: id, finalID: id, chainOrder: [id], rarity: .uncommon,
+                             caughtAt: Date(timeIntervalSince1970: 123),
+                             names: [id: ["ko": "HG 자쿠 II 개", "en": "HG Zaku II Kai", "ja": "HG ザクII改"]])
+        saved.namesVersion = 1
+        let url = try fixture([saved], legacy: false)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let store = CompanionStore(provider: MachineCatalog.allBundled, fileURL: url)
+        XCTAssertEqual(store.dexStoredChainNames(store.state.dex[0])?[id], "HG 자쿠 II 개")
+        await store.backfillMissingDexNames()
+        XCTAssertEqual(store.dexStoredChainNames(store.state.dex[0])?[id], "HG 자쿠 II 改")
+        XCTAssertFalse(store.state.dex[0].needsNamesRefresh)
+    }
+
     func testNewNamesSkipMigrationButEmptyAndMissingSpeciesRetry() throws {
         var fresh = entry()
         XCTAssertFalse(fresh.needsNamesRefresh)

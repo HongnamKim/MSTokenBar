@@ -129,6 +129,19 @@ final class DexSearchAndFilterTests: XCTestCase {
         XCTAssertEqual(korean.filteredHangarCells(query: "Zaku").map(\.machineID), [])
     }
 
+    /// 「改」 names are typed 「개」 on a Korean keyboard, so either spelling must find them.
+    func testHangarSearchReadsKaiHanjaAsHangul() throws {
+        let machine = try XCTUnwrap(MachineCatalog.allBundled.machine(id: 34))
+        let id = GunplaID.encode(machineID: 34, grade: .hg)
+        let entry = DexEntry(baseID: id, finalID: id, chainOrder: [id], rarity: machine.rarity, caughtAt: now)
+        let store = makeStore(dex: [entry], language: .ko, provider: MachineCatalog.allBundled)
+        XCTAssertEqual(store.machineName(34), "자쿠 II 改")
+        for query in ["자쿠 II 개", "자쿠 II 改", "개", "改"] {
+            XCTAssertEqual(store.filteredHangarCells(query: query).map(\.machineID), [34], query)
+        }
+        XCTAssertEqual(store.filteredHangarCells(query: "자쿠 II 카이").map(\.machineID), [])
+    }
+
     /// Regression: the Catch Log used `localizedCaseInsensitiveContains`, which keeps accents, so
     /// "flabebe" missed Flabébé although the PR promised diacritic-insensitive name search.
     func testNameSearchIgnoresCaseAndDiacriticsInCatchLog() {

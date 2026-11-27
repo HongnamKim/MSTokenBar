@@ -29,7 +29,9 @@ enum KoreanParticle {
     private static let rieul: UInt32 = 8
 
     /// 마지막 글자의 종성 인덱스(0 = 받침 없음). 한글 음절이 아니면 nil.
+    /// 기체 이름 끝의 「改」는 「개」로 읽으므로 받침 없음으로 본다(자쿠 II 改가).
     private static func coda(of word: String) -> UInt32? {
+        if word.unicodeScalars.last == "改" { return 0 }
         guard let last = word.unicodeScalars.last, syllables.contains(last.value) else { return nil }
         return (last.value - syllables.lowerBound) % 28
     }
