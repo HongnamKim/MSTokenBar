@@ -59,12 +59,23 @@ enum HatchPlanner {
         let pool = preferred(isDuplicatePhase ? eligible : fresh, variant: wantVariant)
         guard !pool.isEmpty else { return nil }
 
-        // Roll once per suit so adding a second mode does not double its drop rate.
+        // Each hangar slot enters the draw once at its most common eligible rarity.
+        let modesBySuit = Dictionary(grouping: pool, by: \.hangarID)
         var seen: Set<Int> = []
-        let suits = pool.filter { seen.insert($0.hangarID).inserted }
+        let suits = pool.compactMap { machine -> MachineRecord? in
+            guard seen.insert(machine.hangarID).inserted else { return nil }
+            return modesBySuit[machine.hangarID]?.min { $0.rarity.sortRank < $1.rarity.sortRank }
+        }
         let suit = weightedPick(suits, rng: &rng)
-        let modes = pool.filter { $0.hangarID == suit.hangarID }
-        let pick = modes.count == 1 ? suit : modes[Int(rng.next() % UInt64(modes.count))]
+        let modes = modesBySuit[suit.hangarID] ?? [suit]
+        let pick: MachineRecord
+        if modes.count == 1 {
+            pick = suit
+        } else if modes.allSatisfy({ $0.rarity == suit.rarity }) {
+            pick = modes[Int(rng.next() % UInt64(modes.count))]
+        } else {
+            pick = weightedPick(modes, rng: &rng)
+        }
         let start = runGrades(pick, snapshot: snapshot)[0]
         return HatchChoice(startSpeciesID: GunplaID.encode(machineID: pick.id, grade: start),
                            isVariant: pick.variantOf != nil,

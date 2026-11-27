@@ -206,6 +206,24 @@
         "ja": "機動戦士ガンダムSEED DESTINY"
       },
       "order": 22
+    },
+    {
+      "id": "gundam-00",
+      "names": {
+        "ko": "건담 00",
+        "en": "Mobile Suit Gundam 00",
+        "ja": "機動戦士ガンダム00"
+      },
+      "order": 23
+    },
+    {
+      "id": "gundam-00-movie",
+      "names": {
+        "ko": "극장판 건담 00",
+        "en": "Mobile Suit Gundam 00 the Movie: A Wakening of the Trailblazer",
+        "ja": "劇場版 機動戦士ガンダム00 -A wakening of the Trailblazer-"
+      },
+      "order": 24
     }
   ]
 }

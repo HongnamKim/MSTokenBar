@@ -137,6 +137,16 @@ final class HatchPlannerTests: XCTestCase {
         XCTAssertEqual(machineID(choose(snapshot(), sequence: [1, 12])), 2)
     }
 
+    func test_00RaiserKeepsItsRarityInTheSharedHangarSlot() {
+        // 00 Gundam and 00 Raiser share one rare-weight slot. Qan[T] has its own legendary slot.
+        let available = snapshot(graduated: allIDs.subtracting([174, 176, 180]))
+        XCTAssertEqual(machineID(choose(available, sequence: [1, 11, 11])), 174)
+        XCTAssertEqual(machineID(choose(available, sequence: [1, 11, 12])), 176)
+        XCTAssertEqual(machineID(choose(available, sequence: [1, 12])), 180)
+        XCTAssertEqual(machineID(choose(available, tier: .legendary, sequence: [1, 2])), 176)
+        XCTAssertEqual(machineID(choose(available, tier: .legendary, sequence: [1, 3])), 180)
+    }
+
     func test_twoModesShareOneSuitWeightAndOnlyUnfinishedModesCanDrop() {
         // Unit 1 has weight 3 and Sinanju has weight 12.
         let bothModes = snapshot(graduated: allIDs.subtracting([11, 100, 103]))
