@@ -7,9 +7,20 @@ import SwiftUI
 struct ShopView: View {
     let store: CompanionStore
     let nav: PopoverNavigation
+    @State private var showingSeriesBoxes = false
 
     var body: some View {
         let l = store.l
+        if showingSeriesBoxes {
+            SeriesBoxListView(store: store, onBack: { showingSeriesBoxes = false },
+                              onBought: { nav.tab = .home })
+                .frame(height: 520)
+        } else {
+            shopScroll(l)
+        }
+    }
+
+    private func shopScroll(_ l: L) -> some View {
         // 고정 높이 — 컬렉션/가방과 동일(팝오버 재오픈 시 fitting size 축소 방지).
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -25,6 +36,8 @@ struct ShopView: View {
                         EggCard(store: store, nav: nav, tier: tier)
                     }
                 }
+                SeriesBoxCard(store: store, onOpen: { showingSeriesBoxes = true })
+                PreorderCard(store: store, nav: nav)
             }
             .reservesScrollerLane()
         }
@@ -166,7 +179,7 @@ private struct EggCard: View {
     let nav: PopoverNavigation
     let tier: Rarity?
     @State private var stage: Stage = .idle
-    private enum Stage { case idle, confirm, preciousConfirm }
+    private enum Stage { case idle, confirm }
 
     private var price: Int { store.price(of: .egg(tier)) }
 
@@ -244,29 +257,8 @@ private struct EggCard: View {
                 }
             }
         case .confirm:
-            HStack(spacing: 8) {
-                Text(l.eggConfirm(store.displayName, l.eggName(tier)))
-                    .font(.caption2).foregroundStyle(.secondary).lineLimit(2)
-                Spacer()
-                // 이로치나 전설 등 고가치 포켓몬이면 한 번 더 경고, 아니면 즉시 실행.
-                Button(l.buy) {
-                    if store.isHighValueCompanion { stage = .preciousConfirm } else { commit() }
-                }
-                .buttonStyle(.borderedProminent).controlSize(.small)
-                Button(l.cancel) { stage = .idle }
-                    .buttonStyle(.borderless).controlSize(.small)
-            }
-        case .preciousConfirm:
-            HStack(spacing: 8) {
-                WorkshopIcon(.warning, size: 14)
-                Text(store.rarity == .legendary ? l.freshEggLegendaryWarning : l.freshEggShinyWarning)
-                    .font(.caption2.weight(.semibold)).foregroundStyle(.orange).lineLimit(2)
-                Spacer()
-                Button(store.currentIsShiny && store.rarity != .legendary ? l.freshEggDiscardShiny : l.freshEggDiscardValuable) { commit() }
-                    .buttonStyle(.borderedProminent).controlSize(.small).tint(.orange)
-                Button(l.cancel) { stage = .idle }
-                    .buttonStyle(.borderless).controlSize(.small)
-            }
+            ReplaceBoxConfirmRow(store: store, prompt: l.eggConfirm(store.displayName, l.eggName(tier)),
+                                 onCommit: commit, onCancel: { stage = .idle })
         }
     }
 
@@ -274,5 +266,173 @@ private struct EggCard: View {
     private func commit() {
         stage = .idle
         if store.buyEgg(tier) { nav.tab = .home }
+    }
+}
+
+/// "Stop building X and switch?" with [Buy] [Cancel]; a custom or legendary build asks once more.
+/// Shared by `EggCard` and the series box list.
+@MainActor
+struct ReplaceBoxConfirmRow: View {
+    let store: CompanionStore
+    let prompt: String
+    let onCommit: () -> Void
+    let onCancel: () -> Void
+    @State private var precious = false
+
+    var body: some View {
+        let l = store.l
+        if precious {
+            HStack(spacing: 8) {
+                WorkshopIcon(.warning, size: 14)
+                Text(store.rarity == .legendary ? l.freshEggLegendaryWarning : l.freshEggShinyWarning)
+                    .font(.caption2.weight(.semibold)).foregroundStyle(.orange).lineLimit(2)
+                Spacer()
+                Button(store.currentIsShiny && store.rarity != .legendary ? l.freshEggDiscardShiny : l.freshEggDiscardValuable) { onCommit() }
+                    .buttonStyle(.borderedProminent).controlSize(.small).tint(.orange)
+                Button(l.cancel) { onCancel() }
+                    .buttonStyle(.borderless).controlSize(.small)
+            }
+        } else {
+            HStack(spacing: 8) {
+                Text(prompt)
+                    .font(.caption2).foregroundStyle(.secondary).lineLimit(2)
+                Spacer()
+                // 이로치나 전설 등 고가치 포켓몬이면 한 번 더 경고, 아니면 즉시 실행.
+                Button(l.buy) {
+                    if store.isHighValueCompanion { precious = true } else { onCommit() }
+                }
+                .buttonStyle(.borderedProminent).controlSize(.small)
+                Button(l.cancel) { onCancel() }
+                    .buttonStyle(.borderless).controlSize(.small)
+            }
+        }
+    }
+}
+
+/// Series box card — opens the series list. Price is a range because the box's tier depends on the series.
+@MainActor
+struct SeriesBoxCard: View {
+    let store: CompanionStore
+    let onOpen: () -> Void
+
+    var body: some View {
+        let l = store.l
+        let range = store.shopPriceRange
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 10) {
+                SpriteView(speciesID: nil, size: 26)
+                    .frame(width: 30, height: 30)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l.seriesBoxTitle).font(.callout.weight(.semibold))
+                    Text(l.seriesBoxDescription)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if store.hasActive {
+                        Text(l.eggReleaseNote)
+                            .font(.caption2).foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                Spacer()
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("\(l.shopPriceLabel) \(TokenFormatter.compact(range.lowerBound))~\(TokenFormatter.compact(range.upperBound))")
+                        .font(.caption2).foregroundStyle(.tertiary).monospacedDigit()
+                    Spacer()
+                    if !store.hasActive || !store.hasSeriesBoxCandidates {
+                        Button(l.buy) {}
+                            .buttonStyle(.bordered).controlSize(.small).disabled(true)
+                    } else if store.availableTokens < range.lowerBound {
+                        Text(l.notEnoughTokens).font(.caption2).foregroundStyle(.tertiary)
+                    } else {
+                        Button(l.buy) { onOpen() }
+                            .buttonStyle(.bordered).controlSize(.small)
+                    }
+                }
+                if !store.hasActive {
+                    Text(l.eggShopLockedHint)
+                        .font(.caption2).foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if !store.hasSeriesBoxCandidates {
+                    Text(l.seriesBoxAllComplete)
+                        .font(.caption2).foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+/// Pre-order card — buying opens the hangar in pick mode. One pre-order at a time.
+@MainActor
+struct PreorderCard: View {
+    let store: CompanionStore
+    let nav: PopoverNavigation
+
+    var body: some View {
+        let l = store.l
+        let range = store.shopPriceRange
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 10) {
+                WorkshopIcon(.box, size: 26)
+                    .frame(width: 30, height: 30)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l.preorderTitle).font(.callout.weight(.semibold))
+                    Text(l.preorderDescription)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+            }
+            if let preorder = store.state.preorder {
+                PreorderActiveLine(l: l, name: store.machineName(preorder.machineID), box: preorder.boxNumber)
+            } else {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("\(l.shopPriceLabel) \(TokenFormatter.compact(range.lowerBound))~\(TokenFormatter.compact(range.upperBound))")
+                            .font(.caption2).foregroundStyle(.tertiary).monospacedDigit()
+                        Spacer()
+                        if !store.hasPreorderCandidates {
+                            Button(l.buy) {}
+                                .buttonStyle(.bordered).controlSize(.small).disabled(true)
+                        } else if store.availableTokens < range.lowerBound {
+                            Text(l.notEnoughTokens).font(.caption2).foregroundStyle(.tertiary)
+                        } else {
+                            Button(l.buy) { nav.openPreorderPick() }
+                                .buttonStyle(.bordered).controlSize(.small)
+                        }
+                    }
+                    if !store.hasPreorderCandidates {
+                        Text(l.preorderNoCandidates)
+                            .font(.caption2).foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+/// "Pre-ordered · {name} · box 2 of 4" on one line; only the name truncates.
+@MainActor
+struct PreorderActiveLine: View {
+    let l: L
+    let name: String
+    let box: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text("\(l.preorderActiveLabel) ·").fixedSize()
+            Text(name).lineLimit(1).truncationMode(.tail)
+            Text("· \(l.preorderBoxNumber(box))").fixedSize()
+        }
+        .font(.caption2).foregroundStyle(.secondary)
     }
 }
