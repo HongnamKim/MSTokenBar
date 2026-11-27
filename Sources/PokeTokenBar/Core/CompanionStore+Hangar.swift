@@ -1,5 +1,8 @@
 import Foundation
 
+/// Whether a machine can be pre-ordered, or why not.
+enum PreorderPickStatus: Equatable, Sendable { case available, complete, building }
+
 /// 격납고 — one cell per owned machine, built from the dex's synthetic (machine × grade) species.
 extension CompanionStore {
     /// Owned machines, sorted by series order and then machine id. Species that are not catalog

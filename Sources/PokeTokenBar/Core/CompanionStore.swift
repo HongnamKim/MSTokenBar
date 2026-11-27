@@ -1245,6 +1245,50 @@ final class CompanionStore {
         return true
     }
 
+    // MARK: Pre-order
+
+    /// Every catalog machine's pick status, from one collection snapshot. `building` (the active machine)
+    /// wins over `complete`.
+    var preorderPickStatuses: [Int: PreorderPickStatus] {
+        let snapshot = state.collectionSnapshot(catalog: catalog)
+        let activeID = state.active.flatMap { catalog.machine(speciesID: $0.baseID)?.id }
+        return Dictionary(uniqueKeysWithValues: catalog.machines.map { machine in
+            let status: PreorderPickStatus = machine.id == activeID ? .building
+                : snapshot.isComplete(machine) ? .complete : .available
+            return (machine.id, status)
+        })
+    }
+
+    var hasPreorderCandidates: Bool { preorderPickStatuses.values.contains(.available) }
+
+    /// The scaled price of the tier box of the machine's rarity.
+    func preorderPrice(_ machine: MachineRecord) -> Int { price(of: .egg(machine.rarity)) }
+
+    /// Cheapest...dearest scaled box price.
+    var shopPriceRange: ClosedRange<Int> { price(of: .egg(.common))...price(of: .egg(.legendary)) }
+
+    func canBuyPreorder(_ machineID: Int) -> Bool {
+        guard state.preorder == nil, let machine = catalog.machine(id: machineID),
+              preorderPickStatuses[machineID] == .available else { return false }
+        return availableTokens >= preorderPrice(machine)
+    }
+
+    @discardableResult
+    func buyPreorder(_ machineID: Int) -> Bool {
+        guard canBuyPreorder(machineID), let machine = catalog.machine(id: machineID) else { return false }
+        state.spentTokens += preorderPrice(machine)
+        state.preorder = Preorder(machineID: machineID, boxesOpened: 0)
+        // Same as a tool purchase: drop the box's pre-roll so the next tick re-rolls with the pre-order.
+        // The held box is the pre-order's first.
+        if state.active == nil {
+            state.pendingHatchID = nil
+            prefetchedLineID = nil
+        }
+        AppLog.write("preorder purchased: machine=\(machineID)")
+        save()
+        return true
+    }
+
     /// Pray over the egg. A placebo: it only counts, and never touches an RNG or a roll — the species is
     /// usually already in `pendingHatchID` (prefetched at purchase) long before anyone prays.
     func pray() {
@@ -1549,7 +1593,10 @@ final class CompanionStore {
         // 산 보증을 지키는 마지막 관문 — 진짜 등급을 아는 건 여기뿐이다(후보 인덱스엔 capture_rate 만
         // 있고 is_legendary 가 없다). 필터가 어긋났으면(인덱스 stale 등) 낮은 등급을 그냥 내주지 말고
         // 알을 유지한 채 pre-roll 만 버려 다음 틱에 다시 뽑는다 — 사용자는 산 보증을 계속 들고 있는다.
-        if let tier = state.eggTier, line.rarity.sortRank < tier.sortRank {
+        let machine = catalog.machine(speciesID: line.baseID)
+        // A pre-ordered machine passes the gate: it was bought, and the planner put it in this box on purpose.
+        let isPreorderArrival = state.preorder.map { machine?.id == $0.machineID } ?? false
+        if let tier = state.eggTier, line.rarity.sortRank < tier.sortRank, !isPreorderArrival {
             AppLog.write("hatch: rolled \(line.rarity) below guaranteed \(tier) — discarded, re-roll next tick")
             state.pendingHatchID = nil
             prefetchedLineID = nil
@@ -1566,12 +1613,14 @@ final class CompanionStore {
         let overflow = max(0, state.eggUsage - eggHatchThreshold)
         state.eggUsage = 0
         state.eggTier = nil   // 보증은 이 부화로 소비된다(다음 알은 다시 무보증)
+        state.eggSeries = nil
+        // The only place the pre-order count changes: the target ends it, any other opened box is one miss.
+        if isPreorderArrival { state.preorder = nil } else { state.preorder?.boxesOpened += 1 }
         let prayers = state.eggPrayers   // 부화체에 옮기고 알 쪽은 비운다
         state.resetEggPrayers()
         // 이로치 = 전용기. 롤하지 않는다 — 전용기 여부는 선정(`chooseBase`)에서 이미 정해져 시작 종 id 에 담겨 있다.
         // 알림 문구는 선정에 쓰인 것과 같은 분모를 보여준다.
         let shinyOdds = shinyDenominator
-        let machine = catalog.machine(speciesID: line.baseID)
         let isShiny = machine?.variantOf != nil
         var evolutionPlan = makeEvolutionPlan(from: line.tree, baseID: line.baseID)
         let snapshot = state.collectionSnapshot(catalog: catalog)
@@ -1591,13 +1640,16 @@ final class CompanionStore {
         AppLog.write("hatch: base=\(line.baseID) rarity=\(line.rarity) shiny=\(isShiny) forms=\(evolutionPlan.count) boost=\(hasGrowthBoost)")
         let name = line.localizedName(line.baseID, state.language)
         let hatchBody: String
-        if let prayers, prayers.count > 0 {
+        if isPreorderArrival {
+            hatchBody = l.notifPreorderBody(name)
+        } else if let prayers, prayers.count > 0 {
             hatchBody = l.notifPrayerHatchBody(name, prayers: prayers.count, shiny: isShiny,
                                                rarity: line.rarity)
         } else {
             hatchBody = isShiny ? l.notifShinyHatchBody(name, odds: shinyOdds) : l.notifHatchBody(name)
         }
-        notifyCompanionEvent(isShiny ? l.notifShinyHatchTitle : l.notifHatchTitle, hatchBody)
+        notifyCompanionEvent(isPreorderArrival ? l.notifPreorderTitle : (isShiny ? l.notifShinyHatchTitle : l.notifHatchTitle),
+                             hatchBody)
         justEvolvedTo = nil        // 새 부화는 "성장" 문구(진화 아님) — 직전 진화명이 남아 표시되지 않게
         displayState = .levelUp
         eventUntil = clock().addingTimeInterval(4)
@@ -1672,8 +1724,9 @@ final class CompanionStore {
     /// `pendingHatchID` 하나만 영속해도 된다. 카탈로그가 비어 있을 때만 nil → 알 유지.
     private func chooseBase() -> Int? {
         guard let choice = HatchPlanner.choose(catalog: catalog, snapshot: state.collectionSnapshot(catalog: catalog),
-                                               tier: state.eggTier, toolLevel: toolLevel, rng: &rng) else {
-            AppLog.write("hatch: no candidate for tier \(state.eggTier?.rawValue ?? "none") — egg kept, retry next tick")
+                                               tier: state.eggTier, series: state.eggSeries, preorder: state.preorder,
+                                               toolLevel: toolLevel, rng: &rng) else {
+            AppLog.write("hatch: no candidate for tier \(state.eggTier?.rawValue ?? "none") series \(state.eggSeries ?? "none") — egg kept, retry next tick")
             return nil
         }
         return choice.startSpeciesID
