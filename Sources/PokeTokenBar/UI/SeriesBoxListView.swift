@@ -24,24 +24,30 @@ struct SeriesBoxListView: View {
             ScrollView {
                 VStack(spacing: 2) {
                     ForEach(store.catalog.series.sorted { $0.order < $1.order }, id: \.id) { series in
-                        row(series.id, remaining: counts[series.id] ?? 0)
+                        row(series.id, remaining: counts[series.id] ?? 0,
+                            enabled: isEnabled(series.id, counts: counts))
                     }
                 }
                 .reservesScrollerLane()
             }
-            if let id = selected {
+            if let id = selected, isEnabled(id, counts: counts) {
                 ReplaceBoxConfirmRow(
                     store: store,
                     prompt: l.seriesBoxConfirm(store.displayName, store.seriesName(id)),
                     onCommit: { if store.buySeriesBox(id) { onBought() } },
                     onCancel: { selected = nil })
+                .id(id)
             }
         }
     }
 
-    private func row(_ id: String, remaining: Int) -> some View {
+    /// Same rule as `canBuySeriesBox`, from counts read once per body; commit still goes through the store.
+    private func isEnabled(_ id: String, counts: [String: Int]) -> Bool {
+        store.hasActive && (counts[id] ?? 0) > 0 && store.availableTokens >= store.seriesBoxPrice(id)
+    }
+
+    private func row(_ id: String, remaining: Int, enabled: Bool) -> some View {
         let isSelected = selected == id
-        let enabled = remaining > 0 && store.canBuySeriesBox(id)
         return Button { selected = id } label: {
             HStack(spacing: 8) {
                 Text(store.seriesName(id))

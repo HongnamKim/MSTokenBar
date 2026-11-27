@@ -317,6 +317,7 @@ struct SeriesBoxCard: View {
 
     var body: some View {
         let l = store.l
+        let hasCandidates = store.hasSeriesBoxCandidates
         let range = store.shopPriceRange
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 10) {
@@ -340,7 +341,7 @@ struct SeriesBoxCard: View {
                     Text("\(l.shopPriceLabel) \(TokenFormatter.compact(range.lowerBound))~\(TokenFormatter.compact(range.upperBound))")
                         .font(.caption2).foregroundStyle(.tertiary).monospacedDigit()
                     Spacer()
-                    if !store.hasActive || !store.hasSeriesBoxCandidates {
+                    if !store.hasActive || !hasCandidates {
                         Button(l.buy) {}
                             .buttonStyle(.bordered).controlSize(.small).disabled(true)
                     } else if store.availableTokens < range.lowerBound {
@@ -354,7 +355,7 @@ struct SeriesBoxCard: View {
                     Text(l.eggShopLockedHint)
                         .font(.caption2).foregroundStyle(.tertiary)
                         .fixedSize(horizontal: false, vertical: true)
-                } else if !store.hasSeriesBoxCandidates {
+                } else if !hasCandidates {
                     Text(l.seriesBoxAllComplete)
                         .font(.caption2).foregroundStyle(.tertiary)
                         .fixedSize(horizontal: false, vertical: true)
