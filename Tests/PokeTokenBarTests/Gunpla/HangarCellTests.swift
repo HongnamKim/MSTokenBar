@@ -213,6 +213,18 @@ final class HangarCellTests: XCTestCase {
         XCTAssertTrue(HangarMachineCell.showsSpriteGradeBadge(isRaising: false))
     }
 
+    /// The pre-order pick draws every cell at its top released grade; the normal hangar keeps its grades.
+    func test_spriteGradeIsTheTopGradeOnlyInThePreorderPick() {
+        let built = HangarCell(machineID: 1, ownedGrades: [.sd, .hg], releasedGrades: [.sd, .hg, .rg, .mg, .verka, .pg],
+                               isVariant: false, isRaising: false)
+        let unbuilt = HangarCell(machineID: 5, ownedGrades: [], releasedGrades: [.sd, .hg, .mg],
+                                 isVariant: false, isRaising: false)
+        XCTAssertEqual(HangarMachineCell.spriteGrade(built, preorderPick: true), .pg)
+        XCTAssertEqual(HangarMachineCell.spriteGrade(unbuilt, preorderPick: true), .mg)
+        XCTAssertEqual(HangarMachineCell.spriteGrade(built, preorderPick: false), .hg)
+        XCTAssertEqual(HangarMachineCell.spriteGrade(unbuilt, preorderPick: false), .sd)
+    }
+
     /// Hovering a floating pet names the suit on the first line; the box names itself.
     func test_hoverTitleNamesTheSuitOrTheBox() throws {
         let en = try store(dex: [entry(16, [.sd, .hg])])

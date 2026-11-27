@@ -22,4 +22,19 @@ final class PreorderLayoutTests: XCTestCase {
             XCTAssertLessThanOrEqual(long.height, short.height + 1, "\(lang) wraps")
         }
     }
+
+    func test_pickPanelFitsWithTheLongestNames() throws {
+        let longest = MachineCatalog.shared.machines.max { ($0.names["en"] ?? "").count < ($1.names["en"] ?? "").count }!
+        for lang in AppLanguage.allCases {
+            var st = CompanionState()
+            st.language = lang
+            let store = try PreorderFixture.store(st)
+            for choice in [PreorderChoice.machine(longest.id), .modes([11, 100, 115])] {
+                let panel = PreorderPickPanel(store: store, choice: choice, onChooseMode: { _ in }, onConfirm: { _ in },
+                                              onCancel: {})
+                XCTAssertLessThanOrEqual(size(panel, width: PopoverMetrics.contentWidth).width,
+                                         PopoverMetrics.contentWidth, "\(lang) \(choice)")
+            }
+        }
+    }
 }
