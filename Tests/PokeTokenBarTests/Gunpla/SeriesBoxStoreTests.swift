@@ -41,6 +41,15 @@ final class SeriesBoxStoreTests: XCTestCase {
         XCTAssertFalse(try buildingStore(usedSinceInstall: 1).canBuySeriesBox("0080"))
     }
 
+    func test_aRefusedSeriesBoxChangesNothing() throws {
+        let s = try buildingStore()
+        let spent = s.state.spentTokens
+        XCTAssertFalse(s.buySeriesBox("nope"))
+        XCTAssertEqual(s.state.spentTokens, spent)
+        XCTAssertNotNil(s.state.active, "the build keeps going")
+        XCTAssertNil(s.state.eggSeries)
+    }
+
     func test_remainingCountsCustomUnits() throws {
         let s = try buildingStore(F.gouf)
         XCTAssertEqual(s.seriesBoxRemainingCounts["first"], machines(in: "first").count)
