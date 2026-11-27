@@ -114,7 +114,9 @@ final class PreorderStoreTests: XCTestCase {
         XCTAssertFalse(s.canBuyPreorder(9_999), "unknown")
         XCTAssertTrue(s.buyPreorder(F.gouf))
         XCTAssertFalse(s.canBuyPreorder(F.charZaku), "one at a time")
+        let spent = s.state.spentTokens
         XCTAssertFalse(s.buyPreorder(F.charZaku))
+        XCTAssertEqual(s.state.spentTokens, spent, "a refused purchase charges nothing")
 
         var poor = CompanionState()
         poor.usedSinceInstall = 1
@@ -154,5 +156,12 @@ final class PreorderStoreTests: XCTestCase {
         var done = CompanionState()
         done.dex = F.catalog.machines.map { F.finished($0.id) }
         XCTAssertFalse(try F.store(done).hasPreorderCandidates)
+    }
+
+    func test_aCompleteMachineBeingBuiltReportsBuilding() throws {
+        var st = CompanionState()
+        st.dex = [F.finished(F.zaku)]
+        st.active = F.building(F.zaku)
+        XCTAssertEqual(try F.store(st).preorderPickStatuses[F.zaku], .building)
     }
 }
