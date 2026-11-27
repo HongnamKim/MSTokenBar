@@ -4408,6 +4408,1700 @@
       "sprites": {
         "hg": "legend-gundam-hg"
       }
+    },
+    {
+      "id": 172,
+      "modelNumber": "GN-001",
+      "names": {
+        "ko": "건담 엑시아",
+        "en": "Gundam Exia",
+        "ja": "ガンダムエクシア"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660027539000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/186",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/851",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/568",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1059"
+      },
+      "sprites": {
+        "sd": "gundam-exia-sd",
+        "hg": "gundam-exia-hg",
+        "rg": "gundam-exia-rg",
+        "mg": "gundam-exia-mg",
+        "pg": "gundam-exia-pg"
+      }
+    },
+    {
+      "id": 173,
+      "modelNumber": "GN-001RE",
+      "names": {
+        "ko": "건담 엑시아 리페어",
+        "en": "Gundam Exia Repair",
+        "ja": "ガンダムエクシアリペア"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2203",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/572",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/2630"
+      },
+      "sprites": {
+        "rg": "gundam-exia-repair-rg",
+        "mg": "gundam-exia-repair-mg",
+        "pg": "gundam-exia-repair-pg"
+      }
+    },
+    {
+      "id": 174,
+      "modelNumber": "GN-0000",
+      "names": {
+        "ko": "더블오 건담",
+        "en": "00 Gundam",
+        "ja": "ダブルオーガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112566508000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/268"
+      },
+      "sprites": {
+        "sd": "00-gundam-sd",
+        "hg": "00-gundam-hg"
+      }
+    },
+    {
+      "id": 175,
+      "modelNumber": "SVMS-01E",
+      "names": {
+        "ko": "그라함 전용 유니온 플래그 커스텀",
+        "en": "Graham's Union Flag Custom",
+        "ja": "グラハム専用ユニオンフラッグカスタム"
+      },
+      "series": "gundam-00",
+      "faction": "union",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/200"
+      },
+      "sprites": {
+        "hg": "grahams-union-flag-custom-hg"
+      }
+    },
+    {
+      "id": 176,
+      "modelNumber": "GN-0000+GNR-010",
+      "names": {
+        "ko": "더블오 라이저",
+        "en": "00 Raiser",
+        "ja": "ダブルオーライザー"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112584373000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/304",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/667",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/588",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/1053"
+      },
+      "sprites": {
+        "sd": "00-raiser-sd",
+        "hg": "00-raiser-hg",
+        "rg": "00-raiser-rg",
+        "mg": "00-raiser-mg",
+        "pg": "00-raiser-pg"
+      },
+      "hangarGroupID": 174
+    },
+    {
+      "id": 177,
+      "modelNumber": "GN-001REII",
+      "names": {
+        "ko": "건담 엑시아 리페어 II",
+        "en": "Gundam Exia Repair II",
+        "ja": "ガンダムエクシアリペアII"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112599407000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/299",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2612",
+        "mg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112864994000&grp_id=5325"
+      },
+      "sprites": {
+        "sd": "gundam-exia-repair-ii-sd",
+        "hg": "gundam-exia-repair-ii-hg",
+        "rg": "gundam-exia-repair-ii-rg",
+        "mg": "gundam-exia-repair-ii-mg"
+      }
+    },
+    {
+      "id": 178,
+      "modelNumber": "GNX-Y901TW",
+      "names": {
+        "ko": "스사노오",
+        "en": "Susanowo",
+        "ja": "スサノオ"
+      },
+      "series": "gundam-00",
+      "faction": "a_laws",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/300"
+      },
+      "sprites": {
+        "hg": "susanowo-hg"
+      }
+    },
+    {
+      "id": 179,
+      "modelNumber": "CB-0000G/C",
+      "names": {
+        "ko": "리본즈 건담",
+        "en": "Reborns Gundam",
+        "ja": "リボーンズガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "innovators",
+      "rarity": "legendary",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/291"
+      },
+      "sprites": {
+        "hg": "reborns-gundam-hg"
+      }
+    },
+    {
+      "id": 180,
+      "modelNumber": "GNT-0000",
+      "names": {
+        "ko": "더블오 퀀터",
+        "en": "00 Qan[T]",
+        "ja": "ダブルオークアンタ"
+      },
+      "series": "gundam-00-movie",
+      "faction": "celestial_being",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112655660000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/312",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/669",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/843"
+      },
+      "sprites": {
+        "sd": "00-qant-sd",
+        "hg": "00-qant-hg",
+        "rg": "00-qant-rg",
+        "mg": "00-qant-mg"
+      }
+    },
+    {
+      "id": 181,
+      "modelNumber": "GF13-006NA",
+      "names": {
+        "ko": "건담 맥스터",
+        "en": "Gundam Maxter",
+        "ja": "ガンダムマックスター"
+      },
+      "series": "g-gundam",
+      "faction": "neo_america",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://p-bandai.jp/item/item-1000130821/",
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102657299000&grp_id=5325"
+      },
+      "sprites": {
+        "sd": "gundam-maxter-sd",
+        "hg": "gundam-maxter-hg"
+      }
+    },
+    {
+      "id": 182,
+      "modelNumber": "GF13-011NC",
+      "names": {
+        "ko": "드래곤 건담",
+        "en": "Dragon Gundam",
+        "ja": "ドラゴンガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "neo_china",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://p-bandai.jp/item/item-1000130820/",
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102672674000&grp_id=5325"
+      },
+      "sprites": {
+        "sd": "dragon-gundam-sd",
+        "hg": "dragon-gundam-hg"
+      }
+    },
+    {
+      "id": 183,
+      "modelNumber": "GF13-009NF",
+      "names": {
+        "ko": "건담 로즈",
+        "en": "Gundam Rose",
+        "ja": "ガンダムローズ"
+      },
+      "series": "g-gundam",
+      "faction": "neo_france",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2479"
+      },
+      "sprites": {
+        "hg": "gundam-rose-hg"
+      }
+    },
+    {
+      "id": 184,
+      "modelNumber": "GF13-050NSW",
+      "names": {
+        "ko": "노벨 건담",
+        "en": "Nobell Gundam",
+        "ja": "ノーベルガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "neo_sweden",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/428"
+      },
+      "sprites": {
+        "hg": "nobell-gundam-hg"
+      }
+    },
+    {
+      "id": 185,
+      "modelNumber": "GF13-021NG",
+      "names": {
+        "ko": "건담 슈피겔",
+        "en": "Gundam Spiegel",
+        "ja": "ガンダムシュピーゲル"
+      },
+      "series": "g-gundam",
+      "faction": "neo_germany",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/5546",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/518"
+      },
+      "sprites": {
+        "hg": "gundam-spiegel-hg",
+        "mg": "gundam-spiegel-mg"
+      }
+    },
+    {
+      "id": 186,
+      "modelNumber": "JDG-00X",
+      "names": {
+        "ko": "데빌 건담",
+        "en": "Devil Gundam",
+        "ja": "デビルガンダム"
+      },
+      "series": "g-gundam",
+      "faction": "devil_gundam_corps",
+      "rarity": "legendary",
+      "grades": [
+        "sd"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112137807000&grp_id=5325"
+      },
+      "sprites": {
+        "sd": "devil-gundam-sd"
+      }
+    },
+    {
+      "id": 187,
+      "modelNumber": "XXXG-01D",
+      "names": {
+        "ko": "건담 데스사이즈",
+        "en": "Gundam Deathscythe",
+        "ja": "ガンダムデスサイズ"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756790000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/506",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/580"
+      },
+      "sprites": {
+        "sd": "gundam-deathscythe-sd",
+        "hg": "gundam-deathscythe-hg",
+        "mg": "gundam-deathscythe-mg"
+      }
+    },
+    {
+      "id": 188,
+      "modelNumber": "XXXG-01D2",
+      "names": {
+        "ko": "건담 데스사이즈 헬",
+        "en": "Gundam Deathscythe Hell",
+        "ja": "ガンダムデスサイズヘル"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2466"
+      },
+      "sprites": {
+        "hg": "gundam-deathscythe-hell-hg"
+      }
+    },
+    {
+      "id": 189,
+      "modelNumber": "XXXG-01H",
+      "names": {
+        "ko": "건담 헤비암즈",
+        "en": "Gundam Heavyarms",
+        "ja": "ガンダムヘビーアームズ"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756776000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/498",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/594"
+      },
+      "sprites": {
+        "sd": "gundam-heavyarms-sd",
+        "hg": "gundam-heavyarms-hg",
+        "mg": "gundam-heavyarms-mg"
+      }
+    },
+    {
+      "id": 190,
+      "modelNumber": "XXXG-01H2",
+      "names": {
+        "ko": "건담 헤비암즈 改",
+        "en": "Gundam Heavyarms Kai",
+        "ja": "ガンダムヘビーアームズ改"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2396"
+      },
+      "sprites": {
+        "hg": "gundam-heavyarms-kai-hg"
+      }
+    },
+    {
+      "id": 191,
+      "modelNumber": "XXXG-01SR",
+      "names": {
+        "ko": "건담 샌드록",
+        "en": "Gundam Sandrock",
+        "ja": "ガンダムサンドロック"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756783000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/492",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/593"
+      },
+      "sprites": {
+        "sd": "gundam-sandrock-sd",
+        "hg": "gundam-sandrock-hg",
+        "mg": "gundam-sandrock-mg"
+      }
+    },
+    {
+      "id": 192,
+      "modelNumber": "XXXG-01SR2",
+      "names": {
+        "ko": "건담 샌드록 改",
+        "en": "Gundam Sandrock Kai",
+        "ja": "ガンダムサンドロック改"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2317"
+      },
+      "sprites": {
+        "hg": "gundam-sandrock-kai-hg"
+      }
+    },
+    {
+      "id": 193,
+      "modelNumber": "XXXG-01S",
+      "names": {
+        "ko": "셴롱 건담",
+        "en": "Shenlong Gundam",
+        "ja": "シェンロンガンダム"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425756769000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/507",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/586"
+      },
+      "sprites": {
+        "sd": "shenlong-gundam-sd",
+        "hg": "shenlong-gundam-hg",
+        "mg": "shenlong-gundam-mg"
+      }
+    },
+    {
+      "id": 194,
+      "modelNumber": "XXXG-01S2",
+      "names": {
+        "ko": "알트론 건담",
+        "en": "Altron Gundam",
+        "ja": "アルトロンガンダム"
+      },
+      "series": "gundam-wing",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2482"
+      },
+      "sprites": {
+        "hg": "altron-gundam-hg"
+      }
+    },
+    {
+      "id": 195,
+      "modelNumber": "OZ-00MS2",
+      "names": {
+        "ko": "톨기스 II",
+        "en": "Tallgeese II",
+        "ja": "トールギスII"
+      },
+      "series": "gundam-wing",
+      "faction": "oz",
+      "rarity": "rare",
+      "grades": [
+        "rg",
+        "mg"
+      ],
+      "gradeSources": {
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2661",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2140"
+      },
+      "sprites": {
+        "rg": "tallgeese-ii-rg",
+        "mg": "tallgeese-ii-mg"
+      }
+    },
+    {
+      "id": 196,
+      "modelNumber": "OZ-13MSX1",
+      "names": {
+        "ko": "바이에이트",
+        "en": "Vayeate",
+        "ja": "ヴァイエイト"
+      },
+      "series": "gundam-wing",
+      "faction": "oz",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2323"
+      },
+      "sprites": {
+        "hg": "vayeate-hg"
+      }
+    },
+    {
+      "id": 197,
+      "modelNumber": "OZ-13MSX2",
+      "names": {
+        "ko": "메리크리우스",
+        "en": "Mercurius",
+        "ja": "メリクリウス"
+      },
+      "series": "gundam-wing",
+      "faction": "oz",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2323"
+      },
+      "sprites": {
+        "hg": "mercurius-hg"
+      }
+    },
+    {
+      "id": 198,
+      "modelNumber": "XXXG-01D2",
+      "names": {
+        "ko": "건담 데스사이즈 헬(EW판)",
+        "en": "Gundam Deathscythe Hell (EW)",
+        "ja": "ガンダムデスサイズヘル（EW版）"
+      },
+      "series": "endless-waltz",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660090670000&grp_id=5325",
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425612133000&grp_id=5325",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/579"
+      },
+      "sprites": {
+        "sd": "gundam-deathscythe-hell-ew-sd",
+        "hg": "gundam-deathscythe-hell-ew-hg",
+        "mg": "gundam-deathscythe-hell-ew-mg"
+      }
+    },
+    {
+      "id": 199,
+      "modelNumber": "XXXG-01H2",
+      "names": {
+        "ko": "건담 헤비암즈 改(EW판)",
+        "en": "Gundam Heavyarms Kai (EW)",
+        "ja": "ガンダムヘビーアームズ改（EW版）"
+      },
+      "series": "endless-waltz",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425612102000&grp_id=5325",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2810"
+      },
+      "sprites": {
+        "hg": "gundam-heavyarms-kai-ew-hg",
+        "mg": "gundam-heavyarms-kai-ew-mg"
+      }
+    },
+    {
+      "id": 200,
+      "modelNumber": "XXXG-01SR2",
+      "names": {
+        "ko": "건담 샌드록 改(EW판)",
+        "en": "Gundam Sandrock Kai (EW)",
+        "ja": "ガンダムサンドロック改（EW版）"
+      },
+      "series": "endless-waltz",
+      "faction": "gundam_pilots",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/5182",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2690"
+      },
+      "sprites": {
+        "hg": "gundam-sandrock-kai-ew-hg",
+        "mg": "gundam-sandrock-kai-ew-mg"
+      }
+    },
+    {
+      "id": 201,
+      "modelNumber": "GX-9900-DV",
+      "names": {
+        "ko": "건담 X 디바이더",
+        "en": "Gundam X Divider",
+        "ja": "ガンダムXディバイダー"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/844"
+      },
+      "sprites": {
+        "hg": "gundam-x-divider-hg"
+      }
+    },
+    {
+      "id": 202,
+      "modelNumber": "GW-9800",
+      "names": {
+        "ko": "건담 에어마스터",
+        "en": "Gundam Airmaster",
+        "ja": "ガンダムエアマスター"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425770765000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/457"
+      },
+      "sprites": {
+        "sd": "gundam-airmaster-sd",
+        "hg": "gundam-airmaster-hg"
+      }
+    },
+    {
+      "id": 203,
+      "modelNumber": "GW-9800-B",
+      "names": {
+        "ko": "건담 에어마스터 버스트",
+        "en": "Gundam Airmaster Burst",
+        "ja": "ガンダムエアマスターバースト"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2584"
+      },
+      "sprites": {
+        "hg": "gundam-airmaster-burst-hg"
+      }
+    },
+    {
+      "id": 204,
+      "modelNumber": "GT-9600",
+      "names": {
+        "ko": "건담 레오파르드",
+        "en": "Gundam Leopard",
+        "ja": "ガンダムレオパルド"
+      },
+      "series": "after-war-x",
+      "faction": "freeden",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425770758000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/5281"
+      },
+      "sprites": {
+        "sd": "gundam-leopard-sd",
+        "hg": "gundam-leopard-hg"
+      }
+    },
+    {
+      "id": 205,
+      "modelNumber": "MBF-02",
+      "names": {
+        "ko": "스트라이크 루주",
+        "en": "Strike Rouge",
+        "ja": "ストライクルージュ"
+      },
+      "series": "gundam-seed",
+      "faction": "orb",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg",
+        "mg",
+        "pg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/399",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/4484",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/530",
+        "pg": "https://manual.bandai-hobby.net/menus/detail/654"
+      },
+      "sprites": {
+        "hg": "strike-rouge-hg",
+        "rg": "strike-rouge-rg",
+        "mg": "strike-rouge-mg",
+        "pg": "strike-rouge-pg"
+      }
+    },
+    {
+      "id": 206,
+      "modelNumber": "GAT-X102",
+      "names": {
+        "ko": "듀얼 건담 어설트 슈라우드",
+        "en": "Duel Gundam Assault Shroud",
+        "ja": "デュエルガンダム アサルトシュラウド"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112318787000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/331",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/600"
+      },
+      "sprites": {
+        "sd": "duel-gundam-assault-shroud-sd",
+        "hg": "duel-gundam-assault-shroud-hg",
+        "mg": "duel-gundam-assault-shroud-mg"
+      }
+    },
+    {
+      "id": 207,
+      "modelNumber": "GAT-X103",
+      "names": {
+        "ko": "버스터 건담",
+        "en": "Buster Gundam",
+        "ja": "バスターガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/332",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/601"
+      },
+      "sprites": {
+        "hg": "buster-gundam-hg",
+        "mg": "buster-gundam-mg"
+      }
+    },
+    {
+      "id": 208,
+      "modelNumber": "GAT-X207",
+      "names": {
+        "ko": "블리츠 건담",
+        "en": "Blitz Gundam",
+        "ja": "ブリッツガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112256546000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/333",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/602"
+      },
+      "sprites": {
+        "sd": "blitz-gundam-sd",
+        "hg": "blitz-gundam-hg",
+        "mg": "blitz-gundam-mg"
+      }
+    },
+    {
+      "id": 209,
+      "modelNumber": "GAT-X131",
+      "names": {
+        "ko": "칼라미티 건담",
+        "en": "Calamity Gundam",
+        "ja": "カラミティガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "earth_alliance",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/337"
+      },
+      "sprites": {
+        "hg": "calamity-gundam-hg"
+      }
+    },
+    {
+      "id": 210,
+      "modelNumber": "GAT-X252",
+      "names": {
+        "ko": "포비든 건담",
+        "en": "Forbidden Gundam",
+        "ja": "フォビドゥンガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "earth_alliance",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/338"
+      },
+      "sprites": {
+        "hg": "forbidden-gundam-hg"
+      }
+    },
+    {
+      "id": 211,
+      "modelNumber": "GAT-X370",
+      "names": {
+        "ko": "레이더 건담",
+        "en": "Raider Gundam",
+        "ja": "レイダーガンダム"
+      },
+      "series": "gundam-seed",
+      "faction": "earth_alliance",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/339"
+      },
+      "sprites": {
+        "hg": "raider-gundam-hg"
+      }
+    },
+    {
+      "id": 212,
+      "modelNumber": "ZGMF-515",
+      "names": {
+        "ko": "시구",
+        "en": "CGUE",
+        "ja": "シグー"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/336"
+      },
+      "sprites": {
+        "hg": "cgue-hg"
+      }
+    },
+    {
+      "id": 213,
+      "modelNumber": "TMF/A-803",
+      "names": {
+        "ko": "라고우",
+        "en": "LaGOWE",
+        "ja": "ラゴゥ"
+      },
+      "series": "gundam-seed",
+      "faction": "zaft",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/341"
+      },
+      "sprites": {
+        "hg": "lagowe-hg"
+      }
+    },
+    {
+      "id": 214,
+      "modelNumber": "ZGMF-X23S",
+      "names": {
+        "ko": "세이버 건담",
+        "en": "Saviour Gundam",
+        "ja": "セイバーガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/163"
+      },
+      "sprites": {
+        "hg": "saviour-gundam-hg"
+      }
+    },
+    {
+      "id": 215,
+      "modelNumber": "ORB-01",
+      "names": {
+        "ko": "아카츠키 건담(오오와시 장비)",
+        "en": "Akatsuki Gundam (Oowashi)",
+        "ja": "アカツキガンダム（オオワシ装備）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "orb",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "rg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/178",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2014"
+      },
+      "sprites": {
+        "hg": "akatsuki-gundam-oowashi-hg",
+        "rg": "akatsuki-gundam-oowashi-rg"
+      }
+    },
+    {
+      "id": 216,
+      "modelNumber": "ORB-01",
+      "names": {
+        "ko": "아카츠키 건담(시라누이 장비)",
+        "en": "Akatsuki Gundam (Shiranui)",
+        "ja": "アカツキガンダム（シラヌイ装備）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "orb",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/176"
+      },
+      "sprites": {
+        "hg": "akatsuki-gundam-shiranui-hg"
+      },
+      "hangarGroupID": 215
+    },
+    {
+      "id": 217,
+      "modelNumber": "ZGMF-1000/A1",
+      "names": {
+        "ko": "거너 자쿠 워리어(루나마리아 전용기)",
+        "en": "Gunner ZAKU Warrior (Lunamaria Custom)",
+        "ja": "ガナーザクウォーリア（ルナマリア・ホーク専用機）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112341174000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/162",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/635"
+      },
+      "sprites": {
+        "sd": "gunner-zaku-warrior-lunamaria-custom-sd",
+        "hg": "gunner-zaku-warrior-lunamaria-custom-hg",
+        "mg": "gunner-zaku-warrior-lunamaria-custom-mg"
+      }
+    },
+    {
+      "id": 218,
+      "modelNumber": "ZGMF-1001/M",
+      "names": {
+        "ko": "블레이즈 자쿠 팬텀(레이 전용기)",
+        "en": "Blaze ZAKU Phantom (Rey Custom)",
+        "ja": "ブレイズザクファントム（レイ・ザ・バレル専用機）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "uncommon",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112390646000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/170",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2346"
+      },
+      "sprites": {
+        "sd": "blaze-zaku-phantom-rey-custom-sd",
+        "hg": "blaze-zaku-phantom-rey-custom-hg",
+        "mg": "blaze-zaku-phantom-rey-custom-mg"
+      }
+    },
+    {
+      "id": 219,
+      "modelNumber": "ZGMF-X2000",
+      "names": {
+        "ko": "구프 이그나이티드(하이네 전용기)",
+        "en": "GOUF Ignited (Heine Custom)",
+        "ja": "グフイグナイテッド（ハイネ専用機）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "zaft",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/5254"
+      },
+      "sprites": {
+        "hg": "gouf-ignited-heine-custom-hg"
+      }
+    },
+    {
+      "id": 220,
+      "modelNumber": "ZGMF-X88S",
+      "names": {
+        "ko": "가이아 건담",
+        "en": "Gaia Gundam",
+        "ja": "ガイアガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "phantom_pain",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/161"
+      },
+      "sprites": {
+        "hg": "gaia-gundam-hg"
+      }
+    },
+    {
+      "id": 221,
+      "modelNumber": "ZGMF-X24S",
+      "names": {
+        "ko": "카오스 건담",
+        "en": "Chaos Gundam",
+        "ja": "カオスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "phantom_pain",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1067"
+      },
+      "sprites": {
+        "hg": "chaos-gundam-hg"
+      }
+    },
+    {
+      "id": 222,
+      "modelNumber": "ZGMF-X31S",
+      "names": {
+        "ko": "어비스 건담",
+        "en": "Abyss Gundam",
+        "ja": "アビスガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "phantom_pain",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/165"
+      },
+      "sprites": {
+        "hg": "abyss-gundam-hg"
+      }
+    },
+    {
+      "id": 223,
+      "modelNumber": "GFAS-X1",
+      "names": {
+        "ko": "디스트로이 건담",
+        "en": "Destroy Gundam",
+        "ja": "デストロイガンダム"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "phantom_pain",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/1321"
+      },
+      "sprites": {
+        "hg": "destroy-gundam-hg"
+      }
+    },
+    {
+      "id": 224,
+      "modelNumber": "GAT-04",
+      "names": {
+        "ko": "윈덤(네오 로아노크 전용기)",
+        "en": "Windam (Neo Roanoke Custom)",
+        "ja": "ウィンダム（ネオ・ロアノーク専用機）"
+      },
+      "series": "gundam-seed-destiny",
+      "faction": "phantom_pain",
+      "rarity": "uncommon",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4573102614032000&grp_id=5325"
+      },
+      "sprites": {
+        "hg": "windam-neo-roanoke-custom-hg"
+      }
+    },
+    {
+      "id": 225,
+      "modelNumber": "GN-002",
+      "names": {
+        "ko": "건담 듀나메스",
+        "en": "Gundam Dynames",
+        "ja": "ガンダムデュナメス"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/187",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/862"
+      },
+      "sprites": {
+        "hg": "gundam-dynames-hg",
+        "mg": "gundam-dynames-mg"
+      }
+    },
+    {
+      "id": 226,
+      "modelNumber": "GN-003",
+      "names": {
+        "ko": "건담 큐리오스",
+        "en": "Gundam Kyrios",
+        "ja": "ガンダムキュリオス"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/188",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/638"
+      },
+      "sprites": {
+        "hg": "gundam-kyrios-hg",
+        "mg": "gundam-kyrios-mg"
+      }
+    },
+    {
+      "id": 227,
+      "modelNumber": "GN-005",
+      "names": {
+        "ko": "건담 버체",
+        "en": "Gundam Virtue",
+        "ja": "ガンダムヴァーチェ"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/189",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/644"
+      },
+      "sprites": {
+        "hg": "gundam-virtue-hg",
+        "mg": "gundam-virtue-mg"
+      }
+    },
+    {
+      "id": 228,
+      "modelNumber": "GN-004",
+      "names": {
+        "ko": "건담 나드레",
+        "en": "Gundam Nadleeh",
+        "ja": "ガンダムナドレ"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/266",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/4300"
+      },
+      "sprites": {
+        "hg": "gundam-nadleeh-hg",
+        "mg": "gundam-nadleeh-mg"
+      }
+    },
+    {
+      "id": 229,
+      "modelNumber": "GN-006",
+      "names": {
+        "ko": "켈딤 건담",
+        "en": "Cherudim Gundam",
+        "ja": "ケルディムガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/269"
+      },
+      "sprites": {
+        "hg": "cherudim-gundam-hg"
+      }
+    },
+    {
+      "id": 230,
+      "modelNumber": "GN-007",
+      "names": {
+        "ko": "아리오스 건담",
+        "en": "Arios Gundam",
+        "ja": "アリオスガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/270"
+      },
+      "sprites": {
+        "hg": "arios-gundam-hg"
+      }
+    },
+    {
+      "id": 231,
+      "modelNumber": "GNR-101A",
+      "names": {
+        "ko": "GN 아처",
+        "en": "GN Archer",
+        "ja": "GNアーチャー"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/910"
+      },
+      "sprites": {
+        "hg": "gn-archer-hg"
+      }
+    },
+    {
+      "id": 232,
+      "modelNumber": "GN-008",
+      "names": {
+        "ko": "세라비 건담",
+        "en": "Seravee Gundam",
+        "ja": "セラヴィーガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/273"
+      },
+      "sprites": {
+        "hg": "seravee-gundam-hg"
+      }
+    },
+    {
+      "id": 233,
+      "modelNumber": "GN-009",
+      "names": {
+        "ko": "세라핌 건담",
+        "en": "Seraphim Gundam",
+        "ja": "セラフィムガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/296"
+      },
+      "sprites": {
+        "hg": "seraphim-gundam-hg"
+      }
+    },
+    {
+      "id": 234,
+      "modelNumber": "SVMS-01X",
+      "names": {
+        "ko": "그라함 전용 유니온 플래그 커스텀 II",
+        "en": "Graham's Union Flag Custom II",
+        "ja": "グラハム専用ユニオンフラッグカスタムII"
+      },
+      "series": "gundam-00",
+      "faction": "union",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/3899"
+      },
+      "sprites": {
+        "hg": "grahams-union-flag-custom-ii-hg"
+      }
+    },
+    {
+      "id": 235,
+      "modelNumber": "GNW-001",
+      "names": {
+        "ko": "건담 스로네 아인",
+        "en": "Gundam Throne Eins",
+        "ja": "ガンダムスローネアイン"
+      },
+      "series": "gundam-00",
+      "faction": "trinity_team",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/194"
+      },
+      "sprites": {
+        "hg": "gundam-throne-eins-hg"
+      }
+    },
+    {
+      "id": 236,
+      "modelNumber": "GNW-002",
+      "names": {
+        "ko": "건담 스로네 츠바이",
+        "en": "Gundam Throne Zwei",
+        "ja": "ガンダムスローネツヴァイ"
+      },
+      "series": "gundam-00",
+      "faction": "trinity_team",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/195"
+      },
+      "sprites": {
+        "hg": "gundam-throne-zwei-hg"
+      }
+    },
+    {
+      "id": 237,
+      "modelNumber": "GNW-003",
+      "names": {
+        "ko": "건담 스로네 드라이",
+        "en": "Gundam Throne Drei",
+        "ja": "ガンダムスローネドライ"
+      },
+      "series": "gundam-00",
+      "faction": "trinity_team",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/196"
+      },
+      "sprites": {
+        "hg": "gundam-throne-drei-hg"
+      }
+    },
+    {
+      "id": 238,
+      "modelNumber": "GNW-20000",
+      "names": {
+        "ko": "아르케 건담",
+        "en": "Arche Gundam",
+        "ja": "アルケーガンダム"
+      },
+      "series": "gundam-00",
+      "faction": "innovators",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/288"
+      },
+      "sprites": {
+        "hg": "arche-gundam-hg"
+      }
+    },
+    {
+      "id": 239,
+      "modelNumber": "GNX-U02X",
+      "names": {
+        "ko": "마스라오",
+        "en": "Masurao",
+        "ja": "マスラオ"
+      },
+      "series": "gundam-00",
+      "faction": "a_laws",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/305"
+      },
+      "sprites": {
+        "hg": "masurao-hg"
+      }
+    },
+    {
+      "id": 240,
+      "modelNumber": "GN-000",
+      "names": {
+        "ko": "0 건담",
+        "en": "0 Gundam (Type A.C.D.)",
+        "ja": "0ガンダム（実戦配備型）"
+      },
+      "series": "gundam-00",
+      "faction": "innovators",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112599391000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/287"
+      },
+      "sprites": {
+        "sd": "0-gundam-type-a-c-d-sd",
+        "hg": "0-gundam-type-a-c-d-hg"
+      }
+    },
+    {
+      "id": 241,
+      "modelNumber": "GN-010",
+      "names": {
+        "ko": "건담 사바냐",
+        "en": "Gundam Zabanya",
+        "ja": "ガンダムサバーニャ"
+      },
+      "series": "gundam-00-movie",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/929"
+      },
+      "sprites": {
+        "hg": "gundam-zabanya-hg"
+      }
+    },
+    {
+      "id": 242,
+      "modelNumber": "GN-011",
+      "names": {
+        "ko": "건담 하루트",
+        "en": "Gundam Harute",
+        "ja": "ガンダムハルート"
+      },
+      "series": "gundam-00-movie",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/313"
+      },
+      "sprites": {
+        "hg": "gundam-harute-hg"
+      }
+    },
+    {
+      "id": 243,
+      "modelNumber": "CB-002",
+      "names": {
+        "ko": "라파엘 건담",
+        "en": "Raphael Gundam",
+        "ja": "ラファエルガンダム"
+      },
+      "series": "gundam-00-movie",
+      "faction": "celestial_being",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/314"
+      },
+      "sprites": {
+        "hg": "raphael-gundam-hg"
+      }
+    },
+    {
+      "id": 244,
+      "modelNumber": "GNX-903VW",
+      "names": {
+        "ko": "브레이브 지휘관용 시험기",
+        "en": "Brave Commander Test Type",
+        "ja": "ブレイヴ指揮官用試験機"
+      },
+      "series": "gundam-00-movie",
+      "faction": "earth_sphere_federation",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/315"
+      },
+      "sprites": {
+        "hg": "brave-commander-test-type-hg"
+      }
     }
   ]
 }

@@ -85,12 +85,12 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 170)
+        XCTAssertEqual(c.machines.count, 243)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
-        XCTAssertEqual(c.series.count, 23)
+        XCTAssertEqual(c.series.count, 25)
     }
 
     func test_fullArmorUnicornModesFollowTheReleasedFrameColors() throws {
@@ -168,6 +168,28 @@ final class MachineCatalogTests: XCTestCase {
         XCTAssertEqual(art.count, 13)
     }
 
+    func test_00RaiserSharesThe00GundamHangarSlot() throws {
+        let catalog = try MachineCatalog.bundled()
+        let base = try XCTUnwrap(catalog.machine(id: 174))
+        let raiser = try XCTUnwrap(catalog.machine(id: 176))
+        XCTAssertEqual(base.hangarID, raiser.hangarID)
+        XCTAssertEqual(base.grades, [.sd, .hg])
+        XCTAssertEqual(raiser.grades, [.sd, .hg, .rg, .mg, .pg])
+        let baseSprites = try XCTUnwrap(base.sprites)
+        let raiserSprites = try XCTUnwrap(raiser.sprites)
+        XCTAssertTrue(Set(baseSprites.values).isDisjoint(with: raiserSprites.values))
+    }
+
+    func test_akatsukiEquipmentSharesOneHangarSlot() throws {
+        let catalog = try MachineCatalog.bundled()
+        let oowashi = try XCTUnwrap(catalog.machine(id: 215))
+        let shiranui = try XCTUnwrap(catalog.machine(id: 216))
+        XCTAssertEqual(oowashi.hangarID, shiranui.hangarID)
+        XCTAssertEqual(oowashi.grades, [.hg, .rg])
+        XCTAssertEqual(shiranui.grades, [.hg])
+        XCTAssertNotEqual(oowashi.sprites?["hg"], shiranui.sprites?["hg"])
+    }
+
     func test_completedSeriesServeGradeSpecificArtAndKitSources() throws {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
@@ -176,8 +198,8 @@ final class MachineCatalogTests: XCTestCase {
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
                       "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14,
                       "narrative": 5, "hathaway": 6, "f91": 4, "victory": 4,
-                      "g-gundam": 3, "gundam-wing": 4, "endless-waltz": 3, "after-war-x": 3, "turn-a-gundam": 2,
-                      "gundam-seed": 5, "gundam-seed-destiny": 5]
+                      "g-gundam": 9, "gundam-wing": 15, "endless-waltz": 6, "after-war-x": 7, "turn-a-gundam": 2,
+                      "gundam-seed": 14, "gundam-seed-destiny": 15, "gundam-00": 23, "gundam-00-movie": 5]
         // These vintage kits are documented by their original Bandai instruction booklets.
         let printedManuals = [
             "gundam-f91-sd": "https://www.dalong.net/reviews/sd/g21/p/g21_m0001.jpg",

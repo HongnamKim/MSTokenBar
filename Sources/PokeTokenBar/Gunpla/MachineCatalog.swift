@@ -61,7 +61,7 @@ struct MachineCatalog: Sendable {
             }
             if let id = m.hangarGroupID {
                 guard let parent = byID[id], parent.hangarGroupID == nil, parent.id != m.id,
-                      parent.series == m.series, parent.rarity == m.rarity, parent.variantOf == m.variantOf else {
+                      parent.series == m.series, parent.variantOf == m.variantOf else {
                     throw CatalogError.invalidHangarGroup(m.id)
                 }
             }
