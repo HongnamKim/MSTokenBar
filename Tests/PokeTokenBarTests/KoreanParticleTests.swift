@@ -24,6 +24,13 @@ final class KoreanParticleTests: XCTestCase {
         XCTAssertEqual(KoreanParticle.subject.attach(to: ""), "이(가)")
     }
 
+    /// 기체 이름 끝의 「改」는 「개」로 읽는다 — 한글이 아니라고 병기 형태로 빠지면 "자쿠 II 改이(가)"가 된다.
+    func testKaiHanjaEndingReadsAsGae() {
+        XCTAssertEqual(KoreanParticle.subject.attach(to: "자쿠 II 改"), "자쿠 II 改가")
+        XCTAssertEqual(KoreanParticle.direction.attach(to: "자쿠 III 改"), "자쿠 III 改로")
+        XCTAssertEqual(L(.ko).notifHatchBody("HG 자쿠 II 改"), "박스에서 HG 자쿠 II 改가 나왔어요!")
+    }
+
     /// 실제 문구 — 스크린샷으로 보고된 "유니란이(가)"·"듀란(으)로"·"란쿨루스(으)로"가 사라진다.
     func testKoreanCopyUsesTheMatchingParticle() {
         let l = L(.ko)

@@ -1384,6 +1384,18 @@ read_when:
   `Fatal error: Duplicate values for key: '1'` 로 프로세스가 죽는 것을 확인.
   **스윕:** `CompanionStore` 의 나머지(`claimedTodayTokensByProvider` 키)는 딕셔너리 키라 유일하다. 세이브
   밖의 사용처(로그 스캔·PokéAPI 스탯)는 이 입력 경로가 아니라 범위 밖.
+- **번들 이름을 바꾸면 저장 사본·검색·조사 판정을 같이 바꾼다.** 한국어 기체명의 「개」를 「改」로
+  바꿨다(자쿠 II 改, 자쿠 III 改). 이름을 읽는 곳이 셋이라 `machines.json` 만 고치면 셋 다 어긋난다.
+  ① 격납고는 번들 카탈로그를 읽지만 `DexEntry.names` 는 졸업 때 저장한 사본이고, `namesVersion` 이
+  현재 값인 세이브는 다시 읽지 않아 옛 표기가 남는다 → `DexEntry.currentNamesVersion` 을 올려 한 번
+  다시 읽게 한다. ② 이름 검색은 문자열 일치라 한글 자판으로 치는 「개」가 「改」를 찾지 못한다 →
+  `DexSearchMatcher` 와 카탈로그 페이지의 `normalize` 가 「改」를 「개」로 접어 비교한다.
+  ③ `KoreanParticle` 은 한글 음절만 받침을 판정해 "자쿠 II 改이(가)"로 병기 형태가 된다 → 「改」를
+  받침 없음으로 본다.
+  **왜 미리 걸리지 않나:** 번들 이름을 단언하는 테스트가 없어 데이터만 고쳐도 전부 통과한다.
+  **회귀 가드:** `testRenamedBundledNameReplacesTheSavedCopy`(버전을 되돌리면 실패),
+  `testHangarSearchReadsKaiHanjaAsHangul`, `testKaiHanjaEndingReadsAsGae`.
+  번들 이름을 다시 바꿀 때는 `currentNamesVersion` 을 또 올린다.
 
 ## 렌더 기하 (스프라이트·이미지)
 

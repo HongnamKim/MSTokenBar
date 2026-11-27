@@ -535,7 +535,7 @@ final class CompanionStore {
     /// The one search rule shared by the hangar grid and the Catch Log, so the two screens cannot
     /// drift apart. In the Catch Log a query matches a species number (`25` or `#25`) or part of any
     /// stored name in any language; in the hangar, the machine name or model number. Both ignore case
-    /// and diacritics ("flabebe" finds Flabébé).
+    /// and diacritics ("flabebe" finds Flabébé), and read 「改」 as 「개」 ("자쿠 II 개" finds 자쿠 II 改).
     struct DexSearchMatcher: Sendable {
         private let query: String
         private let number: Int?
@@ -544,13 +544,20 @@ final class CompanionStore {
         init?(_ rawQuery: String) {
             let trimmed = rawQuery.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return nil }
-            query = trimmed
+            query = Self.folded(trimmed)
             number = Int(trimmed.hasPrefix("#") ? String(trimmed.dropFirst()) : trimmed)
+        }
+
+        /// 「改」 is typed as 「개」 on a Korean keyboard, so both spellings must find the same name.
+        private static func folded(_ text: String) -> String {
+            text.replacingOccurrences(of: "改", with: "개")
         }
 
         /// A hangar cell matches its machine name (current language) or model number ("ms-06" finds MS-06F).
         func matches(name: String, modelNumber: String) -> Bool {
-            [name, modelNumber].contains { $0.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
+            [name, modelNumber].contains {
+                Self.folded($0).range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            }
         }
 
         /// An individual matches through any species of its chain, like its evolution line in the log row.
@@ -563,7 +570,9 @@ final class CompanionStore {
             if let number, ids.contains(number) { return true }
             // Partial numbers keep working: "25" also finds #125, "#25" finds #25 and #250.
             if ids.contains(where: { "#\($0)".contains(query) }) { return true }
-            return names.contains { $0.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
+            return names.contains {
+                Self.folded($0).range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            }
         }
     }
 

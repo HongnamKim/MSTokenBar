@@ -555,7 +555,8 @@
         text
           .toLowerCase()
           .normalize("NFKC")
-          .replace(/[\s·._()'-]/g, "");
+          .replace(/[\s·._()'-]/g, "")
+          .replace(/改/g, "개");
       function render() {
         for (const b of el("tabs").children)
           b.setAttribute("aria-pressed", String(b.textContent === kind));

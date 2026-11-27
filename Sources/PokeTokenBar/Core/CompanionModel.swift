@@ -479,7 +479,9 @@ struct MonState: Codable, Sendable {
 /// 도감 항목 — 라인 전체(초기→최종) 순서 보존.
 struct DexEntry: Codable, Sendable, Identifiable {
     /// Version 1 preserves every API language; earlier saves retained only app-supported names.
-    static let currentNamesVersion = 1
+    /// Version 2 re-reads the bundled machine names after 「개」 became 「改」 (자쿠 II 改, 자쿠 III 改).
+    /// `names` is a saved copy of the catalog, so bump this whenever a bundled name changes.
+    static let currentNamesVersion = 2
     var id = UUID().uuidString
     var baseID: Int
     var finalID: Int
