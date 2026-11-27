@@ -38,7 +38,7 @@ struct PreorderPickPanel: View {
                     let status = statuses[id] ?? .complete
                     Button { onChooseMode(id) } label: {
                         HStack(spacing: 6) {
-                            Text(store.machineName(id)).fontWeight(.semibold).lineLimit(1)
+                            Text(store.machineName(id)).fontWeight(.semibold).lineLimit(1).truncationMode(.middle)
                             Text(l.rarityLabel(machine.rarity)).foregroundStyle(.secondary).fixedSize()
                             Spacer(minLength: 4)
                             Group {
@@ -75,7 +75,7 @@ struct PreorderPickPanel: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
                     Text(machine.modelNumber).fixedSize()
-                    Text(store.machineName(id)).lineLimit(1).truncationMode(.tail)
+                    Text(store.machineName(id)).lineLimit(1).truncationMode(.middle)
                     Text("· \(l.rarityLabel(machine.rarity))").fixedSize()
                 }
                 .font(.callout.weight(.semibold))
