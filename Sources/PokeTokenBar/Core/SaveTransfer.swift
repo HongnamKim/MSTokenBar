@@ -153,7 +153,20 @@ enum SaveTransfer {
         // 조합으로 둘 다 들어오면 그 보증이 다음 알로 새어 영구 프리미엄이 되므로 여기서 떨군다.
         // 그 보증으로 미리 뽑아둔 종(pendingHatchID)도 함께 버린다 — 보증만 지우면 졸업 후 받는 **무료**
         // 알이 그 pre-roll 로 부화해, 아무도 사지 않은 프리미엄 결과가 나온다.
-        if s.active != nil { s.eggTier = nil; s.pendingHatchID = nil; s.resetEggPrayers() }
+        if s.active != nil { s.eggTier = nil; s.eggSeries = nil; s.pendingHatchID = nil; s.resetEggPrayers() }
+        // Unknown series would leave a box with no candidate that never opens; an unknown machine has no box
+        // to arrive in. The catalog is `.shared` (like `FullArmorUnicornMigration`) because `sanitized` takes none.
+        if let series = s.eggSeries, !MachineCatalog.shared.series.contains(where: { $0.id == series }) {
+            s.eggSeries = nil
+        }
+        if var preorder = s.preorder {
+            if MachineCatalog.shared.machine(id: preorder.machineID) == nil {
+                s.preorder = nil
+            } else {
+                preorder.boxesOpened = min(max(0, preorder.boxesOpened), Preorder.missesBeforeGuarantee)
+                s.preorder = preorder
+            }
+        }
         if var prayers = s.eggPrayers {   // pray() increments it, so an absurd saved count must not trap
             prayers.count = clampToken(prayers.count)
             s.eggPrayers = prayers
@@ -196,7 +209,7 @@ enum SaveTransfer {
     ///
     /// `CompanionState` 의 필드는 이전 관점에서 세 부류다.
     ///  - **진행**: 어느 기기에서든 참(`usedSinceInstall`·`dex`·`inventory`·`active`·`eggUsage`·`eggTier`·
-    ///    `pendingHatchID`·`eggPrayers`·`representativeSpeciesID`…)
+    ///    `preorder`·`eggSeries`·`pendingHatchID`·`eggPrayers`·`representativeSpeciesID`…)
     ///    → 그대로. 알 보증(`eggTier`)은 산 물건이지 이 기기의 장부가 아니라 기기를 옮겨도 따라간다.
     ///  - **로컬 장부**: *그 기기가* 어디까지 적립했나(`claimedTodayTokensByProvider`·`lastDate`·`installBaselineSet`)
     ///    → 새 기기 기준으로 다시 잡는다. 그대로 들여오면 옛 기기의 오늘 총량이 문턱이 되어

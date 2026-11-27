@@ -236,6 +236,8 @@ enum FreshEgg {
     /// 상점에서 파는 알 — 보증 없음(기본) → 고급 이상 → 희귀 이상. `nil` = 등급 보증 없는 기존 알.
     /// **전설 전용 알은 팔지 않는다**(등급 하한을 capture_rate 로 표현할 수 없고, 최고 등급을 확정
     /// 상품으로 만들지 않는다). 전설은 고급/희귀 알에서 자연 가중대로 섞여 나온다 — 희귀 알 기준 약 10%.
+    /// 등급 박스로는 레전더리를 팔지 않는다. 다만 특정 레전더리는 예약 주문이나 8B 작품 박스로 보증할 수
+    /// 있다 (소유자 결정, 2026-11-27).
     static let shopTiers: [Rarity?] = [nil, .uncommon, .rare]
 
     /// 등급 보증 알의 가격 — 배율은 새 상수를 짓지 않고 **기존 졸업 총량 표**를 그대로 쓴다
@@ -570,6 +572,18 @@ private extension KeyedDecodingContainer {
     }
 }
 
+/// A pre-order (spec §5): the machine, and the boxes opened without it since the purchase.
+struct Preorder: Codable, Sendable, Equatable {
+    var machineID: Int
+    var boxesOpened: Int
+    static let missesBeforeGuarantee = 3
+    static let oddsDenominator: UInt64 = 4
+    /// The next box is the 4th: it brings the machine.
+    var isGuaranteedNext: Bool { boxesOpened >= Self.missesBeforeGuarantee }
+    /// 1...4 — which box of the pre-order the next box is.
+    var boxNumber: Int { boxesOpened + 1 }
+}
+
 /// 영속 상태(Application Support JSON). 포켓몬 전환 — 이전 커스텀 캐릭터 상태는 폐기(새로 시작).
 struct CompanionState: Codable, Sendable {
     // 토큰: 설치 이후만 측정
@@ -586,6 +600,10 @@ struct CompanionState: Codable, Sendable {
     var eggTier: Rarity?
     // 알 상태에서 미리 롤해둔 부화 종(프리패칭) — 부화 순간 네트워크 딜레이 제거. 재시작에도 유지.
     var pendingHatchID: Int?
+    /// The pre-order in progress. Spans boxes (and builds): only the box that brings the machine ends it.
+    var preorder: Preorder?
+    /// The series of the series box being held (nil while building). Egg-scoped like `eggTier`: consumed at hatch.
+    var eggSeries: String?
     /// Prayers said over the current egg (nil until the first one). Egg-scoped like `eggUsage`:
     /// reset by `resetEggPrayers` whenever a new egg starts and copied onto the hatched individual.
     var eggPrayers: PrayerRecord?
@@ -638,6 +656,8 @@ struct CompanionState: Codable, Sendable {
         // 모르는 rawValue 는 nil(보증 없음)로 강등 — 관대 디코딩의 안전한 방향(있지도 않은 보증을 만들지 않는다).
         eggTier            = c.lenientOptional(Rarity.self, forKey: .eggTier)
         pendingHatchID     = c.lenientOptional(Int.self, forKey: .pendingHatchID)
+        preorder           = c.lenientOptional(Preorder.self, forKey: .preorder)
+        eggSeries          = c.lenientOptional(String.self, forKey: .eggSeries)
         eggPrayers         = c.lenientOptional(PrayerRecord.self, forKey: .eggPrayers)
         if c.contains(.claimedTodayTokensByProvider) {
             claimedTodayTokensByProvider = c.lenient([String: Int].self,
