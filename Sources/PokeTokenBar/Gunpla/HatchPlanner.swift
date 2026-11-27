@@ -46,12 +46,21 @@ struct HatchChoice: Equatable {
 
 /// Box opening (spec §5.3): roll variant first, then pick an incomplete machine of that kind by rarity weight,
 /// starting just below its first empty grade cell.
+///
+/// A pre-order is rolled first (§5.2): a guaranteed box or a one-in-four roll opens the target machine,
+/// whatever the box's tier or series. Otherwise the box's own roll runs and may still bring the target.
+/// `series` narrows the pool to one series and keeps the duplicate phase inside it.
 enum HatchPlanner {
     static let rarityWeight: [Rarity: Int] = [.common: 100, .uncommon: 40, .rare: 12, .legendary: 3]
 
-    static func choose(catalog: MachineCatalog, snapshot: CollectionSnapshot, tier: Rarity?, toolLevel: Int,
+    static func choose(catalog: MachineCatalog, snapshot: CollectionSnapshot, tier: Rarity?,
+                       series: String? = nil, preorder: Preorder? = nil, toolLevel: Int,
                        rng: inout any RandomNumberGenerator) -> HatchChoice? {
-        let eligible = catalog.machines.filter { isEligible($0, tier: tier) }
+        if let preorder, let target = catalog.machine(id: preorder.machineID),
+           preorder.isGuaranteedNext || rng.next() % Preorder.oddsDenominator == 0 {
+            return choice(target, snapshot: snapshot, isDuplicatePhase: snapshot.isComplete(target))
+        }
+        let eligible = catalog.machines.filter { isEligible($0, tier: tier) && (series == nil || $0.series == series) }
         let fresh = eligible.filter { !snapshot.isComplete($0) }
         let wantVariant = rng.next() % ToolSet.shinyDenominator(toolLevel: toolLevel) == 0
 
@@ -76,9 +85,13 @@ enum HatchPlanner {
         } else {
             pick = weightedPick(modes, rng: &rng)
         }
-        let start = runGrades(pick, snapshot: snapshot)[0]
-        return HatchChoice(startSpeciesID: GunplaID.encode(machineID: pick.id, grade: start),
-                           isVariant: pick.variantOf != nil,
+        return choice(pick, snapshot: snapshot, isDuplicatePhase: isDuplicatePhase)
+    }
+
+    private static func choice(_ machine: MachineRecord, snapshot: CollectionSnapshot, isDuplicatePhase: Bool) -> HatchChoice {
+        let start = runGrades(machine, snapshot: snapshot)[0]
+        return HatchChoice(startSpeciesID: GunplaID.encode(machineID: machine.id, grade: start),
+                           isVariant: machine.variantOf != nil,
                            isDuplicatePhase: isDuplicatePhase)
     }
 
