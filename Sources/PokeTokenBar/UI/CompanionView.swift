@@ -613,6 +613,32 @@ extension DexEntryLink {
     }
 }
 
+/// "예약 · {name} · 이번 박스 25% (2/4)" — one line; only the name truncates.
+@MainActor
+struct PreorderStatusLine: View {
+    let l: L
+    let name: String
+    let preorder: Preorder
+    let nextBox: Bool
+
+    private var trailing: String {
+        preorder.isGuaranteedNext
+            ? l.preorderStatusGuaranteed(nextBox: nextBox)
+            : l.preorderStatusOdds(box: preorder.boxNumber, nextBox: nextBox)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            WorkshopIcon(.box, size: 11)
+            Text("\(l.preorderShort) ·").fixedSize()
+            Text(name).lineLimit(1).truncationMode(.tail)
+            Text("· \(trailing)").fixedSize()
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
+}
+
 /// 팝오버 상단 — 현재 포켓몬 + 진화 진행 + 부화/진화 연출.
 @MainActor
 struct CompanionHeader: View {
@@ -713,6 +739,10 @@ struct CompanionHeader: View {
                                 .foregroundStyle(eggImminent ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
                             // 등급 보증 알이면 무엇을 품고 있는지 — 도감 칩과 같은 라벨·색.
                             // 알 스프라이트는 한 장뿐이라 등급 구분은 이 배지가 유일한 신호다.
+                            if let series = store.eggSeriesID {
+                                Badge(store.l.seriesBoxHint(store.seriesName(series)), tint: .accent, style: .tinted)
+                                    .lineLimit(1)
+                            }
                             if let guarantee = store.eggGuarantee {
                                 Badge(store.l.eggGuaranteeHint(guarantee), tint: .rarity(guarantee))
                             }
@@ -742,6 +772,10 @@ struct CompanionHeader: View {
                     Text(statusLine).font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer()
+            }
+            if let preorder = store.state.preorder {
+                PreorderStatusLine(l: store.l, name: store.machineName(preorder.machineID),
+                                   preorder: preorder, nextBox: store.hasActive)
             }
             if store.hasActive, !store.lineNodes.isEmpty {
                 // 폭을 안 주면 분기 라인(이브이)이 넘쳐 팝오버 콘텐츠 전체가 좌우로 잘린다.

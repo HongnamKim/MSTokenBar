@@ -37,4 +37,37 @@ final class PreorderLayoutTests: XCTestCase {
             }
         }
     }
+
+    func test_homeLineStaysOneLine() {
+        let width = PopoverMetrics.scrollContentWidth
+        for lang in AppLanguage.allCases {
+            for nextBox in [false, true] {
+                for preorder in [Preorder(machineID: 5, boxesOpened: 1), Preorder(machineID: 5, boxesOpened: 3)] {
+                    let l = L(lang)
+                    let short = size(PreorderStatusLine(l: l, name: "A", preorder: preorder, nextBox: nextBox), width: width)
+                    let long = size(PreorderStatusLine(l: l, name: longestName(lang), preorder: preorder, nextBox: nextBox),
+                                    width: width)
+                    XCTAssertLessThanOrEqual(long.width, width, "\(lang) \(nextBox) \(preorder)")
+                    XCTAssertLessThanOrEqual(long.height, short.height + 1, "\(lang) \(nextBox) \(preorder) wraps")
+                }
+            }
+        }
+    }
+
+    func test_seriesBadgeKeepsTheHeaderWidth() throws {
+        for lang in AppLanguage.allCases {
+            let longest = MachineCatalog.shared.series.max {
+                (lang.resolveName($0.names) ?? "").count < (lang.resolveName($1.names) ?? "").count
+            }!
+            var st = CompanionState()
+            st.language = lang
+            st.eggSeries = longest.id
+            let store = try PreorderFixture.store(st)
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("preorder-sprites-\(UUID())")
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let header = CompanionHeader(store: store, spriteStore: SpriteStore(directory: dir))
+            XCTAssertLessThanOrEqual(size(header, width: PopoverMetrics.scrollContentWidth).width,
+                                     PopoverMetrics.scrollContentWidth, "\(lang) \(longest.id)")
+        }
+    }
 }
