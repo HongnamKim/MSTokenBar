@@ -59,7 +59,9 @@ final class PreorderSaveTests: XCTestCase {
         var whileBuilding = CompanionState()
         whileBuilding.eggSeries = "0080"
         whileBuilding.active = building()
+        whileBuilding.preorder = Preorder(machineID: 5, boxesOpened: 2)
         XCTAssertNil(SaveTransfer.sanitized(whileBuilding).eggSeries)
+        XCTAssertEqual(SaveTransfer.sanitized(whileBuilding).preorder, Preorder(machineID: 5, boxesOpened: 2))
     }
 
     func test_importKeepsPreorderAndSeriesBox() {

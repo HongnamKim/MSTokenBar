@@ -64,7 +64,8 @@ final class PreorderStoreTests: XCTestCase {
         await F.openBox(s)
         let machine = try opened(s)
         XCTAssertNotEqual(machine, F.zaku, "the common pre-roll was discarded")
-        if machine == F.gouf { XCTAssertNil(s.state.preorder) } else { XCTAssertEqual(s.state.preorder?.boxesOpened, 2) }
+        XCTAssertNotEqual(machine, F.gouf, "fixture: seed 7 must miss the pre-order roll so the count is checked")
+        XCTAssertEqual(s.state.preorder?.boxesOpened, 2)
     }
 
     func test_toolPurchaseDropsThePreRollWithoutCounting() throws {
