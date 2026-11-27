@@ -742,6 +742,7 @@ struct CompanionHeader: View {
                             if let series = store.eggSeriesID {
                                 Badge(store.l.seriesBoxHint(store.seriesName(series)), tint: .accent, style: .tinted)
                                     .lineLimit(1)
+                                    .layoutPriority(-1)
                             }
                             if let guarantee = store.eggGuarantee {
                                 Badge(store.l.eggGuaranteeHint(guarantee), tint: .rarity(guarantee))

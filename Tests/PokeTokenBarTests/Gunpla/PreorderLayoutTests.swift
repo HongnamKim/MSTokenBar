@@ -55,19 +55,24 @@ final class PreorderLayoutTests: XCTestCase {
     }
 
     func test_seriesBadgeKeepsTheHeaderWidth() throws {
-        for lang in AppLanguage.allCases {
-            let longest = MachineCatalog.shared.series.max {
-                (lang.resolveName($0.names) ?? "").count < (lang.resolveName($1.names) ?? "").count
-            }!
+        func header(_ lang: AppLanguage, series: String) throws -> CGSize {
             var st = CompanionState()
             st.language = lang
-            st.eggSeries = longest.id
+            st.eggSeries = series
             let store = try PreorderFixture.store(st)
             let dir = FileManager.default.temporaryDirectory.appendingPathComponent("preorder-sprites-\(UUID())")
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            let header = CompanionHeader(store: store, spriteStore: SpriteStore(directory: dir))
-            XCTAssertLessThanOrEqual(size(header, width: PopoverMetrics.scrollContentWidth).width,
-                                     PopoverMetrics.scrollContentWidth, "\(lang) \(longest.id)")
+            let view = CompanionHeader(store: store, spriteStore: SpriteStore(directory: dir))
+            return size(view, width: PopoverMetrics.scrollContentWidth)
+        }
+        for lang in AppLanguage.allCases {
+            let byLength = MachineCatalog.shared.series.sorted {
+                (lang.resolveName($0.names) ?? "").count < (lang.resolveName($1.names) ?? "").count
+            }
+            let short = try header(lang, series: byLength.first!.id)
+            let long = try header(lang, series: byLength.last!.id)
+            XCTAssertLessThanOrEqual(long.width, PopoverMetrics.scrollContentWidth, "\(lang) \(byLength.last!.id)")
+            XCTAssertLessThanOrEqual(long.height, short.height + 1, "\(lang) \(byLength.last!.id) wraps")
         }
     }
 }
