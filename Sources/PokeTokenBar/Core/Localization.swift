@@ -1754,6 +1754,11 @@ struct L {
           "\(monName) を手放して \(eggName) にしますか？")
     }
 
+    var freshEggShinyWarning: String { t("전용기예요! 정말 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
+    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
+    var freshEggDiscardShiny: String { t("전용기 제작 중단", "Send Custom off", "専用機を手放す") }
+    var freshEggDiscardValuable: String { t("제작 중단", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
+
     // MARK: 예약 주문 · 작품 박스 (pre-order / series box copy)
     var preorderTitle: String { t("예약 주문", "Pre-order", "予約注文") }
     var preorderDescription: String {
@@ -1790,10 +1795,6 @@ struct L {
     func seriesBoxRemaining(_ count: Int) -> String { t("남은 \(count)기", "\(count) left", "残り\(count)機") }
     func seriesBoxHint(_ seriesName: String) -> String { t("작품 · \(seriesName)", "Series · \(seriesName)", "作品・\(seriesName)") }
     var seriesBoxAllComplete: String { t("모든 작품을 완성했어요", "Every series is complete", "すべての作品を完成しました") }
-    var freshEggShinyWarning: String { t("전용기예요! 정말 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
-    var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
-    var freshEggDiscardShiny: String { t("전용기 제작 중단", "Send Custom off", "専用機を手放す") }
-    var freshEggDiscardValuable: String { t("제작 중단", "Send off", "手放す", "Soltar", "Laisser partir", "Soltar", "Verabschieden", "Отпустить") }
 
     // MARK: 사탕 획득 알림 ("왜 받는지" = 토큰 한도를 다 채운 수고에 대한 보상)
     func notifCandyTitle(item: String, count: Int) -> String {
