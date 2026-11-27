@@ -2114,6 +2114,7 @@ struct HangarMachineCell: View {
         case .available, nil: nil
         }
     }
+    private var blockedOpacity: Double { pickBlockedLabel == nil ? 1 : 0.45 }
     /// The badge over the sprite's bottom: the pick's blocked reason, or the normal hangar's RAISING.
     private var showsBottomBadge: Bool { preorderPick == nil ? cell.isRaising : pickBlockedLabel != nil }
 
@@ -2122,6 +2123,7 @@ struct HangarMachineCell: View {
             VStack(spacing: 1) {
                 sprite
                     .frame(width: Self.thumb, height: Self.thumb)
+                    .opacity(blockedOpacity)
                     // Keep the raising badge over the sprite to leave room for the name. The pre-order
                     // mark sits at the bottom-leading corner, lifted above the badge when there is one.
                     .overlay(alignment: .bottom) {
@@ -2144,11 +2146,12 @@ struct HangarMachineCell: View {
                     .font(.system(size: 11))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                gradeLabels
+                    .opacity(blockedOpacity)
+                gradeLabels.opacity(blockedOpacity)
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 10)   // room for the model-number tag above the sprite
-            .overlay(alignment: .topLeading) { modelTag }
+            .overlay(alignment: .topLeading) { modelTag.opacity(blockedOpacity) }
             .overlay(alignment: .topTrailing) {
                 // Custom-unit marker.
                 if cell.isVariant {
@@ -2180,8 +2183,8 @@ struct HangarMachineCell: View {
             .animation(.easeOut(duration: 0.12), value: isHovered)
         }
         .buttonStyle(.plain)
-        // A finished or building machine cannot be pre-ordered: dimmed, no tap, no hover feedback.
-        .opacity(pickBlockedLabel == nil ? 1 : 0.45)
+        // A finished or building machine cannot be pre-ordered: no tap, no hover feedback (its content is
+        // dimmed in the body, so the blocked badge stays at full strength).
         .disabled(pickBlockedLabel != nil)
         .onHover { isHovered = $0 && pickBlockedLabel == nil }
         .help(tooltip)
