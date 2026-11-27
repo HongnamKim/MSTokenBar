@@ -1222,7 +1222,13 @@ final class CompanionStore {
     @discardableResult
     func buyEgg(_ tier: Rarity?) -> Bool {
         guard canBuyEgg(tier) else { return false }
-        state.spentTokens += price(of: .egg(tier))
+        restartBox(spending: price(of: .egg(tier)), tier: tier, series: nil)
+        return true
+    }
+
+    /// The shared tail of every box purchase: charge, release the build into the dex, and start a new box.
+    private func restartBox(spending price: Int, tier: Rarity?, series: String?) {
+        state.spentTokens += price
         if let a = state.active {
             state.dex.append(releasedDexEntry(from: a))   // 놓아줌 기록 — 도감에서 종이 사라지지 않게
         }
@@ -1236,13 +1242,13 @@ final class CompanionStore {
         state.resetEggPrayers()
         isHatchRetryDelayed = false
         state.eggTier = tier          // 등급 보증(nil = 보증 없음)
+        state.eggSeries = series      // 작품 박스의 작품(nil = 작품 제한 없음)
         state.pendingHatchID = nil    // 새 보증으로 처음부터 롤(활성 포켓몬이 있는 동안엔 원래 비어 있다)
         prefetchedLineID = nil
         justGraduated = nil; justEvolvedTo = nil; eventUntil = nil
-        AppLog.write("egg purchased: discarded active, tier=\(tier?.rawValue ?? "none")")
+        AppLog.write("egg purchased: discarded active, tier=\(tier?.rawValue ?? "none") series=\(series ?? "none")")
         Task { await self.ensureEggPrefetch() }   // 다음 부화 예열
         save()
-        return true
     }
 
     // MARK: Pre-order
@@ -1288,6 +1294,38 @@ final class CompanionStore {
         save()
         return true
     }
+
+    // MARK: Series box
+
+    /// Unfinished machines per series, custom units included (§7.2). A series with none is absent.
+    var seriesBoxRemainingCounts: [String: Int] {
+        let snapshot = state.collectionSnapshot(catalog: catalog)
+        var counts: [String: Int] = [:]
+        for machine in catalog.machines where !snapshot.isComplete(machine) { counts[machine.series, default: 0] += 1 }
+        return counts
+    }
+
+    var hasSeriesBoxCandidates: Bool { !seriesBoxRemainingCounts.isEmpty }
+
+    /// The scaled tier box price of the series' lowest rarity (§6.3).
+    func seriesBoxPrice(_ seriesID: String) -> Int {
+        let lowest = catalog.machines.filter { $0.series == seriesID }.map(\.rarity).min { $0.sortRank < $1.sortRank }
+        return price(of: .egg(lowest))
+    }
+
+    func canBuySeriesBox(_ seriesID: String) -> Bool {
+        hasActive && (seriesBoxRemainingCounts[seriesID] ?? 0) > 0 && availableTokens >= seriesBoxPrice(seriesID)
+    }
+
+    @discardableResult
+    func buySeriesBox(_ seriesID: String) -> Bool {
+        guard canBuySeriesBox(seriesID) else { return false }
+        restartBox(spending: seriesBoxPrice(seriesID), tier: nil, series: seriesID)
+        return true
+    }
+
+    /// The held box's series; nil while building. Mirrors `eggGuarantee`.
+    var eggSeriesID: String? { state.active == nil ? state.eggSeries : nil }
 
     /// Pray over the egg. A placebo: it only counts, and never touches an RNG or a roll — the species is
     /// usually already in `pendingHatchID` (prefetched at purchase) long before anyone prays.
