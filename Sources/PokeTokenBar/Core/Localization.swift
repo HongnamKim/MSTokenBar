@@ -1204,6 +1204,9 @@ struct L {
     var notifShinyHatchTitle: String { t("전용기!", "Custom Mobile Suit!", "専用機！") }
     /// 실제 판정에 쓴 분모를 받는다 — 도색 공구를 보유하면 32 가 아니다.
     func notifShinyHatchBody(_ name: String, odds: UInt64) -> String { t("전용기 \(KoreanParticle.subject.attach(to: name)) 나왔어요! (1/\(odds))", "A Custom \(name) came out! (1 in \(odds))", "専用機の \(name) が登場しました！(1/\(odds))") }
+    // pre-order / series box 알림 (도착 — 확률 숫자는 노출하지 않는다)
+    var notifPreorderTitle: String { t("예약 도착!", "Pre-order arrived!", "予約到着！") }
+    func notifPreorderBody(_ name: String) -> String { t("예약한 \(KoreanParticle.subject.attach(to: name)) 도착했어요", "Your pre-ordered \(name) has arrived", "予約した\(name)が届きました") }
     // MARK: 박스 흔들기 (박스 위약 버튼 — 코드 식별자는 세이브 호환을 위해 prayer 그대로)
     func prayerBornWith(_ n: Int) -> String { t("박스를 \(n)번 흔들고 개봉함", "Unboxed after \(n) shakes", "ボックスを\(n)回振ってから開封") }
     var prayerReachedHeaven: String { t("흔든다고 내용물이 바뀌진 않아요. 아마도요.", "Shaking doesn't change what's inside. Probably.", "振っても中身は変わりません。たぶん。") }
@@ -1750,6 +1753,43 @@ struct L {
           "Send off \(monName) for the \(eggName)?",
           "\(monName) を手放して \(eggName) にしますか？")
     }
+
+    // MARK: 예약 주문 · 작품 박스 (pre-order / series box copy)
+    var preorderTitle: String { t("예약 주문", "Pre-order", "予約注文") }
+    var preorderDescription: String {
+        t("원하는 기체를 골라 예약해요. 박스마다 25% 확률로 나오고, 늦어도 4번째 박스에서 받아요.",
+          "Pick a Mobile Suit to pre-order. Each box has a 25% chance to bring it, and the 4th box brings it at the latest.",
+          "欲しい機体を選んで予約します。箱ごとに25%の確率で届き、遅くとも4箱目で受け取れます。")
+    }
+    var preorderPickPrompt: String { t("예약할 기체를 고르세요", "Pick a Mobile Suit to pre-order", "予約する機体を選んでください") }
+    var preorderOddsLine: String { t("박스마다 25% · 4번째 박스에 확정", "25% per box · guaranteed by the 4th", "箱ごとに25%・4箱目で確定") }
+    var preorderShort: String { t("예약", "Pre-order", "予約") }
+    var preorderActiveLabel: String { t("예약 중", "Pre-ordered", "予約中") }
+    func preorderBoxNumber(_ box: Int) -> String { t("\(box)/4번째 박스", "box \(box) of 4", "4箱中\(box)箱目") }
+    /// `nextBox == false` 는 뽑기 대기 중인 박스(이번), `true` 는 다음 박스 기준 문구.
+    func preorderStatusOdds(box: Int, nextBox: Bool) -> String {
+        nextBox
+            ? t("다음 박스 25% (\(box)/4)", "Next box 25% (\(box)/4)", "次の箱 25% (\(box)/4)")
+            : t("이번 박스 25% (\(box)/4)", "This box 25% (\(box)/4)", "この箱 25% (\(box)/4)")
+    }
+    func preorderStatusGuaranteed(nextBox: Bool) -> String {
+        nextBox
+            ? t("다음 박스에 확정", "Guaranteed next box", "次の箱で確定")
+            : t("이번 박스에 확정", "Guaranteed this box", "この箱で確定")
+    }
+    var preorderNoCandidates: String { t("예약할 수 있는 기체가 없어요", "No Mobile Suit left to pre-order", "予約できる機体がありません") }
+    var preorderCompleteLabel: String { t("완성", "Complete", "完成") }
+    var preorderBuildingLabel: String { t("제작 중", "Building", "製作中") }
+    var seriesBoxTitle: String { t("작품 박스", "Series Box", "作品ボックス") }
+    var seriesBoxDescription: String { t("고른 작품의 기체만 나와요.", "Only Mobile Suits from the series you pick come out.", "選んだ作品の機体だけが出ます。") }
+    func seriesBoxConfirm(_ monName: String, _ seriesName: String) -> String {
+        t("\(monName) 제작을 중단하고 \(seriesName) 작품 박스로 바꿀까요?",
+          "Stop building \(monName) and switch to a \(seriesName) Series Box?",
+          "\(monName)の製作を中止して\(seriesName)の作品ボックスにしますか？")
+    }
+    func seriesBoxRemaining(_ count: Int) -> String { t("남은 \(count)기", "\(count) left", "残り\(count)機") }
+    func seriesBoxHint(_ seriesName: String) -> String { t("작품 · \(seriesName)", "Series · \(seriesName)", "作品・\(seriesName)") }
+    var seriesBoxAllComplete: String { t("모든 작품을 완성했어요", "Every series is complete", "すべての作品を完成しました") }
     var freshEggShinyWarning: String { t("전용기예요! 정말 중단할까요?", "This one is a Custom unit! Really send it off?", "専用機です！本当に手放しますか？") }
     var freshEggLegendaryWarning: String { t("전설 등급 기체예요! 정말 중단할까요?", "This is a Legendary Mobile Suit! Really send it off?", "伝説級の機体です！本当に手放しますか？") }
     var freshEggDiscardShiny: String { t("전용기 제작 중단", "Send Custom off", "専用機を手放す") }

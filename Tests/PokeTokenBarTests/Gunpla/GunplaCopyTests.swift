@@ -107,6 +107,21 @@ final class GunplaCopyTests: XCTestCase {
                                                             currentDex: 2, currentTokens: "2M")),
                 ("restoreDoneMessage", l.restoreDoneMessage(dex: 1, tokens: "1M")),
                 ("snapshotDexAndTokens", l.snapshotDexAndTokens(dex: 1, tokens: "1M")),
+                // pre-order / series box
+                ("preorderTitle", l.preorderTitle), ("preorderDescription", l.preorderDescription),
+                ("preorderPickPrompt", l.preorderPickPrompt), ("preorderOddsLine", l.preorderOddsLine),
+                ("preorderShort", l.preorderShort), ("preorderActiveLabel", l.preorderActiveLabel),
+                ("preorderBoxNumber", l.preorderBoxNumber(2)),
+                ("preorderStatusOdds.this", l.preorderStatusOdds(box: 2, nextBox: false)),
+                ("preorderStatusOdds.next", l.preorderStatusOdds(box: 2, nextBox: true)),
+                ("preorderStatusGuaranteed.this", l.preorderStatusGuaranteed(nextBox: false)),
+                ("preorderStatusGuaranteed.next", l.preorderStatusGuaranteed(nextBox: true)),
+                ("preorderNoCandidates", l.preorderNoCandidates), ("preorderCompleteLabel", l.preorderCompleteLabel),
+                ("preorderBuildingLabel", l.preorderBuildingLabel),
+                ("notifPreorderTitle", l.notifPreorderTitle), ("notifPreorderBody", l.notifPreorderBody("A")),
+                ("seriesBoxTitle", l.seriesBoxTitle), ("seriesBoxDescription", l.seriesBoxDescription),
+                ("seriesBoxConfirm", l.seriesBoxConfirm("A", "Zeta")), ("seriesBoxRemaining", l.seriesBoxRemaining(3)),
+                ("seriesBoxHint", l.seriesBoxHint("Zeta")), ("seriesBoxAllComplete", l.seriesBoxAllComplete),
             ]
             for kind in ItemKind.allCases {
                 rendered.append(("itemName.\(kind)", l.itemName(kind)))
