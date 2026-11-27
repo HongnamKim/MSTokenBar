@@ -377,6 +377,7 @@ struct PreorderCard: View {
     var body: some View {
         let l = store.l
         let range = store.shopPriceRange
+        let hasCandidates = store.hasPreorderCandidates
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 10) {
                 WorkshopIcon(.box, size: 26)
@@ -397,7 +398,7 @@ struct PreorderCard: View {
                         Text("\(l.shopPriceLabel) \(TokenFormatter.compact(range.lowerBound))~\(TokenFormatter.compact(range.upperBound))")
                             .font(.caption2).foregroundStyle(.tertiary).monospacedDigit()
                         Spacer()
-                        if !store.hasPreorderCandidates {
+                        if !hasCandidates {
                             Button(l.buy) {}
                                 .buttonStyle(.bordered).controlSize(.small).disabled(true)
                         } else if store.availableTokens < range.lowerBound {
@@ -407,7 +408,7 @@ struct PreorderCard: View {
                                 .buttonStyle(.bordered).controlSize(.small)
                         }
                     }
-                    if !store.hasPreorderCandidates {
+                    if !hasCandidates {
                         Text(l.preorderNoCandidates)
                             .font(.caption2).foregroundStyle(.tertiary)
                             .fixedSize(horizontal: false, vertical: true)
