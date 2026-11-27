@@ -134,6 +134,50 @@ final class PopoverNavigationTests: XCTestCase {
         XCTAssertNil(nav.dexDetailCollectionID)
         XCTAssertNil(nav.dexDetailInstanceID)
     }
+
+    func testPreorderPickOpensTheHangarAndCancelReturnsToTheShop() {
+        let nav = PopoverNavigation()
+        nav.tab = .shop
+        nav.showingCollectionLog = true
+        nav.openPreorderPick()
+        XCTAssertEqual(nav.tab, .collection)
+        XCTAssertTrue(nav.pickingPreorder)
+        XCTAssertFalse(nav.showingCollectionLog)
+        nav.finishPreorderPick(purchased: false)
+        XCTAssertEqual(nav.tab, .shop)
+        XCTAssertFalse(nav.pickingPreorder)
+    }
+
+    func testPreorderPurchaseGoesHome() {
+        let nav = PopoverNavigation()
+        nav.openPreorderPick()
+        nav.finishPreorderPick(purchased: true)
+        XCTAssertEqual(nav.tab, .home)
+        XCTAssertFalse(nav.pickingPreorder)
+    }
+
+    func testPreorderPickEndsWhenLeavingSwitchingOrReopening() {
+        let triggers: [(String, (PopoverNavigation) -> Void)] = [
+            ("other tab", { $0.tab = .home }),
+            ("build log", { $0.showingCollectionLog = true }),
+            ("reopen", { $0.reset() }),
+            ("display-pet pick", { $0.openRepresentativeDex() }),
+        ]
+        for (name, trigger) in triggers {
+            let nav = PopoverNavigation()
+            nav.openPreorderPick()
+            trigger(nav)
+            XCTAssertFalse(nav.pickingPreorder, name)
+        }
+    }
+
+    func testDisplayPetAndPreorderPicksExcludeEachOther() {
+        let nav = PopoverNavigation()
+        nav.openRepresentativeDex()
+        nav.openPreorderPick()
+        XCTAssertFalse(nav.pickingDisplayPet)
+        XCTAssertTrue(nav.pickingPreorder)
+    }
 }
 
 final class RepresentativeLocalizationTests: XCTestCase {

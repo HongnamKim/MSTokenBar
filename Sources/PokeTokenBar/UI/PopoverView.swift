@@ -34,15 +34,17 @@ extension View {
 final class PopoverNavigation {
     var showSettings = false { didSet { if showSettings { dexDetailCollectionID = nil } } }
     var tab: PopoverTab = .home {
-        didSet { if tab != .collection { dexDetailCollectionID = nil; pickingDisplayPet = false } }
+        didSet { if tab != .collection { dexDetailCollectionID = nil; pickingDisplayPet = false; pickingPreorder = false } }
     }
     /// Opened from Settings: tapping a hangar cell picks that machine for the second pet and returns.
     var pickingDisplayPet = false
+    /// Opened from the shop's pre-order card: tapping a hangar cell picks that machine as the pre-order target.
+    var pickingPreorder = false
     /// 일반적인 컬렉션 재진입에는 마지막 세그먼트를 유지하되, 대표 포켓몬 선택 진입점은 도감으로 강제한다.
     var showingCollectionLog = false {
         didSet {
             if showingCollectionLog != oldValue { dexDetailCollectionID = nil }
-            if showingCollectionLog { pickingDisplayPet = false }
+            if showingCollectionLog { pickingDisplayPet = false; pickingPreorder = false }
         }
     }
     /// The usage recap takes over the popover like Settings does; closing the popover drops it.
@@ -65,6 +67,7 @@ final class PopoverNavigation {
 
     func reset() {
         pickingDisplayPet = false
+        pickingPreorder = false
         showSettings = false
         expandAdvancedOnOpen = false
         showingRecap = false
@@ -97,7 +100,23 @@ final class PopoverNavigation {
         showSettings = false
         showingCollectionLog = false
         tab = .collection
+        pickingPreorder = false
         pickingDisplayPet = true   // last: the didSets above clear it
+    }
+
+    /// The shop's pre-order card opens the hangar in pick mode, like `openRepresentativeDex`.
+    func openPreorderPick() {
+        showSettings = false
+        showingCollectionLog = false
+        tab = .collection
+        pickingDisplayPet = false
+        pickingPreorder = true   // last: the didSets above clear it
+    }
+
+    /// Pick mode ends: back to the shop on cancel, to Home once the pre-order is bought.
+    func finishPreorderPick(purchased: Bool) {
+        pickingPreorder = false
+        tab = purchased ? .home : .shop
     }
 
     /// A cell tapped in pick mode: the caller stores the choice; this returns to Settings.
