@@ -1,5 +1,16 @@
 import Foundation
 
+/// Whether a machine can be pre-ordered, or why not.
+enum PreorderPickStatus: Equatable, Sendable {
+    case available, complete, building
+
+    /// A hangar entry with several modes: available while any mode is, complete when all are, else building.
+    static func combined(_ statuses: [PreorderPickStatus]) -> PreorderPickStatus {
+        if statuses.contains(.available) { return .available }
+        return statuses.allSatisfy { $0 == .complete } ? .complete : .building
+    }
+}
+
 /// 격납고 — one cell per owned machine, built from the dex's synthetic (machine × grade) species.
 extension CompanionStore {
     /// Owned machines, sorted by series order and then machine id. Species that are not catalog
@@ -136,8 +147,31 @@ extension CompanionStore {
     private func filteredBuiltHangarCells(
         query: String, rarity: Rarity?, variantOnly: Bool, series: String?, sort: DexSortOption
     ) -> [HangarCell] {
+        let cells = filterHangarCells(hangarCells, query: query, rarity: rarity, variantOnly: variantOnly,
+                                      series: series)
+        return sortHangarCells(cells, by: sort)
+    }
+
+    /// Every catalog machine as a hangar cell (§7.3): built machines keep their owned grades, the rest are
+    /// unbuilt cells, custom units included. Every filter keeps unbuilt cells, and the query matches names too.
+    func preorderPickCells(query: String = "", rarity: Rarity? = nil, variantOnly: Bool = false,
+                           series: String? = nil, sort: DexSortOption = .numberAsc) -> [HangarCell] {
+        let built = Dictionary(hangarCells.map { ($0.machineID, $0) }, uniquingKeysWith: { first, _ in first })
+        let order = hangarOrder
+        let all = catalog.machines.map { machine in
+            built[machine.id] ?? HangarCell(machineID: machine.id, ownedGrades: [], releasedGrades: machine.grades,
+                                            isVariant: machine.isVariant, isRaising: false)
+        }
+        .sorted { order($0) < order($1) }
+        let cells = filterHangarCells(all, query: query, rarity: rarity, variantOnly: variantOnly, series: series)
+        return sortHangarCells(cells, by: sort)
+    }
+
+    private func filterHangarCells(
+        _ cells: [HangarCell], query: String, rarity: Rarity?, variantOnly: Bool, series: String?
+    ) -> [HangarCell] {
         let matcher = DexSearchMatcher(query)
-        let cells = hangarCells.filter { cell in
+        return cells.filter { cell in
             guard let machine = catalog.machine(id: cell.machineID) else { return false }
             if let rarity, machine.rarity != rarity { return false }
             if variantOnly, !cell.isVariant { return false }
@@ -147,7 +181,6 @@ extension CompanionStore {
             }
             return true
         }
-        return sortHangarCells(cells, by: sort)
     }
 
     /// `cells` must be in hangar order (series, id); that order is the "number" order and the tie-break.

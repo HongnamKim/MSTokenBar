@@ -613,6 +613,32 @@ extension DexEntryLink {
     }
 }
 
+/// "예약 · {name} · 이번 박스 25% (2/4)" — one line; only the name truncates.
+@MainActor
+struct PreorderStatusLine: View {
+    let l: L
+    let name: String
+    let preorder: Preorder
+    let nextBox: Bool
+
+    private var trailing: String {
+        preorder.isGuaranteedNext
+            ? l.preorderStatusGuaranteed(nextBox: nextBox)
+            : l.preorderStatusOdds(box: preorder.boxNumber, nextBox: nextBox)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            WorkshopIcon(.box, size: 11)
+            Text("\(l.preorderShort) ·").fixedSize()
+            Text(name).lineLimit(1).truncationMode(.tail)
+            Text("· \(trailing)").fixedSize()
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
+}
+
 /// 팝오버 상단 — 현재 포켓몬 + 진화 진행 + 부화/진화 연출.
 @MainActor
 struct CompanionHeader: View {
@@ -713,6 +739,11 @@ struct CompanionHeader: View {
                                 .foregroundStyle(eggImminent ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
                             // 등급 보증 알이면 무엇을 품고 있는지 — 도감 칩과 같은 라벨·색.
                             // 알 스프라이트는 한 장뿐이라 등급 구분은 이 배지가 유일한 신호다.
+                            if let series = store.eggSeriesID {
+                                Badge(store.l.seriesBoxHint(store.seriesName(series)), tint: .accent, style: .tinted)
+                                    .lineLimit(1)
+                                    .layoutPriority(-1)
+                            }
                             if let guarantee = store.eggGuarantee {
                                 Badge(store.l.eggGuaranteeHint(guarantee), tint: .rarity(guarantee))
                             }
@@ -742,6 +773,10 @@ struct CompanionHeader: View {
                     Text(statusLine).font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer()
+            }
+            if let preorder = store.state.preorder {
+                PreorderStatusLine(l: store.l, name: store.machineName(preorder.machineID),
+                                   preorder: preorder, nextBox: store.hasActive)
             }
             if store.hasActive, !store.lineNodes.isEmpty {
                 // 폭을 안 주면 분기 라인(이브이)이 넘쳐 팝오버 콘텐츠 전체가 좌우로 잘린다.
@@ -1015,6 +1050,8 @@ struct CollectionView: View {
     /// Same for the catch log: the row (`DexEntry.id`) that opened the detail page, scrolled back
     /// into view when Back rebuilds the log. Used once.
     @State private var logReturnAnchor: String?
+    /// The pre-order pick's bottom panel: the tapped cell's modes, or the machine to confirm. nil = no panel.
+    @State private var preorderChoice: PreorderChoice?
 
     /// 도감·로그 공통 높이 — 상점·가방과 같은 520. 세그먼트를 전환할 때도, 탭을 넘나들 때도
     /// 팝오버가 리사이즈되지 않는다.
@@ -1082,6 +1119,17 @@ struct CollectionView: View {
                     }
                 }
 
+                if nav.pickingPreorder && !nav.showingCollectionLog {
+                    HStack(spacing: 6) {
+                        Text(store.l.preorderPickPrompt)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                        Spacer()
+                        Button(store.l.cancel) { nav.finishPreorderPick(purchased: false) }
+                            .controlSize(.small)
+                    }
+                }
+
                 filterToolbar
 
                 if nav.showingCollectionLog {
@@ -1107,10 +1155,24 @@ struct CollectionView: View {
                                 nav.dexDetailCollectionID = store.hangarDetailCollectionID(cell)
                             }
                         },
-                        onResetFilters: resetFilters
+                        onResetFilters: resetFilters,
+                        preorderPick: nav.pickingPreorder && !nav.showingCollectionLog,
+                        onPickPreorder: { entry in
+                            preorderChoice = entry.cells.count > 1 ? .modes(entry.cells.map(\.machineID))
+                                                                   : .machine(entry.cells[0].machineID)
+                        }
                     )
                     // The grid kept its own copy of the anchor; a later rebuild (segment switch) starts on page 1.
                     .onAppear { dexReturnAnchor = nil }
+                    // Over the grid's bottom, so the grid does not relayout. Paying happens only from its confirm row.
+                    .overlay(alignment: .bottom) {
+                        if nav.pickingPreorder, let preorderChoice {
+                            PreorderPickPanel(store: store, choice: preorderChoice,
+                                              onChooseMode: { self.preorderChoice = .machine($0) },
+                                              onConfirm: { if store.buyPreorder($0) { nav.finishPreorderPick(purchased: true) } },
+                                              onCancel: { self.preorderChoice = nil })
+                        }
+                    }
                 }
             }
             .frame(height: Self.contentHeight)
@@ -1463,6 +1525,10 @@ private struct DexGridView: View {
     let onOpenSeriesList: (String?) -> Void
     let onSelectCell: (HangarCell) -> Void
     let onResetFilters: () -> Void
+    /// The pre-order pick (§7.3): every catalog machine, drawn at its top grade, finished ones disabled.
+    let preorderPick: Bool
+    /// A pickable cell tapped in the pre-order pick.
+    let onPickPreorder: (HangarEntry) -> Void
 
     /// nil = the page that shows `returnAnchor` (Back from a detail page). Paging or filtering sets it.
     @State private var page: Int?
@@ -1486,7 +1552,9 @@ private struct DexGridView: View {
          returnAnchor: String?,
          onOpenSeriesList: @escaping (String?) -> Void,
          onSelectCell: @escaping (HangarCell) -> Void,
-         onResetFilters: @escaping () -> Void) {
+         onResetFilters: @escaping () -> Void,
+         preorderPick: Bool,
+         onPickPreorder: @escaping (HangarEntry) -> Void) {
         self.store = store
         self.searchText = searchText
         self.shinyOnly = shinyOnly
@@ -1496,19 +1564,27 @@ private struct DexGridView: View {
         self.onOpenSeriesList = onOpenSeriesList
         self.onSelectCell = onSelectCell
         self.onResetFilters = onResetFilters
+        self.preorderPick = preorderPick
+        self.onPickPreorder = onPickPreorder
         _returnAnchor = State(initialValue: returnAnchor)
     }
 
     var body: some View {
-        let all = store.hangarCells
-        let filtered = store.filteredHangarCells(
-            query: searchText,
-            rarity: selectedRarity,
-            variantOnly: shinyOnly,
-            series: selectedSeries,
-            sort: sortOption,
-            includeUnbuilt: true
-        )
+        // The pick's header counts the whole pick list (decision 7). Its status map builds a collection
+        // snapshot, so it is read once here.
+        let statuses = preorderPick ? store.preorderPickStatuses : [:]
+        let all = preorderPick ? store.preorderPickCells() : store.hangarCells
+        let filtered = preorderPick
+            ? store.preorderPickCells(query: searchText, rarity: selectedRarity, variantOnly: shinyOnly,
+                                      series: selectedSeries, sort: sortOption)
+            : store.filteredHangarCells(
+                query: searchText,
+                rarity: selectedRarity,
+                variantOnly: shinyOnly,
+                series: selectedSeries,
+                sort: sortOption,
+                includeUnbuilt: true
+            )
         let visible = HangarEntry.grouped(filtered, catalog: store.catalog)
         let anchorMachine = returnAnchor.flatMap(Int.init).flatMap { store.catalog.machine(speciesID: $0) }
         let preferredID = selectedID ?? anchorMachine?.id
@@ -1525,12 +1601,14 @@ private struct DexGridView: View {
             if visible.isEmpty {
                 emptySearchResults
             } else {
-                grid(slice, preferredID: preferredID)
+                grid(slice, preferredID: preferredID, statuses: statuses)
                     .background(ScrollWheelPager { step in
                         let next = DexScrollPager.pageAfterScroll(current: current, pageCount: pageCount, step: step)
                         if next != current { page = next; selectedID = nil }
                     })
-                footer(slice.map { $0.displayed(preferredID: preferredID) }, current: current, pageCount: pageCount)
+                // The pick's footer is the pager only.
+                footer(preorderPick ? [] : slice.map { $0.displayed(preferredID: preferredID) },
+                       current: current, pageCount: pageCount)
             }
         }
         .onChange(of: searchText) { page = 0; selectedID = nil }
@@ -1667,7 +1745,7 @@ private struct DexGridView: View {
         }
     }
 
-    private func grid(_ slice: [HangarEntry], preferredID: Int?) -> some View {
+    private func grid(_ slice: [HangarEntry], preferredID: Int?, statuses: [Int: PreorderPickStatus]) -> some View {
         VStack(spacing: Self.spacing) {
             ForEach(0..<Self.rows, id: \.self) { row in
                 HStack(spacing: Self.spacing) {
@@ -1676,15 +1754,28 @@ private struct DexGridView: View {
                         if i < slice.count {
                             let entry = slice[i]
                             let cell = entry.displayed(preferredID: preferredID)
+                            // A cell with several modes is complete only when every mode is.
+                            let pick = preorderPick
+                                ? PreorderPickStatus.combined(entry.cells.map { statuses[$0.machineID] ?? .complete })
+                                : nil
                             HangarMachineCell(store: store, cell: cell,
                                               isSelected: selectedID == cell.machineID,
-                                              isRepresentative: store.isRepresentative(cell)) {
-                                selectedID = cell.machineID
-                                if cell.isBuilt { onSelectCell(cell) }
+                                              isRepresentative: store.isRepresentative(cell),
+                                              preorderPick: pick,
+                                              isPreordered: entry.cells.contains {
+                                                  $0.machineID == store.state.preorder?.machineID
+                                              }) {
+                                if let pick {
+                                    if pick == .available { onPickPreorder(entry) }
+                                } else {
+                                    selectedID = cell.machineID
+                                    if cell.isBuilt { onSelectCell(cell) }
+                                }
                             }
                             .overlay(alignment: .topTrailing) {
                                 let built = entry.cells.filter(\.isBuilt)
-                                if built.count > 1 {
+                                // The pick chooses among modes in its own panel.
+                                if !preorderPick, built.count > 1 {
                                     Menu {
                                         ForEach(built) { mode in
                                             Button(store.machineName(mode.machineID)) {
@@ -1993,6 +2084,10 @@ struct HangarMachineCell: View {
     let cell: HangarCell
     let isSelected: Bool
     let isRepresentative: Bool
+    /// The pre-order pick's status for this cell; nil = the normal hangar.
+    var preorderPick: PreorderPickStatus? = nil
+    /// The normal hangar marks the pre-ordered machine's cell.
+    var isPreordered = false
     let onTap: () -> Void
     @State private var isHovered = false
 
@@ -2002,27 +2097,61 @@ struct HangarMachineCell: View {
     /// so the raising cell drops the mark; its bold grade in the grade row still shows the current grade.
     static func showsSpriteGradeBadge(isRaising: Bool) -> Bool { !isRaising }
 
+    /// Pick mode draws the top released grade; otherwise the highest owned grade, or the first for a silhouette.
+    static func spriteGrade(_ cell: HangarCell, preorderPick: Bool) -> GunplaGrade {
+        preorderPick ? cell.releasedGrades[cell.releasedGrades.count - 1]
+                     : cell.ownedGrades.max() ?? cell.releasedGrades[0]
+    }
+
     private var machine: MachineRecord? { store.catalog.machine(id: cell.machineID) }
-    private var name: String { store.hangarCellName(cell) }
+    /// Pick mode names every machine, built or not, so the player knows what they pre-order.
+    private var name: String { preorderPick == nil ? store.hangarCellName(cell) : store.machineName(cell.machineID) }
+    /// Why the pick cannot take this cell; nil when it can, and in the normal hangar.
+    private var pickBlockedLabel: String? {
+        switch preorderPick {
+        case .complete: store.l.preorderCompleteLabel
+        case .building: store.l.preorderBuildingLabel
+        case .available, nil: nil
+        }
+    }
+    private var blockedOpacity: Double { pickBlockedLabel == nil ? 1 : 0.45 }
+    /// The badge over the sprite's bottom: the pick's blocked reason, or the normal hangar's RAISING.
+    private var showsBottomBadge: Bool { preorderPick == nil ? cell.isRaising : pickBlockedLabel != nil }
 
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 1) {
                 sprite
                     .frame(width: Self.thumb, height: Self.thumb)
-                    // Keep the raising badge over the sprite to leave room for the name.
+                    .opacity(blockedOpacity)
+                    // Keep the raising badge over the sprite to leave room for the name. The pre-order
+                    // mark sits at the bottom-leading corner, lifted above the badge when there is one.
                     .overlay(alignment: .bottom) {
-                        if cell.isRaising { raisingBadge.fixedSize() }
+                        VStack(spacing: 1) {
+                            if isPreordered {
+                                WorkshopIcon(.box, size: 12, label: store.l.preorderTitle)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            if let pickBlockedLabel {
+                                Badge(pickBlockedLabel.uppercased(), tint: preorderPick == .building ? .accent : .secondary,
+                                      style: .tinted, size: 10)
+                                    .background(.regularMaterial, in: Capsule())
+                                    .fixedSize()
+                            } else if preorderPick == nil, cell.isRaising {
+                                raisingBadge.fixedSize()
+                            }
+                        }
                     }
                 Text(name)
                     .font(.system(size: 11))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                gradeLabels
+                    .opacity(blockedOpacity)
+                gradeLabels.opacity(blockedOpacity)
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 10)   // room for the model-number tag above the sprite
-            .overlay(alignment: .topLeading) { modelTag }
+            .overlay(alignment: .topLeading) { modelTag.opacity(blockedOpacity) }
             .overlay(alignment: .topTrailing) {
                 // Custom-unit marker.
                 if cell.isVariant {
@@ -2054,7 +2183,10 @@ struct HangarMachineCell: View {
             .animation(.easeOut(duration: 0.12), value: isHovered)
         }
         .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
+        // A finished or building machine cannot be pre-ordered: no tap, no hover feedback (its content is
+        // dimmed in the body, so the blocked badge stays at full strength).
+        .disabled(pickBlockedLabel != nil)
+        .onHover { isHovered = $0 && pickBlockedLabel == nil }
         .help(tooltip)
         .accessibilityLabel(tooltip)
         .contextMenu {
@@ -2071,14 +2203,16 @@ struct HangarMachineCell: View {
 
     /// A built machine shows its highest owned grade; a silhouette is its first released grade filled
     /// with a faint primary colour, so it reads in light and dark mode and gives away no colours.
+    /// The pre-order pick draws both at the top released grade (`spriteGrade`).
     @ViewBuilder private var sprite: some View {
+        let speciesID = GunplaID.encode(machineID: cell.machineID,
+                                        grade: Self.spriteGrade(cell, preorderPick: preorderPick != nil))
         if cell.isBuilt {
-            SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
-                       showsGradeBadge: Self.showsSpriteGradeBadge(isRaising: cell.isRaising))
+            SpriteView(speciesID: speciesID, size: Self.thumb,
+                       showsGradeBadge: Self.showsSpriteGradeBadge(isRaising: showsBottomBadge))
         } else {
             Color.primary.opacity(0.28)
-                .mask(SpriteView(speciesID: store.hangarRepresentativeSpeciesID(cell), size: Self.thumb,
-                                 showsGradeBadge: false))
+                .mask(SpriteView(speciesID: speciesID, size: Self.thumb, showsGradeBadge: false))
                 .accessibilityHidden(true)
         }
     }
@@ -2134,9 +2268,11 @@ struct HangarMachineCell: View {
     /// 툴팁과 접근성 라벨이 같은 문장을 쓴다 — 칸이 글자로 못 보여주는 희귀도·보유 등급 수를 담는다.
     private var tooltip: String {
         var parts = ["\(machine?.modelNumber ?? "#\(cell.machineID)") \(name)"]
+        // The pre-order mark and the pick's blocked reason are drawn, so the tooltip says them too.
+        let marks = [isPreordered ? store.l.preorderTitle : nil, pickBlockedLabel].compactMap { $0 }
         guard cell.isBuilt else {
             return (parts + [store.l.hangarNotBuilt,
-                             store.l.hangarGradesOwned(0, of: cell.releasedGrades.count)]).joined(separator: " · ")
+                             store.l.hangarGradesOwned(0, of: cell.releasedGrades.count)] + marks).joined(separator: " · ")
         }
         if let machine { parts.append(store.l.rarityLabel(machine.rarity)) }
         parts.append(store.l.hangarGradesOwned(cell.ownedGrades.intersection(cell.releasedGrades).count,
@@ -2144,7 +2280,7 @@ struct HangarMachineCell: View {
         if cell.isVariant { parts.append(store.l.hangarVariantLabel) }
         if cell.isRaising { parts.append(store.l.dexRaising) }
         if isRepresentative { parts.append(store.l.representativeBadge) }
-        return parts.joined(separator: " · ")
+        return (parts + marks).joined(separator: " · ")
     }
 }
 
