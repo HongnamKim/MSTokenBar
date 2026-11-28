@@ -17,6 +17,7 @@ A macOS menu-bar app that turns the AI coding tokens you already spend (Claude C
 - **Hangar**: one cell per suit records every grade you have built. Suits you have not built yet appear as silhouettes with only their model number as a clue. Filter by series and earn a badge for completing each one.
 - **Build record**: every build keeps a record of when its box was opened, when each grade was reached and how many tokens each tool contributed. The suit's detail page shows it as one bar per grade, split by source.
 - **Items**: a Sanding Sponge gives instant progress, and Uncommon or Rare Boxes guarantee a rarity tier.
+- **Pre-orders and Series Boxes**: pre-order one suit you have not completed, and every box that opens has a 25% chance to bring it, with the 4th box bringing it at the latest. A Series Box only opens suits from the series you pick.
 
 | Hangar | Series list |
 | --- | --- |
@@ -25,6 +26,10 @@ A macOS menu-bar app that turns the AI coding tokens you already spend (Claude C
 | Suit detail and build record | Shop |
 | --- | --- |
 | ![Suit detail and build record](assets/screenshot-gunpla-build-record.png) | ![Shop](assets/screenshot-gunpla-shop.png) |
+
+| Series Box and Pre-order | Series Box list |
+| --- | --- |
+| ![Series Box and Pre-order](assets/screenshot-gunpla-shop-boxes.png) | ![Series Box list](assets/screenshot-gunpla-series-boxes.png) |
 
 ## Requirements
 
