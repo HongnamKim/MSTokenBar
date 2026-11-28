@@ -67,7 +67,7 @@ final class DexCompletionStoreTests: XCTestCase {
     func testCompleteSeriesIsReportedComplete() throws {
         let s = try store(owning: zeta)
         let completion = s.dexCompletions.first { $0.seriesID == "zeta" }
-        XCTAssertEqual(completion?.ownedCells, 31)   // 30 + Zeta Gundam's Ver.Ka
+        XCTAssertEqual(completion?.ownedCells, 35)   // 34 + Zeta Gundam's Ver.Ka
         XCTAssertTrue(completion?.isComplete ?? false)
         XCTAssertTrue(s.earnedDexBadges.contains(.series("zeta")))
     }
