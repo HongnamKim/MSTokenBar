@@ -6102,6 +6102,495 @@
       "sprites": {
         "hg": "brave-commander-test-type-hg"
       }
+    },
+    {
+      "id": 343,
+      "modelNumber": "RX-78-2 + G-Fighter",
+      "names": {
+        "ko": "G-아머",
+        "en": "G-Armor",
+        "ja": "Gアーマー"
+      },
+      "series": "first",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/g20/p/g20_m0001.jpg",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/244",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/559"
+      },
+      "sprites": {
+        "sd": "g-armor-sd",
+        "hg": "g-armor-hg",
+        "mg": "g-armor-mg"
+      }
+    },
+    {
+      "id": 344,
+      "modelNumber": "RX-79[G]",
+      "names": {
+        "ko": "육전형 건담(패러슈트 팩)",
+        "en": "Gundam Ground Type Parachute Pack",
+        "ja": "陸戦型ガンダム（パラシュート・パック仕様）"
+      },
+      "series": "08th-ms-team",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2645"
+      },
+      "sprites": {
+        "hg": "ground-gundam-parachute-hg"
+      }
+    },
+    {
+      "id": 345,
+      "modelNumber": "FXA-05D/RX-178",
+      "names": {
+        "ko": "슈퍼 건담",
+        "en": "Super Gundam",
+        "ja": "スーパーガンダム"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112070203000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/233",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/430"
+      },
+      "sprites": {
+        "sd": "super-gundam-sd",
+        "hg": "super-gundam-hg",
+        "mg": "super-gundam-mg"
+      }
+    },
+    {
+      "id": 346,
+      "modelNumber": "MSN-00100",
+      "names": {
+        "ko": "백식(메가 바주카 런처)",
+        "en": "Hyaku Shiki with Mega Bazooka Launcher",
+        "ja": "百式（メガ・バズーカ・ランチャー装備）"
+      },
+      "series": "zeta",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/821"
+      },
+      "sprites": {
+        "hg": "hyaku-shiki-mega-bazooka-hg"
+      }
+    },
+    {
+      "id": 347,
+      "modelNumber": "MSZ-010S",
+      "names": {
+        "ko": "강화형 ZZ 건담",
+        "en": "Enhanced ZZ Gundam",
+        "ja": "強化型ダブルゼータガンダム"
+      },
+      "series": "zz",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "verka"
+      ],
+      "gradeSources": {
+        "verka": "https://manual.bandai-hobby.net/menus/detail/2679"
+      },
+      "sprites": {
+        "verka": "enhanced-zz-verka"
+      }
+    },
+    {
+      "id": 348,
+      "modelNumber": "FA-010S",
+      "names": {
+        "ko": "풀아머 ZZ 건담",
+        "en": "Full Armor ZZ Gundam",
+        "ja": "フルアーマーZZガンダム"
+      },
+      "series": "zz",
+      "faction": "aeug",
+      "rarity": "legendary",
+      "grades": [
+        "sd",
+        "mg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4902425250540000&grp_id=5325",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/446",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/4556"
+      },
+      "sprites": {
+        "sd": "full-armor-zz-sd",
+        "mg": "full-armor-zz-mg",
+        "verka": "full-armor-zz-verka"
+      }
+    },
+    {
+      "id": 349,
+      "modelNumber": "RX-0[N]",
+      "names": {
+        "ko": "밴시 노른",
+        "en": "Unicorn Gundam 02 Banshee Norn (Destroy Mode)",
+        "ja": "バンシィ・ノルン（デストロイモード）"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4549660158578000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/397",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2250"
+      },
+      "sprites": {
+        "sd": "banshee-norn-destroy-sd",
+        "hg": "banshee-norn-destroy-hg",
+        "mg": "banshee-norn-destroy-mg"
+      }
+    },
+    {
+      "id": 350,
+      "modelNumber": "NZ-999",
+      "names": {
+        "ko": "네오 지옹",
+        "en": "Neo Zeong",
+        "ja": "ネオ・ジオング"
+      },
+      "series": "uc",
+      "faction": "neo_zeon",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg"
+      ],
+      "gradeSources": {
+        "sd": "https://www.bandaispirits.co.jp/products/search/detail.php?prd_id=4543112895059000&grp_id=5325",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/452"
+      },
+      "sprites": {
+        "sd": "neo-zeong-sd",
+        "hg": "neo-zeong-hg"
+      }
+    },
+    {
+      "id": 351,
+      "modelNumber": "NZ-666",
+      "names": {
+        "ko": "크샤트리아 리페어드",
+        "en": "Kshatriya Repaired",
+        "ja": "クシャトリヤ・リペアード"
+      },
+      "series": "uc",
+      "faction": "mineva_faction",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/451"
+      },
+      "sprites": {
+        "hg": "kshatriya-repaired-hg"
+      }
+    },
+    {
+      "id": 352,
+      "modelNumber": "RGM-96X",
+      "names": {
+        "ko": "제스타 캐논",
+        "en": "Jesta Cannon",
+        "ja": "ジェスタ・キャノン"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/438",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2278"
+      },
+      "sprites": {
+        "hg": "jesta-cannon-hg",
+        "mg": "jesta-cannon-mg"
+      }
+    },
+    {
+      "id": 353,
+      "modelNumber": "RGM-89S",
+      "names": {
+        "ko": "스타크 제간",
+        "en": "Stark Jegan",
+        "ja": "スタークジェガン"
+      },
+      "series": "uc",
+      "faction": "londo_bell",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/921",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2476"
+      },
+      "sprites": {
+        "hg": "stark-jegan-hg",
+        "mg": "stark-jegan-mg"
+      }
+    },
+    {
+      "id": 354,
+      "modelNumber": "RGZ-95C",
+      "names": {
+        "ko": "리젤 C형(디펜서 유닛)",
+        "en": "ReZEL Type C Defenser Unit",
+        "ja": "リゼルC型（ディフェンサー・ユニット）"
+      },
+      "series": "uc",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/370",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/607"
+      },
+      "sprites": {
+        "hg": "rezel-c-defenser-hg",
+        "mg": "rezel-c-defenser-mg"
+      }
+    },
+    {
+      "id": 355,
+      "modelNumber": "NZ-999",
+      "names": {
+        "ko": "II 네오 지옹",
+        "en": "II Neo Zeong",
+        "ja": "IIネオ・ジオング"
+      },
+      "series": "narrative",
+      "faction": "neo_zeon",
+      "rarity": "legendary",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2537"
+      },
+      "sprites": {
+        "hg": "ii-neo-zeong-hg"
+      }
+    },
+    {
+      "id": 356,
+      "modelNumber": "RGM-96X",
+      "names": {
+        "ko": "제스타(셰자르대 B·C반 사양)",
+        "en": "Jesta Shezarr Team B and C",
+        "ja": "ジェスタ（シェザール隊仕様 B＆C班装備）"
+      },
+      "series": "narrative",
+      "faction": "efsf",
+      "rarity": "uncommon",
+      "grades": [
+        "hg",
+        "mg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2662",
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2538"
+      },
+      "sprites": {
+        "hg": "jesta-shezarr-bc-hg",
+        "mg": "jesta-shezarr-bc-mg"
+      }
+    },
+    {
+      "id": 357,
+      "modelNumber": "FA-93HWS",
+      "names": {
+        "ko": "뉴 건담 HWS",
+        "en": "Nu Gundam Heavy Weapon System",
+        "ja": "νガンダム（ヘビー・ウエポン・システム装備型）"
+      },
+      "series": "cca-msv",
+      "faction": "londo_bell",
+      "rarity": "rare",
+      "grades": [
+        "sd",
+        "hg",
+        "rg",
+        "verka"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/b209/p/bb209_m0001.JPG",
+        "hg": "https://manual.bandai-hobby.net/menus/detail/404",
+        "rg": "https://manual.bandai-hobby.net/menus/detail/2777",
+        "verka": "https://manual.bandai-hobby.net/menus/detail/2809"
+      },
+      "sprites": {
+        "sd": "nu-gundam-hws-sd",
+        "hg": "nu-gundam-hws-hg",
+        "rg": "nu-gundam-hws-rg",
+        "verka": "nu-gundam-hws-verka"
+      }
+    },
+    {
+      "id": 358,
+      "modelNumber": "RX-93",
+      "names": {
+        "ko": "뉴 건담(더블 핀 판넬 장비형)",
+        "en": "Nu Gundam Double Fin Funnel Type",
+        "ja": "νガンダム（ダブル・フィン・ファンネル装備型）"
+      },
+      "series": "cca-msv",
+      "faction": "londo_bell",
+      "rarity": "rare",
+      "grades": [
+        "rg"
+      ],
+      "gradeSources": {
+        "rg": "https://manual.bandai-hobby.net/menus/detail/4314"
+      },
+      "sprites": {
+        "rg": "nu-gundam-double-fin-funnel-rg"
+      }
+    },
+    {
+      "id": 359,
+      "modelNumber": "FA-78-2",
+      "names": {
+        "ko": "헤비 건담",
+        "en": "Heavy Gundam",
+        "ja": "ヘビーガンダム"
+      },
+      "series": "msv-z-msv",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "mg"
+      ],
+      "gradeSources": {
+        "mg": "https://p-bandai.jp/hobby/special-1000004925/"
+      },
+      "sprites": {
+        "mg": "heavy-gundam-mg"
+      }
+    },
+    {
+      "id": 360,
+      "modelNumber": "FA-178",
+      "names": {
+        "ko": "풀아머 건담 Mk-II",
+        "en": "Full Armor Gundam Mk-II",
+        "ja": "フルアーマーガンダムMk-II"
+      },
+      "series": "msv-z-msv",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "sd"
+      ],
+      "gradeSources": {
+        "sd": "https://www.dalong.net/reviews/sd/g07/p/g07_m0001.jpg"
+      },
+      "sprites": {
+        "sd": "full-armor-gundam-mk-ii-sd"
+      }
+    },
+    {
+      "id": 361,
+      "modelNumber": "MSR-00100S",
+      "names": {
+        "ko": "백식 改",
+        "en": "Hyaku Shiki Kai",
+        "ja": "百式改"
+      },
+      "series": "msv-z-msv",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "mg"
+      ],
+      "gradeSources": {
+        "mg": "https://manual.bandai-hobby.net/menus/detail/2796"
+      },
+      "sprites": {
+        "mg": "hyaku-shiki-kai-mg"
+      }
+    },
+    {
+      "id": 362,
+      "modelNumber": "MSZ-006",
+      "names": {
+        "ko": "제타 건담(웨이브 슈터)",
+        "en": "Zeta Gundam Wave Shooter",
+        "ja": "ゼータガンダム（ウェイブシューター）"
+      },
+      "series": "msv-z-msv",
+      "faction": "aeug",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/2618"
+      },
+      "sprites": {
+        "hg": "zeta-wave-shooter-hg"
+      }
+    },
+    {
+      "id": 363,
+      "modelNumber": "RX-78GP02A",
+      "names": {
+        "ko": "GP02A(MLRS 사양)",
+        "en": "Gundam GP02A MLRS",
+        "ja": "ガンダムGP02A（MLRS仕様）"
+      },
+      "series": "bonds-of-the-battlefield",
+      "faction": "efsf",
+      "rarity": "rare",
+      "grades": [
+        "hg"
+      ],
+      "gradeSources": {
+        "hg": "https://manual.bandai-hobby.net/menus/detail/260"
+      },
+      "sprites": {
+        "hg": "gp02a-mlrs-hg"
+      }
     }
   ]
 }

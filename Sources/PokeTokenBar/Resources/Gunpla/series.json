@@ -224,6 +224,33 @@
         "ja": "劇場版 機動戦士ガンダム00 -A wakening of the Trailblazer-"
       },
       "order": 24
+    },
+    {
+      "id": "cca-msv",
+      "names": {
+        "ko": "역습의 샤아 MSV",
+        "en": "Char’s Counterattack MSV",
+        "ja": "CCA-MSV"
+      },
+      "order": 41
+    },
+    {
+      "id": "msv-z-msv",
+      "names": {
+        "ko": "MSV · Z-MSV",
+        "en": "MSV / Z-MSV",
+        "ja": "MSV・Ζ-MSV"
+      },
+      "order": 42
+    },
+    {
+      "id": "bonds-of-the-battlefield",
+      "names": {
+        "ko": "전장의 인연",
+        "en": "Bonds of the Battlefield",
+        "ja": "戦場の絆"
+      },
+      "order": 43
     }
   ]
 }

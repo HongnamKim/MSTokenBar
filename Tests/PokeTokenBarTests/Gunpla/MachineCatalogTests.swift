@@ -85,12 +85,12 @@ final class MachineCatalogTests: XCTestCase {
 
     func test_bundledCatalogLoadsAndIsValid() throws {
         let c = try MachineCatalog.bundled()
-        XCTAssertEqual(c.machines.count, 243)
+        XCTAssertEqual(c.machines.count, 264)
         XCTAssertFalse(c.machines.filter { $0.variantOf != nil }.isEmpty)
         XCTAssertEqual(c.machine(id: 3)?.isVariant, true)
         XCTAssertEqual(c.machine(speciesID: GunplaID.encode(machineID: 1, grade: .pg))?.id, 1)
         XCTAssertNil(c.machine(speciesID: 25))
-        XCTAssertEqual(c.series.count, 25)
+        XCTAssertEqual(c.series.count, 28)
     }
 
     func test_fullArmorUnicornModesFollowTheReleasedFrameColors() throws {
@@ -194,14 +194,18 @@ final class MachineCatalogTests: XCTestCase {
         let catalog = try MachineCatalog.bundled()
         let bandaiHosts: Set<String> = ["manual.bandai-hobby.net", "bandai-hobby.net",
                                         "www.bandaispirits.co.jp", "www.bandainamco.co.jp", "p-bandai.jp"]
-        let counts = ["first": 16, "08th-ms-team": 6, "0080": 10, "0083": 12,
+        let counts = ["first": 17, "08th-ms-team": 7, "0080": 10, "0083": 12,
                       "the-origin": 7, "thunderbolt": 6, "cucuruz-doans-island": 7,
-                      "zeta": 13, "zz": 10, "cca": 8, "beltorchika-children": 2, "uc": 14,
-                      "narrative": 5, "hathaway": 6, "f91": 4, "victory": 4,
+                      "zeta": 15, "zz": 12, "cca": 8, "beltorchika-children": 2, "uc": 20,
+                      "narrative": 7, "hathaway": 6, "f91": 4, "victory": 4,
                       "g-gundam": 9, "gundam-wing": 15, "endless-waltz": 6, "after-war-x": 7, "turn-a-gundam": 2,
-                      "gundam-seed": 14, "gundam-seed-destiny": 15, "gundam-00": 23, "gundam-00-movie": 5]
+                      "gundam-seed": 14, "gundam-seed-destiny": 15, "gundam-00": 23, "gundam-00-movie": 5,
+                      "cca-msv": 2, "msv-z-msv": 4, "bonds-of-the-battlefield": 1]
         // These vintage kits are documented by their original Bandai instruction booklets.
         let printedManuals = [
+            "full-armor-gundam-mk-ii-sd": "https://www.dalong.net/reviews/sd/g07/p/g07_m0001.jpg",
+            "g-armor-sd": "https://www.dalong.net/reviews/sd/g20/p/g20_m0001.jpg",
+            "nu-gundam-hws-sd": "https://www.dalong.net/reviews/sd/b209/p/bb209_m0001.JPG",
             "gundam-f91-sd": "https://www.dalong.net/reviews/sd/g21/p/g21_m0001.jpg",
             "wing-gundam-tv-sd": "https://www.dalong.net/reviews/sd/g34/p/g34_m0001.JPG",
             "victory-gundam-sd": "https://www.dalong.net/reviews/sd/g23/p/g23_m0001.JPG",

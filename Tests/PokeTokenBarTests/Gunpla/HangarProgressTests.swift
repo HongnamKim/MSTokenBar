@@ -17,9 +17,9 @@ final class HangarProgressTests: XCTestCase {
     }
 
     func test_seriesCompletionCountsReleasedCellsOnly() throws {
-        // 13 base machines with 42 released grades (RX-78-2 has Ver.Ka); 3 variants (Char's Zaku II, Gelgoog, Z'Gok) with 12.
+        // 14 base machines with 45 released grades (RX-78-2 has Ver.Ka); 3 variants (Char's Zaku II, Gelgoog, Z'Gok) with 12.
         let empty = try XCTUnwrap(completion("first", []))
-        XCTAssertEqual(empty.totalCells, 42)
+        XCTAssertEqual(empty.totalCells, 45)
         XCTAssertEqual(empty.variantTotalCells, 12)
         XCTAssertEqual(empty.ownedCells, 0)
         XCTAssertEqual(empty.variantOwnedCells, 0)
@@ -35,16 +35,16 @@ final class HangarProgressTests: XCTestCase {
     }
 
     /// The series list counts machines, so several grades of one machine are one. Dom, Z'Gok and Acguy in
-    /// every released grade fill 10 of the 42 cells but are 3 of the 13 machines the grid shows.
+    /// every released grade fill 10 of the 45 cells but are 3 of the 14 machines the grid shows.
     func test_builtMachinesCountAMachineOnceHoweverManyGrades() throws {
         let empty = try XCTUnwrap(completion("first", []))
         XCTAssertEqual(empty.builtMachines, 0)
-        XCTAssertEqual(empty.totalMachines, 13)
+        XCTAssertEqual(empty.totalMachines, 14)
 
         let first = try XCTUnwrap(completion("first", [cell(16), cell(19), cell(21)]))
         XCTAssertEqual(first.ownedCells, 10)
         XCTAssertEqual(first.builtMachines, 3)
-        XCTAssertEqual(first.totalMachines, 13)
+        XCTAssertEqual(first.totalMachines, 14)
     }
 
     /// 전용기 keep their own tally: building one adds no machine to the series count.
@@ -58,7 +58,7 @@ final class HangarProgressTests: XCTestCase {
     func test_builtMachinesCountEachModeOnItsOwn() throws {
         let uc = try XCTUnwrap(completion("uc", [cell(11, [.hg, .rg]), cell(100, [.hg])]))
         XCTAssertEqual(uc.builtMachines, 2)
-        XCTAssertEqual(uc.totalMachines, 19)
+        XCTAssertEqual(uc.totalMachines, 25)
     }
 
     func test_completionsFollowCatalogSeriesOrder() {
@@ -66,7 +66,7 @@ final class HangarProgressTests: XCTestCase {
                        ["first", "08th-ms-team", "0080", "0083", "the-origin", "thunderbolt", "cucuruz-doans-island",
                         "zeta", "zz", "cca", "beltorchika-children", "uc", "narrative", "hathaway", "f91", "victory",
                         "g-gundam", "gundam-wing", "endless-waltz", "after-war-x", "turn-a-gundam", "gundam-seed", "gundam-seed-destiny",
-                        "gundam-00", "gundam-00-movie"])
+                        "gundam-00", "gundam-00-movie", "cca-msv", "msv-z-msv", "bonds-of-the-battlefield"])
     }
 
     func test_unicornModesShareOneHangarEntryAndKeepIndependentGrades() throws {
@@ -129,7 +129,8 @@ final class HangarProgressTests: XCTestCase {
                                 .series("narrative"), .series("hathaway"), .series("f91"), .series("victory"),
                                 .series("g-gundam"), .series("gundam-wing"), .series("endless-waltz"),
                                 .series("after-war-x"), .series("turn-a-gundam"), .series("gundam-seed"), .series("gundam-seed-destiny"),
-                                .series("gundam-00"), .series("gundam-00-movie"), .all, .allVariant])
+                                .series("gundam-00"), .series("gundam-00-movie"), .series("cca-msv"), .series("msv-z-msv"),
+                                .series("bonds-of-the-battlefield"), .all, .allVariant])
 
         let baseOnly = catalog.machines.filter { !$0.isVariant }.map { cell($0.id) }
         let baseBadges = HangarProgress.earnedBadges(HangarProgress.completions(owned: baseOnly, catalog: catalog))
